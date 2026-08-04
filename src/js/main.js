@@ -21,12 +21,12 @@ const heroSettings = {
 const CAMERA_SHOTS = [
 	{ target: 'overview', zoom: 1, xOffset: 0, yOffset: 0 },     // 1. Full overview
 	{ target: 1, zoom: 3, xOffset: -30, yOffset: 10 },        // 2. Building 1
-	{ target: 2, zoom: 2.2, xOffset: 10, yOffset: 180 },         // 3. Building 2
-	{ target: 3, zoom: 2.6, xOffset: -10, yOffset: -10 },     // 4. Building 3 balcony
-	{ target: 3, zoom: 2.2, xOffset: -100, yOffset: 200 },       // 5. Building 3 storefront
-	{ target: 4, zoom: 2.2, xOffset: 0, yOffset: 180 },          // 6. Building 4
-	{ target: 5, zoom: 2.2, xOffset: 0, yOffset: 180 },          // 7. Building 5
-	{ target: 6, zoom: 2.2, xOffset: 0, yOffset: 180 },          // 8. Building 6
+	{ target: 2, zoom: 2.8, xOffset: 10, yOffset: 10 },         // 3. Building 2
+	{ target: 3, zoom: 2.8, xOffset: -10, yOffset: 110 },     // 4. Building 3 balcony
+	{ target: 3, zoom: 2.8, xOffset: -10, yOffset: 10 },       // 5. Building 3 storefront
+	{ target: 4, zoom: 2.8, xOffset: 10, yOffset: 10 },          // 6. Building 4
+	{ target: 5, zoom: 3, xOffset: 20, yOffset: 10 },          // 7. Building 5
+	{ target: 6, zoom: 3, xOffset: 10, yOffset: 10 },          // 8. Building 6
 	{ target: 'overview', zoom: 1, xOffset: 0, yOffset: 0 },     // 9. Full overview
 ];
 
