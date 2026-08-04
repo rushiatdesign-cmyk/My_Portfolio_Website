@@ -40,15 +40,17 @@ body {
 }
 
 .scene__layer {
-	z-index: 2;
+	z-index: 0;
 	max-width: 100%;
     max-height: 100%;
-	transition: transform 260ms ease;
+    transform: translate(-50%, calc(-50% + 10px)); /*this makes the top floors positon wherever I want */
+
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
 	will-change: transform; /* Adjust the margin-bottom value as needed */
 }
 
 .scene__layer.is-active {
-	transform: translate(-50%, calc(-50% - 18px));
+  transform: translate(-50%, calc(-50% - 5px));
 }
 
 .hotspot {
