@@ -19,15 +19,15 @@ const heroSettings = {
 };
 
 const CAMERA_SHOTS = [
-	{ target: 'overview', zoom: 1, yOffset: 0 },     // 1. Full overview
-	{ target: 1, zoom: 2.2, yOffset: 180 },          // 2. Building 1
-	{ target: 2, zoom: 2.2, yOffset: 180 },          // 3. Building 2
-	{ target: 3, zoom: 2.6, yOffset: -120 },         // 4. Building 3 balcony
-	{ target: 3, zoom: 2.2, yOffset: 180 },          // 5. Building 3 storefront
-	{ target: 4, zoom: 2.2, yOffset: 180 },          // 6. Building 4
-	{ target: 5, zoom: 2.2, yOffset: 180 },          // 7. Building 5
-	{ target: 6, zoom: 2.2, yOffset: 180 },          // 8. Building 6
-	{ target: 'overview', zoom: 1, yOffset: 0 },     // 9. Full overview
+	{ target: 'overview', zoom: 1, xOffset: 0, yOffset: 0 },     // 1. Full overview
+	{ target: 1, zoom: 3, xOffset: -30, yOffset: 10 },        // 2. Building 1
+	{ target: 2, zoom: 2.2, xOffset: 10, yOffset: 180 },         // 3. Building 2
+	{ target: 3, zoom: 2.6, xOffset: -10, yOffset: -10 },     // 4. Building 3 balcony
+	{ target: 3, zoom: 2.2, xOffset: -100, yOffset: 200 },       // 5. Building 3 storefront
+	{ target: 4, zoom: 2.2, xOffset: 0, yOffset: 180 },          // 6. Building 4
+	{ target: 5, zoom: 2.2, xOffset: 0, yOffset: 180 },          // 7. Building 5
+	{ target: 6, zoom: 2.2, xOffset: 0, yOffset: 180 },          // 8. Building 6
+	{ target: 'overview', zoom: 1, xOffset: 0, yOffset: 0 },     // 9. Full overview
 ];
 
 const HOTSPOT_SELECTOR = '.hotspot';
@@ -90,13 +90,21 @@ function deactivateLayer(targetId) {
 
 function getShotPosition(shot, sceneNode) {
 	if (shot.target === 'overview') {
-		return { x: 0, y: 0, scale: shot.zoom ?? 1 };
+		return {
+			x: shot.xOffset ?? 0,
+			y: shot.yOffset ?? 0,
+			scale: shot.zoom ?? 1,
+		};
 	}
 
 	const hotspot = document.querySelector(`.hotspot[data-target="building-${shot.target}"]`);
 
 	if (!hotspot) {
-		return { x: 0, y: 0, scale: 1 };
+		return {
+			x: shot.xOffset ?? 0,
+			y: shot.yOffset ?? 0,
+			scale: shot.zoom ?? 1,
+		};
 	}
 
 	const left = parseFloat(hotspot.dataset.left || '0');
@@ -112,9 +120,9 @@ function getShotPosition(shot, sceneNode) {
 	const targetY = sceneHeight * (centerY / 100);
 
 	return {
-		x: sceneWidth / 2 - targetX,
-		y: sceneHeight / 2 - targetY + shot.yOffset,
-		scale: shot.zoom,
+		x: sceneWidth / 2 - targetX + (shot.xOffset ?? 0),
+		y: sceneHeight / 2 - targetY + (shot.yOffset ?? 0),
+		scale: shot.zoom ?? 1,
 	};
 }
 
@@ -307,7 +315,7 @@ function initHeroSection() {
 
 	window.__heroScrollScene = scrollScene;
 }
-
+1
 window.addEventListener('DOMContentLoaded', () => {
 	initHotspots();
 	initHeroSection();
