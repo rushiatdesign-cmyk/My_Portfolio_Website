@@ -72,7 +72,7 @@ body {
 	top: var(--top, 0%);
 	width: var(--width, 0%);
 	height: var(--height, 0%);
-	z-index: 3;
+	z-index: 999;
 	border: 0;
 	background: transparent;
 	cursor: pointer;
@@ -83,3 +83,60 @@ body {
 	outline-offset: 2px;
 }
 
+/* Shop button styles */
+/* Custom font */
+@font-face {
+    font-family: "Thane";
+    src: url("../Fonts/thane.ttf") format("truetype");
+}
+
+/* Shop button */
+.shop-btn {
+    position: absolute;
+    z-index: 1000;
+
+    left: var(--left);
+    top: var(--top);
+
+    transform: translate(-50%, -50%);
+
+    font-family: "Thane", sans-serif;
+    font-size: clamp(8px, 1.2vw, 20px);
+
+    color: #d32a2a;
+    text-decoration: none;
+
+    padding: 8px 18px;
+	
+}
+
+/* Button positions */
+.shop-btn-1 {
+    --left: 14%;
+    --top: 54.3%;
+}
+
+.shop-btn-2 {
+    --left: 26%;
+    --top: 54.4%;
+}
+
+.shop-btn-3 {
+    --left: 40%;
+    --top: 54.5%;
+}
+
+.shop-btn-4 {
+    --left: 51%;
+    --top: 54.6%;
+}
+
+.shop-btn-5 {
+    --left: 61.5%;
+    --top: 55.2%;
+}
+
+.shop-btn-6 {
+    --left: 75.6%;
+    --top: 56%;
+}

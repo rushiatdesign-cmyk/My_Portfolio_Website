@@ -20,7 +20,7 @@ const heroSettings = {
 
 const CAMERA_SHOTS = [
 	{ target: 'overview', zoom: 1, xOffset: 0, yOffset: 0 },     // 1. Full overview
-	{ target: 1, zoom: 3, xOffset: -30, yOffset: 10 },        // 2. Building 1
+	{ target: 1, zoom: 3, xOffset: -40, yOffset: 10 },        // 2. Building 1
 	{ target: 2, zoom: 2.8, xOffset: 10, yOffset: 10 },         // 3. Building 2
 	{ target: 3, zoom: 2.8, xOffset: -10, yOffset: 110 },     // 4. Building 3 balcony
 	{ target: 3, zoom: 2.8, xOffset: -10, yOffset: 10 },       // 5. Building 3 storefront
