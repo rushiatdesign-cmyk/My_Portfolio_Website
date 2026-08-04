@@ -22,6 +22,21 @@ body {
 	overflow: hidden;
 }
 
+.camera {
+	position: absolute;
+	inset: 0;
+	transform-origin: center center;
+	will-change: transform;
+}
+
+.scene__track {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	will-change: transform;
+}
+
 .scene__ground,
 .scene__layer {
 	position: absolute;
@@ -29,28 +44,26 @@ body {
 	top: 50%;
 	transform: translate(-50%, -50%);
 	pointer-events: none;
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
 }
 
 .scene__ground {
 	width: auto;
 	height: auto;
-	max-width: 100%;
-	max-height: 100%;
 	z-index: 1;
 }
 
 .scene__layer {
 	z-index: 0;
-	max-width: 100%;
-    max-height: 100%;
-    transform: translate(-50%, calc(-50% + 10px)); /*this makes the top floors positon wherever I want */
-
-  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
-	will-change: transform; /* Adjust the margin-bottom value as needed */
+	transform: translate(-50%, calc(-50% + 10px));
+	transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+	will-change: transform;
 }
 
 .scene__layer.is-active {
-  transform: translate(-50%, calc(-50% - 5px));
+  transform: translate(-50%, calc(-50% - 2px));
 }
 
 .hotspot {
@@ -69,3 +82,4 @@ body {
 	outline: 2px solid #000;
 	outline-offset: 2px;
 }
+

@@ -28,54 +28,44 @@ const layers = [
 		<title>Portfolio Hero</title>
 	</head>
 	<body>
-		<main class="hero">
-			<div class="scene">
-				<img class="scene__ground" src={buildingsGround.src} alt="Ground background" />
+		<main id="hero" class="hero">
+			<div id="hero-scene" class="scene">
 
-				<img id="building-1" class="scene__layer" src={building1Top.src} alt="Building 1" aria-hidden="true" />
-				<img id="building-2" class="scene__layer" src={building2Top.src} alt="Building 2" aria-hidden="true" />
-				<img id="building-3" class="scene__layer" src={building3Top.src} alt="Building 3" aria-hidden="true" />
-				<img id="building-4" class="scene__layer" src={building4Top.src} alt="Building 4" aria-hidden="true" />
-				<img id="building-5" class="scene__layer" src={building5Top.src} alt="Building 5" aria-hidden="true" />
-				<img id="building-6" class="scene__layer" src={building6Top.src} alt="Building 6" aria-hidden="true" />
+    <div id="hero-camera" class="camera">
 
-				<button class="hotspot" type="button" data-target="building-1" data-left="6" data-top="50" data-width="14" data-height="24"></button>
+        <div id="hero-scene-track" class="scene__track">
+
+            <img id="hero-ground"
+                class="scene__ground"
+                src={buildingsGround.src}
+                alt="Ground background" />
+
+            <img id="building-1" class="scene__layer" src={building1Top.src} />
+            <img id="building-2" class="scene__layer" src={building2Top.src} />
+            <img id="building-3" class="scene__layer" src={building3Top.src} />
+            <img id="building-4" class="scene__layer" src={building4Top.src} />
+            <img id="building-5" class="scene__layer" src={building5Top.src} />
+            <img id="building-6" class="scene__layer" src={building6Top.src} />
+
+        </div>
+		
+		<button class="hotspot" type="button" data-target="building-1" data-left="6" data-top="50" data-width="14" data-height="24"></button>
 				<button class="hotspot" type="button" data-target="building-2" data-left="20" data-top="50" data-width="12" data-height="24"></button>
 				<button class="hotspot" type="button" data-target="building-3" data-left="34" data-top="49" data-width="12" data-height="24"></button>
 				<button class="hotspot" type="button" data-target="building-4" data-left="46" data-top="49" data-width="12" data-height="24"></button>
 				<button class="hotspot" type="button" data-target="building-5" data-left="58" data-top="52" data-width="11" data-height="24"></button>
 				<button class="hotspot" type="button" data-target="building-6" data-left="68" data-top="52" data-width="16" data-height="24"></button>
-			</div>
+
+    </div>
+
+    <!-- Keep ALL hotspots exactly here -->
+
+</div>
+
+				
+			
 		</main>
 
-		<script>
-			const hotspots = Array.from(document.querySelectorAll<HTMLButtonElement>('.hotspot'));
-
-			hotspots.forEach((hotspot) => {
-				const targetId = hotspot.dataset.target;
-				const left = hotspot.dataset.left;
-				const top = hotspot.dataset.top;
-				const width = hotspot.dataset.width;
-				const height = hotspot.dataset.height;
-
-				hotspot.style.setProperty('--left', `${left}%`);
-				hotspot.style.setProperty('--top', `${top}%`);
-				hotspot.style.setProperty('--width', `${width}%`);
-				hotspot.style.setProperty('--height', `${height}%`);
-
-				if (!targetId) return;
-
-				const target = document.getElementById(targetId);
-				if (!(target instanceof HTMLImageElement)) return;
-
-				const activate = () => target.classList.add('is-active');
-				const deactivate = () => target.classList.remove('is-active');
-
-				hotspot.addEventListener('mouseenter', activate);
-				hotspot.addEventListener('mouseleave', deactivate);
-				hotspot.addEventListener('focus', activate);
-				hotspot.addEventListener('blur', deactivate);
-			});
-		</script>
+		<script type="module" src="/src/js/main.js"></script>
 	</body>
 </html>
