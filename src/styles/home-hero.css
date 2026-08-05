@@ -37,6 +37,13 @@ body {
 	will-change: transform;
 }
 
+.hotspot-layer {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 3;
+}
+
 .scene__ground,
 .scene__layer {
 	position: absolute;
@@ -72,10 +79,17 @@ body {
 	top: var(--top, 0%);
 	width: var(--width, 0%);
 	height: var(--height, 0%);
-	z-index: 999;
-	border: 0;
-	background: transparent;
-	cursor: pointer;
+	pointer-events: auto;
+	z-index: 4;
+}
+
+.hotspot-trigger{
+    position:absolute;
+    inset:0;
+
+    border:0;
+    background:transparent;
+    cursor:pointer;
 }
 
 .hotspot:focus-visible {
@@ -91,52 +105,24 @@ body {
 }
 
 /* Shop button */
-.shop-btn {
-    position: absolute;
-    z-index: 1000;
+.shop-btn{
+    position:absolute;
 
-    left: var(--left);
-    top: var(--top);
+    left:50%;
+    top:20px;
 
-    transform: translate(-50%, -50%);
+    transform:translateX(-50%);
 
-    font-family: "Thane", sans-serif;
-    font-size: clamp(8px, 1.2vw, 20px);
+    white-space:nowrap;
 
-    color: #d32a2a;
-    text-decoration: none;
+    font-family:"Thane", sans-serif;
+    font-size:12px;
 
-    padding: 8px 18px;
-	
+    color:#d32a2a;
+    text-decoration:none;
+
+    pointer-events:auto;
 }
 
-/* Button positions */
-.shop-btn-1 {
-    --left: 14%;
-    --top: 54.3%;
-}
 
-.shop-btn-2 {
-    --left: 26%;
-    --top: 54.4%;
-}
 
-.shop-btn-3 {
-    --left: 40%;
-    --top: 54.5%;
-}
-
-.shop-btn-4 {
-    --left: 51%;
-    --top: 54.6%;
-}
-
-.shop-btn-5 {
-    --left: 61.5%;
-    --top: 55.2%;
-}
-
-.shop-btn-6 {
-    --left: 75.6%;
-    --top: 56%;
-}
