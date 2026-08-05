@@ -40,6 +40,7 @@ const layers = [
                 src={buildingsGround.src}
                 alt="Ground background" />
 
+			<div class="scene__stage">
             <img id="building-1" class="scene__layer" src={building1Top.src} />
             <img id="building-2" class="scene__layer" src={building2Top.src} />
             <img id="building-3" class="scene__layer" src={building3Top.src} />
@@ -48,84 +49,40 @@ const layers = [
             <img id="building-6" class="scene__layer" src={building6Top.src} />
 
             <div class="hotspot-layer">
-                <div
-                    class="hotspot"
-                    data-target="building-1"
-                    data-shop="building1"
-                    data-left="6"
-                    data-top="50"
-                    data-width="14"
-                    data-height="24">
+                <div class="hotspot" 
+				data-target="building-1" 
+				data-shop="building1" 
+				data-left="6" 
+				data-top="50" 
+				data-width="14" 
+				data-height="24">
+				
+	<a class="hotspot-trigger" href="/bakery" aria-label="Bakery"></a>
+</div>
 
-                    <button class="hotspot-trigger" type="button"></button>
-                    <a class="shop-btn" href="/bakery">Bakery</a>
-                </div>
+<div class="hotspot" data-target="building-2" data-shop="building2" data-left="20" data-top="50" data-width="12" data-height="24">
+	<a class="hotspot-trigger" href="/bakery" aria-label="Bakery"></a>
+</div>
 
-                <div
-                    class="hotspot"
-                    data-target="building-2"
-                    data-shop="building2"
-                    data-left="20"
-                    data-top="50"
-                    data-width="12"
-                    data-height="24">
+<div class="hotspot" data-target="building-3" data-shop="building3" data-left="34" data-top="49" data-width="12" data-height="24">
+	<a class="hotspot-trigger" href="/bakery" aria-label="Bakery"></a>
+</div>
 
-                    <button class="hotspot-trigger" type="button"></button>
-                    <a class="shop-btn" href="/bakery">Bakery</a>
-                </div>
+<div class="hotspot" data-target="building-4" data-shop="building4" data-left="46" data-top="49" data-width="12" data-height="24">
+	<a class="hotspot-trigger" href="/bakery" aria-label="Bakery"></a>
+</div>
 
-                <div
-                    class="hotspot"
-                    data-target="building-3"
-                    data-shop="building3"
-                    data-left="34"
-                    data-top="49"
-                    data-width="12"
-                    data-height="24" style="margin-top: 10px;">
+<div class="hotspot" data-target="building-5" data-shop="building5" data-left="58" data-top="52" data-width="11" data-height="24">
+	<a class="hotspot-trigger" href="/bakery" aria-label="Bakery"></a>
+</div>
 
-                    <button class="hotspot-trigger" type="button"></button>
-                    <a class="shop-btn" href="/bakery">Gallery</a>
-                </div>
+<div class="hotspot" data-target="building-6" data-shop="building6" data-left="68" data-top="52" data-width="16" data-height="24">
+	<a class="hotspot-trigger" href="/bakery" aria-label="Bakery"></a>
+</div>
 
-                <div
-                    class="hotspot"
-                    data-target="building-4"
-                    data-shop="building4"
-                    data-left="46"
-                    data-top="49"
-                    data-width="12"
-                    data-height="24">
-
-                    <button class="hotspot-trigger" type="button"></button>
-                    <a class="shop-btn" href="/bakery">Bakery</a>
-                </div>
-
-                <div
-                    class="hotspot"
-                    data-target="building-5"
-                    data-shop="building5"
-                    data-left="58"
-                    data-top="52"
-                    data-width="11"
-                    data-height="24">
-
-                    <button class="hotspot-trigger" type="button"></button>
-                    <a class="shop-btn" href="/bakery">Bakery</a>
-                </div>
-
-                <div
-                    class="hotspot"
-                    data-target="building-6"
-                    data-shop="building6"
-                    data-left="68"
-                    data-top="52"
-                    data-width="16"
-                    data-height="24">
-
-                    <button class="hotspot-trigger" type="button"></button>
-                    <a class="shop-btn" href="/bakery">Bakery</a>
-                </div>
             </div>
+
+			</div>
         </div>
 		
 		
