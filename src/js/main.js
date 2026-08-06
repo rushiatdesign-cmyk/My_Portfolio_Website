@@ -1,6 +1,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { initModals } from './modal.js';
 
 const HERO_IDS = {
 	ROOT: 'hero',
@@ -315,8 +316,9 @@ function initHeroSection() {
 
 	window.__heroScrollScene = scrollScene;
 }
-1
+
 window.addEventListener('DOMContentLoaded', () => {
 	initHotspots();
 	initHeroSection();
+	initModals();
 });

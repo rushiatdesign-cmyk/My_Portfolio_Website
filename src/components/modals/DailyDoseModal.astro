@@ -1,0 +1,110 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import "../../styles/modal-shell.css";
+import "../../styles/daily-dose.css";
+
+const entries = await getCollection('daily-dose');
+
+const grouped = entries.reduce<Record<string, CollectionEntry<'daily-dose'>[]>>(
+	(acc, entry) => {
+		const cat = entry.data.category;
+
+		if (!acc[cat]) acc[cat] = [];
+
+		acc[cat].push(entry);
+
+		return acc;
+	},
+	{}
+);
+
+Object.values(grouped).forEach((group) => {
+	group.sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+});
+---
+
+<div class="modal-window daily-dose-window">
+
+	<header class="modal-header">
+
+		<div class="modal-title">
+
+			<h2>Daily Dose</h2>
+
+			<p>
+				A collection of thoughts, articles and resources.
+			</p>
+
+		</div>
+
+		<button
+			class="modal-close"
+			type="button"
+			data-close-modal
+			aria-label="Close"
+		>
+			×
+		</button>
+
+	</header>
+
+	<div class="modal-body daily-dose-content">
+
+		{Object.entries(grouped).map(([category, items]) => (
+
+			<section class="daily-dose-section">
+
+				<h3>{category}</h3>
+
+				<div class="daily-dose-grid">
+
+					{items.map((item) => (
+
+						<article class="daily-dose-card">
+
+							<div class="daily-dose-image">
+
+								<img
+									src={item.data.image}
+									alt={item.data.title}
+								/>
+
+							</div>
+
+							<div class="daily-dose-card-content">
+
+								<p class="daily-dose-meta">
+
+									{item.data.meta}
+
+								</p>
+
+								<h4>
+
+									{item.data.title}
+
+								</h4>
+
+							</div>
+
+						</article>
+
+					))}
+
+				</div>
+
+			</section>
+
+		))}
+
+	</div>
+
+	<footer class="modal-footer">
+
+		<p>
+			Daily Dose Archive
+		</p>
+
+	</footer>
+
+</div>

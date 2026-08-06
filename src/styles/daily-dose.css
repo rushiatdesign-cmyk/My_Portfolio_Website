@@ -1,0 +1,187 @@
+/* ======================================
+   DAILY DOSE THEME
+====================================== */
+
+
+/* Main poster */
+
+.daily-dose-window{
+
+    background:#76A67D;
+
+}
+
+
+/* Header */
+
+.daily-dose-header{
+
+    background:#76A67D;
+
+}
+
+
+/* Footer */
+
+.daily-dose-footer{
+
+    background:#76A67D;
+
+}
+
+
+/* Scrollbar */
+
+.daily-dose-content::-webkit-scrollbar-track{
+
+    background:#5D8C64;
+
+}
+
+.daily-dose-content::-webkit-scrollbar-thumb{
+
+    background:#F4D6CB;
+
+}
+
+.daily-dose-content::-webkit-scrollbar-thumb:hover{
+
+    background:#FFE6DD;
+
+}
+
+
+/* Close Button */
+
+.daily-dose-close{
+
+    background:#F4D6CB;
+
+}
+
+.daily-dose-close:hover{
+
+    background:#FFE6DD;
+
+}
+
+
+/* ===========================
+   CATEGORY
+=========================== */
+
+.daily-dose-section{
+
+    margin-bottom:50px;
+
+}
+
+.daily-dose-section h3{
+
+    margin:0 0 18px;
+
+    font-size:22px;
+
+    font-weight:400;
+
+}
+
+
+/* ===========================
+   GRID
+=========================== */
+
+.daily-dose-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+
+    gap:20px;
+
+}
+
+
+/* ===========================
+   CARD
+=========================== */
+
+.daily-dose-card{
+
+    background:#F6D8CD;
+
+    border:2px solid #1d1d1d;
+
+    overflow:hidden;
+
+    transition:.18s;
+
+}
+
+.daily-dose-card:hover{
+
+    transform:translateY(-4px);
+
+}
+
+
+/* ===========================
+   IMAGE
+=========================== */
+
+.daily-dose-image{
+
+    aspect-ratio:1;
+
+    overflow:hidden;
+
+    border-bottom:2px solid #1d1d1d;
+
+}
+
+.daily-dose-image img{
+
+    width:100%;
+
+    height:100%;
+
+    display:block;
+
+    object-fit:cover;
+
+}
+
+
+/* ===========================
+   CARD CONTENT
+=========================== */
+
+.daily-dose-card-content{
+
+    padding:14px;
+
+}
+
+.daily-dose-meta{
+
+    margin:0 0 8px;
+
+    font-size:10px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.08em;
+
+}
+
+.daily-dose-card-content h4{
+
+    margin:0;
+
+    font-size:15px;
+
+    font-weight:500;
+
+    line-height:1.4;
+
+}

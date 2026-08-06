@@ -1,0 +1,165 @@
+/* ======================================
+   MODAL SHELL
+   Shared by all popup windows
+====================================== */
+
+.modal-window{
+
+    width:min(1100px,92vw);
+
+    height:min(90vh,900px);
+
+    display:flex;
+
+    flex-direction:column;
+
+    background:#fff;
+
+    border:2px solid #1d1d1d;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+}
+
+
+/* ==========================
+   HEADER
+========================== */
+
+.modal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:40px;
+
+    padding:28px;
+
+    border-bottom:2px solid #1d1d1d;
+
+}
+
+.modal-title{
+
+    flex:1;
+
+}
+
+.modal-title h2{
+
+    margin:0;
+
+    font-size:34px;
+
+    font-weight:400;
+
+    line-height:1.1;
+
+}
+
+.modal-title p{
+
+    margin-top:8px;
+
+    font-size:13px;
+
+    opacity:.8;
+
+}
+
+
+/* ==========================
+   CLOSE BUTTON
+========================== */
+
+.modal-close{
+
+    width:42px;
+
+    height:42px;
+
+    border:2px solid #1d1d1d;
+
+    background:#fff;
+
+    cursor:pointer;
+
+    font-size:24px;
+
+    line-height:1;
+
+    transition:.18s;
+
+}
+
+.modal-close:hover{
+
+    background:#efefef;
+
+}
+
+
+/* ==========================
+   BODY
+========================== */
+
+.modal-body{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    min-height:0;
+
+}
+
+
+/* ==========================
+   FOOTER
+========================== */
+
+.modal-footer{
+
+    border-top:2px solid #1d1d1d;
+
+    padding:18px 28px;
+
+    font-size:13px;
+
+}
+
+
+/* ==========================
+   SCROLLBAR
+========================== */
+
+.modal-body::-webkit-scrollbar{
+
+    width:18px;
+
+}
+
+.modal-body::-webkit-scrollbar-track{
+
+    border-left:2px solid #1d1d1d;
+
+}
+
+.modal-body::-webkit-scrollbar-thumb{
+
+    border:2px solid #1d1d1d;
+
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover{
+
+    cursor:pointer;
+
+}
