@@ -166,6 +166,7 @@ function fmtDate(d: Date) {
           // Show modal
           modal.classList.add('is-active');
           document.body.style.overflow = 'hidden'; // lock scroll
+          document.body.classList.add('modal-open');
         });
       });
 
@@ -173,6 +174,7 @@ function fmtDate(d: Date) {
       const closeModal = () => {
         modal.classList.remove('is-active');
         document.body.style.overflow = ''; // unlock scroll
+        document.body.classList.remove('modal-open');
       };
 
       closeBtn.addEventListener('click', closeModal);

@@ -11,7 +11,7 @@
 
 body {
   background: #f5ede0;
-  font-family: 'Special Elite', 'Courier New', monospace;
+  font-family: 'EB Garamond', serif;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -26,11 +26,11 @@ body {
   pointer-events: none;
 
   border-style: solid;
-  border-width: 30px;
+  border-width: clamp(13px, 3.5vw, 44px);
   border-image-source: url('/images/frame/frame.PNG');
-  border-image-slice: 11% 5%;
+  border-image-slice: 3% 3% 3% 3%;
   border-image-repeat: round;
-
+  border-image-width: clamp(13px, 3.5vw, 44px);
 }
 
 
@@ -40,9 +40,16 @@ body {
 ====================================================== */
 .blog-deco {
   position: fixed;
-  z-index: 110;
+  z-index: 20;
   pointer-events: none;
   user-select: none;
+  transition: z-index 0.3s ease;
+}
+
+body.modal-open .blog-deco {
+  z-index: 999;
+  filter: blur(3px);
+  /* 10% gaussian blur effect */
 }
 
 .blog-deco--treeleft {
@@ -86,14 +93,20 @@ body {
 ====================================================== */
 .blog-layout-content {
   position: relative;
-  z-index: 5;
-  min-height: 100vh;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(20px, 4vh, 44px);
   padding:
-    clamp(56px, 9vh, 100px) clamp(48px, 9vw, 130px) clamp(130px, 22vh, 230px) clamp(48px, 9vw, 130px);
+    clamp(160px, 20vh, 280px) clamp(48px, 9vw, 130px) clamp(130px, 22vh, 230px) clamp(48px, 9vw, 130px);
+}
+
+body.modal-open .blog-header,
+body.modal-open .blog-grid {
+  opacity: 0.15;
+  filter: blur(4px);
+  pointer-events: none;
 }
 
 /* ======================================================
@@ -103,6 +116,15 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  background-color: #f5ede0;
+  padding: clamp(30px, 5vw, 30px) 0 30px;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+
+  /* Smoothly fade out the left and right edges so it doesn't form a harsh rectangle that covers the trees */
 }
 
 .blog-logo {
@@ -115,11 +137,16 @@ body {
    CARD GRID
 ====================================================== */
 .blog-grid {
+  position: relative;
+  z-index: -1;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: clamp(14px, 3vw, 32px);
   width: 100%;
+  max-width: 900px;
+  padding-top: 6%;
+  transition: opacity 0.3s ease, filter 0.3s ease;
 }
 
 
@@ -130,15 +157,17 @@ body {
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
-  font-family: 'Special Elite', 'Courier New', monospace;
+  font-family: 'EB Garamond', serif;
   color: #1a1a1a;
 }
 
 .blog-post-content h1 {
-  font-size: clamp(24px, 4vw, 42px);
+  font-family: 'Slackey', cursive;
+  font-size: clamp(24px, 4vw, 40px);
   color: #d64e2c;
-  margin-bottom: 16px;
-  line-height: 1.2;
+  line-height: 1.1;
+  margin-top: 0;
+  margin-bottom: 0.2em;
 }
 
 .blog-post-hero {
@@ -168,6 +197,7 @@ body {
 }
 
 .blog-post-body h2 {
+  font-family: 'Slackey', cursive;
   font-size: clamp(20px, 3vw, 28px);
   color: #d64e2c;
   margin-top: 2em;
@@ -213,9 +243,7 @@ body {
     padding-bottom: 130px;
   }
 
-  .blog-frame {
-    border-width: 13px;
-  }
+
 
   .blog-deco--treeleft {
     width: 85px;
@@ -246,7 +274,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(245, 237, 224, 0.95);
+  background: rgba(245, 237, 224, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -254,8 +282,6 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
 }
 
 .blog-modal-overlay.is-active {

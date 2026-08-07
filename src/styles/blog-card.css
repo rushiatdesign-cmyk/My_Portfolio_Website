@@ -12,15 +12,15 @@
 }
 
 .blog-card:hover {
-  transform: translateY(-7px);
+  transform: translateY(2px);
 }
 
 /* Maximize button — top-right corner of card */
 .blog-card__maximize {
   position: absolute;
   /* Adjust TOP and RIGHT to change where the button sits */
-  top: 2px;
-  right: 2px;
+  top: 10px;
+  right: 4px;
   /* Adjust WIDTH and HEIGHT to change the scale/size of the button */
   width: 28px;
   height: 28px;
@@ -40,10 +40,11 @@
 }
 
 .blog-card__maximize img {
-  width: 100%;
-  height: 100%;
+  width: 70%;
+  height: 70%;
   object-fit: contain;
   display: block;
+  margin-top: 2%;
 }
 
 /* Hand-drawn border */
@@ -62,17 +63,24 @@
   width: 100%;
   aspect-ratio: 3 / 3.4;
   overflow: hidden;
-  clip-path: polygon(10% 0%, 90% 0%,
-      100% 10%, 100% 90%,
-      90% 100%, 10% 100%,
-      0% 90%, 0% 10%);
+  -webkit-mask-image: url("/images/frame/blogimagemask.PNG");
+  mask-image: url("/images/frame/blogimagemask.PNG");
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+
+  -webkit-mask-position: center;
+  mask-position: center;
 }
 
 .blog-card__img {
-  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -89,9 +97,9 @@
 }
 
 .blog-card__title {
-  font-family: inherit;
-  font-size: clamp(11px, 1.7vw, 14px);
-  font-weight: 700;
+  font-family: 'Slackey', cursive;
+  font-size: clamp(14px, 1.8vw, 18px);
+  font-weight: normal;
   color: #d64e2c;
   line-height: 1.25;
   margin: 0;
