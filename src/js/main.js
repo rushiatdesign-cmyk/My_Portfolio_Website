@@ -10,6 +10,9 @@ const HERO_IDS = {
 	TRACK: 'hero-scene-track',
 };
 
+// Tracks the current camera zoom scale so hover effects can be gated.
+let currentCameraScale = 1;
+
 const heroSettings = {
 	pinDuration: 8000,
 	scrub: 1,
@@ -78,6 +81,9 @@ function initHotspots() {
 }
 
 function activateLayer(targetId) {
+	// Only lift building tops on the wide/overview shot (scale === 1).
+	// When zoomed in the popping effect looks wrong, so skip it.
+	if (currentCameraScale !== 1) return;
 	const target = document.getElementById(targetId);
 	if (!target) return;
 	target.classList.add('is-active');
@@ -196,6 +202,15 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 					scale: camera.scale,
 					duration: heroSettings.shotDuration,
 					ease: heroSettings.ease,
+					onUpdate() {
+						// Keep currentCameraScale in sync so activateLayer can gate the hover.
+						const matrix = new DOMMatrix(window.getComputedStyle(cameraNode).transform);
+						currentCameraScale = matrix.a; // 'a' is the X scale component
+						// If we zoomed in, immediately remove any active building-top lift.
+						if (currentCameraScale > 1) {
+							document.querySelectorAll('.scene__layer.is-active').forEach(el => el.classList.remove('is-active'));
+						}
+					},
 				},
 				label
 			);
