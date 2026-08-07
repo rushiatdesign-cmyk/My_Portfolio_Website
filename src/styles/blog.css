@@ -52,18 +52,37 @@ body.modal-open .blog-deco {
   /* 10% gaussian blur effect */
 }
 
+/* Gentle infinite tree sway with subtle scale breath */
+@keyframes tree-sway {
+
+  0%,
+  100% {
+    transform: rotate(-2deg) scale(1.05);
+  }
+
+  50% {
+    transform: rotate(2deg) scale(1.06);
+  }
+}
+
 .blog-deco--treeleft {
-  top: -3%;
+  top: 7%;
+  /* 10% lower than before (-3% → 7%) */
   left: -1%;
   width: clamp(120px, 18vw, 260px);
   height: auto;
+  transform-origin: bottom center;
+  animation: tree-sway 6s ease-in-out infinite;
 }
 
 .blog-deco--treeright {
-  top: -3%;
+  top: 7%;
+  /* 10% lower than before (-3% → 7%) */
   right: -1%;
   width: clamp(110px, 16vw, 240px);
   height: auto;
+  transform-origin: bottom center;
+  animation: tree-sway 7s ease-in-out infinite reverse;
 }
 
 .blog-deco--frameleft {
@@ -80,6 +99,18 @@ body.modal-open .blog-deco {
   height: auto;
 }
 
+@keyframes lilly-waggle {
+
+  0%,
+  100% {
+    transform: translateY(37%) translateX(-1%) rotate(-1deg) scaleX(-1) scale(1.00);
+  }
+
+  50% {
+    transform: translateY(37%) translateX(1%) rotate(1deg) scaleX(-1) scale(1.01);
+  }
+}
+
 .blog-deco--lilly {
   display: block;
   width: clamp(100px, 15vw, 210px);
@@ -87,8 +118,8 @@ body.modal-open .blog-deco {
   margin-right: clamp(6px, 12vw, 10px);
   flex-shrink: 0;
   align-self: flex-end;
-  /* translateY % is relative to lilly's own height — perfectly scale-invariant */
-  transform: translateY(37%);
+  transform-origin: bottom center;
+  animation: lilly-waggle 4s ease-in-out infinite;
 }
 
 /* ======================================================
