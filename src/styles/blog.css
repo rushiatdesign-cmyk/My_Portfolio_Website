@@ -41,15 +41,14 @@ body {
 .blog-deco {
   position: fixed;
   z-index: 20;
+  /* above blog-layout-content stacking context (z-index: 10) */
   pointer-events: none;
   user-select: none;
-  transition: z-index 0.3s ease;
 }
 
+/* When modal is open: push trees/frames behind the popup (z-index: 60) */
 body.modal-open .blog-deco {
-  z-index: 999;
-
-  /* 10% gaussian blur effect */
+  z-index: 5;
 }
 
 /* Gentle infinite tree sway with subtle scale breath */
@@ -217,6 +216,7 @@ body.modal-open .blog-grid {
   margin: 0 auto;
   font-family: 'EB Garamond', serif;
   color: #1a1a1a;
+  padding: 0 clamp(24px, 5vw, 64px) clamp(40px, 6vh, 80px);
 }
 
 .blog-post-content h1 {
@@ -331,12 +331,14 @@ body.modal-open .blog-grid {
 .blog-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background: rgba(245, 237, 224, 0.6);
+  z-index: 60;
+  /* above trees/frames (20), below lilly+bar zone (115) */
+  background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: clamp(20px, 4vw, 40px);
+  /* 10% thick padding on all sides so content never hits screen edges */
+  padding: 8vh 8vw;
   opacity: 0;
   pointer-events: none;
 }
@@ -349,48 +351,52 @@ body.modal-open .blog-grid {
 .blog-modal-panel {
   position: relative;
   width: 100%;
-  max-width: 900px;
-  height: 90vh;
+  max-width: 100%;
+  height: 100%;
   background: #f5ede0;
-  border-style: solid;
-  border-color: transparent;
-  border-width: 11px 10px 13px 10px;
-  /* 30% thinner */
-  border-image-source: url('/images/frame/blogborder.PNG');
-  border-image-slice: 16 13 16 13 fill;
-  border-image-repeat: stretch;
+
+  /* Rough hand-drawn style border using asymmetric border-radius + outline */
+  border: 3px solid #FD6244;
+  border-radius: 3px 9px 4px 8px / 7px 3px 9px 4px;
+  outline: 2px solid #FD6244;
+  outline-offset: 6px;
+
+  /* No shadow */
   overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  padding: clamp(24px, 5vw, 60px);
+  padding: 0;
+  /* remove top padding — handled by sticky close bar */
 }
 
 .blog-modal-overlay.is-active .blog-modal-panel {
   opacity: 1;
-  transform: scale(1);
 }
 
 .blog-modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  background: none;
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 16px 8px;
+  width: 100%;
+  background: #f5ede0;
+  /* match panel bg so it masks content scrolling under it */
+  z-index: 10;
+  box-sizing: border-box;
+
+  /* reset button defaults */
   border: none;
   cursor: pointer;
-  z-index: 1010;
-  opacity: 0.7;
-  transition: opacity 0.2s, transform 0.2s;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+.blog-modal-close img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  display: block;
 }
 
 .blog-modal-close:hover {
   opacity: 1;
-  transform: scale(1.1);
-}
-
-.blog-modal-close img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
 }
