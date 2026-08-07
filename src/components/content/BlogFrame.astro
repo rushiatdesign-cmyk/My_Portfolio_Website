@@ -1,0 +1,270 @@
+---
+/**
+ * BlogFrame.astro
+ * Reusable illustrated page shell.
+ * Renders: fixed frame border, decorative elements, logo banner, card grid.
+ * 
+ * blog.astro    → uses default Frame 1 assets
+ * gallery.astro → can pass different frameSrc / decos / logoSrc
+ * work.astro    → can pass nothing and use plain layout
+ */
+
+export interface DecoConfig {
+  /** Path to the fixed page border image */
+  frameSrc?: string;
+  /** border-image-slice for the page frame */
+  frameSlice?: string;
+  /** Top-left tree / decorative element */
+  treeleftSrc?: string;
+  /** Top-right tree / decorative element */
+  treeRightSrc?: string;
+  /** Bottom-left arch / ornament */
+  frameLeftSrc?: string;
+  /** Bottom-right flag / ornament */
+  frameRightSrc?: string;
+  /** Bottom-left character / mascot */
+  lillySrc?: string;
+}
+
+export interface Props {
+  /** Page <title> */
+  pageTitle?: string;
+  /** Meta description */
+  description?: string;
+  /** Path to logo banner image shown at the top-center */
+  logoSrc?: string;
+  /** alt text for logo */
+  logoAlt?: string;
+  /** Page background colour */
+  bgColor?: string;
+  /** Decorative assets config */
+  decos?: DecoConfig;
+  /** Extra <head> content (fonts etc.) — pass as slot="head" */
+}
+
+const {
+  pageTitle   = 'Portfolio',
+  description = '',
+  logoSrc     = '/images/frame/bloglogo.PNG',
+  logoAlt     = 'Blog',
+  bgColor     = '#f5ede0',
+  decos       = {},
+} = Astro.props;
+
+const {
+  frameSrc     = '/images/frame/frame.PNG',
+  frameSlice   = '7% 6% 6% 5%',
+  treeleftSrc  = '/images/frame/treeleft.PNG',
+  treeRightSrc = '/images/frame/treeright.PNG',
+  frameLeftSrc = '/images/frame/frameleft.PNG',
+  frameRightSrc= '/images/frame/frameright.PNG',
+  lillySrc     = '/images/frame/lilly.PNG',
+} = decos;
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/favicon.ico" />
+  <title>{pageTitle}</title>
+  {description && <meta name="description" content={description} />}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
+  <!-- Extra head content from caller (additional fonts, meta, etc.) -->
+  <slot name="head" />
+</head>
+
+<body style={`background:${bgColor};`}>
+
+  <!-- Fixed full-viewport hand-drawn frame border -->
+  <div
+    class="bf-frame"
+    aria-hidden="true"
+    style={`
+      border-image-source: url('${frameSrc}');
+      border-image-slice: ${frameSlice} fill;
+    `}
+  ></div>
+
+  <!-- Fixed decorative elements (skip if src is empty string) -->
+  {treeleftSrc   && <img src={treeleftSrc}   class="bf-deco bf-deco--treeleft"   alt="" aria-hidden="true" />}
+  {treeRightSrc  && <img src={treeRightSrc}  class="bf-deco bf-deco--treeright"  alt="" aria-hidden="true" />}
+  {frameLeftSrc  && <img src={frameLeftSrc}  class="bf-deco bf-deco--frameleft"  alt="" aria-hidden="true" />}
+  {frameRightSrc && <img src={frameRightSrc} class="bf-deco bf-deco--frameright" alt="" aria-hidden="true" />}
+  {lillySrc      && <img src={lillySrc}      class="bf-deco bf-deco--lilly"      alt="" aria-hidden="true" />}
+
+  <!-- Scrollable page content -->
+  <main class="bf-page">
+
+    <!-- Logo banner -->
+    {logoSrc && (
+      <header class="bf-header">
+        <img src={logoSrc} class="bf-logo" alt={logoAlt} />
+      </header>
+    )}
+
+    <!-- Card grid — injected by caller -->
+    <section class="bf-grid" aria-label={logoAlt}>
+      <slot />
+    </section>
+
+    <!-- Any extra page content below cards -->
+    <slot name="after-grid" />
+
+  </main>
+
+  <!-- Scripts / modal shell injected by caller -->
+  <slot name="scripts" />
+
+</body>
+</html>
+
+<style>
+/* ======================================================
+   RESET
+====================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ======================================================
+   FIXED VIEWPORT FRAME
+====================================================== */
+.bf-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+
+  border-style: solid;
+  border-width: clamp(16px, 3.5vw, 44px);
+  border-image-repeat: round;
+  border-image-width: clamp(16px, 3.5vw, 44px);
+}
+
+/* ======================================================
+   FIXED DECORATIVES
+====================================================== */
+.bf-deco {
+  position: fixed;
+  z-index: 110;
+  pointer-events: none;
+  user-select: none;
+}
+
+.bf-deco--treeleft {
+  top: -3%; left: -1%;
+  width: clamp(120px, 18vw, 260px);
+  height: auto;
+}
+.bf-deco--treeright {
+  top: -3%; right: -1%;
+  width: clamp(110px, 16vw, 240px);
+  height: auto;
+}
+.bf-deco--frameleft {
+  bottom: 0; left: 0;
+  width: clamp(80px, 14vw, 200px);
+  height: auto;
+}
+.bf-deco--frameright {
+  bottom: 0; right: 0;
+  width: clamp(44px, 7vw, 110px);
+  height: auto;
+}
+.bf-deco--lilly {
+  bottom: clamp(4px, 2vw, 32px);
+  left: clamp(64px, 12vw, 180px);
+  width: clamp(100px, 15vw, 210px);
+  height: auto;
+  z-index: 115;
+}
+
+/* ======================================================
+   PAGE LAYOUT
+====================================================== */
+.bf-page {
+  position: relative;
+  z-index: 5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 4vh, 44px);
+  padding:
+    clamp(56px, 9vh, 100px)
+    clamp(48px, 9vw, 130px)
+    clamp(130px, 22vh, 230px)
+    clamp(48px, 9vw, 130px);
+}
+
+/* ======================================================
+   LOGO BANNER
+====================================================== */
+.bf-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.bf-logo {
+  width: clamp(200px, 48vw, 540px);
+  height: auto;
+  display: block;
+}
+
+/* ======================================================
+   CARD GRID (flex wrap — callers add cards as slot)
+====================================================== */
+.bf-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(14px, 3vw, 32px);
+  width: 100%;
+}
+
+/* Card sizing — callers can override via :global if needed */
+.bf-grid :global(.fc) {
+  flex: 0 1 clamp(170px, 24vw, 260px);
+  min-width: 170px;
+}
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+@media (max-width: 720px) {
+  .bf-page {
+    padding-left:  clamp(30px, 7vw, 72px);
+    padding-right: clamp(30px, 7vw, 72px);
+    padding-bottom: clamp(100px, 18vh, 180px);
+  }
+  .bf-deco--treeleft  { width: clamp(80px, 22vw, 150px); }
+  .bf-deco--treeright { width: clamp(75px, 20vw, 140px); }
+  .bf-deco--frameleft { width: clamp(56px, 16vw, 110px); }
+  .bf-deco--frameright{ width: clamp(36px, 10vw, 72px); }
+  .bf-deco--lilly     { width: clamp(76px, 17vw, 140px); left: clamp(46px, 13vw, 120px); }
+  .bf-grid :global(.fc) { flex: 0 1 calc(50% - 10px); min-width: 140px; }
+}
+
+@media (max-width: 460px) {
+  .bf-page {
+    padding-left:  24px;
+    padding-right: 24px;
+    padding-bottom: 130px;
+  }
+  .bf-frame { border-width: 13px; }
+  .bf-grid :global(.fc) { flex: 0 1 100%; max-width: 280px; }
+  .bf-deco--treeleft  { width: 85px; }
+  .bf-deco--treeright { width: 78px; }
+  .bf-deco--frameleft { width: 56px; }
+  .bf-deco--frameright{ width: 36px; }
+  .bf-deco--lilly     { width: 100px; left: 20px; }
+}
+</style>
