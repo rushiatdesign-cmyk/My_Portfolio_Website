@@ -68,24 +68,49 @@ body.modal-open .blog-deco {
 
 .blog-deco--frameleft {
   bottom: 0;
-  left: 0;
+  left: -2vw;
   width: clamp(80px, 14vw, 200px);
   height: auto;
 }
 
 .blog-deco--frameright {
   bottom: 0;
-  right: 0;
+  right: -2vw;
   width: clamp(44px, 7vw, 110px);
   height: auto;
 }
 
 .blog-deco--lilly {
-  bottom: clamp(4px, 2vw, 32px);
-  right: clamp(6px, 12vw, 10px);
+  display: block;
   width: clamp(100px, 15vw, 210px);
   height: auto;
+  margin-right: clamp(6px, 12vw, 10px);
+  flex-shrink: 0;
+  align-self: flex-end;
+  /* translateY % is relative to lilly's own height — perfectly scale-invariant */
+  transform: translateY(37%);
+}
+
+/* ======================================================
+   BOTTOM ACCENT BAR
+====================================================== */
+.blog-footer-zone {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 115;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  /* lilly stacks directly on top of bar, no gap */
+}
+
+.blog-bottom-bar {
+  height: 6vh;
+  background-color: #FD6244;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 /* ======================================================
@@ -122,9 +147,11 @@ body.modal-open .blog-grid {
   z-index: 5;
   background-color: #f5ede0;
   padding: clamp(30px, 5vw, 30px) 0 30px;
-  transition: opacity 0.3s ease, filter 0.3s ease;
+  transition: opacity 0.3s ease, filter 0.3s ease, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
 
-  /* Smoothly fade out the left and right edges so it doesn't form a harsh rectangle that covers the trees */
+.blog-header.is-hidden {
+  transform: translateY(-100%);
 }
 
 .blog-logo {
@@ -274,14 +301,13 @@ body.modal-open .blog-grid {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(245, 237, 224, 0.4);
+  background: rgba(245, 237, 224, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: clamp(20px, 4vw, 40px);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease;
 }
 
 .blog-modal-overlay.is-active {
@@ -297,21 +323,19 @@ body.modal-open .blog-grid {
   background: #f5ede0;
   border-style: solid;
   border-color: transparent;
-  border-width: 16px 14px 18px 14px;
+  border-width: 11px 10px 13px 10px;
+  /* 30% thinner */
   border-image-source: url('/images/frame/blogborder.PNG');
   border-image-slice: 16 13 16 13 fill;
   border-image-repeat: stretch;
   overflow-y: auto;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(0.2);
-  opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
   padding: clamp(24px, 5vw, 60px);
 }
 
 .blog-modal-overlay.is-active .blog-modal-panel {
-  transform: translate(0, 0) scale(1);
   opacity: 1;
+  transform: scale(1);
 }
 
 .blog-modal-close {

@@ -129,7 +129,7 @@ function fmtDate(d: Date) {
       const modal = document.getElementById('blog-modal')!;
       const closeBtn = document.getElementById('blog-modal-close')!;
       const hiddenContainer = document.getElementById('blog-hidden-content')!;
-      
+
       const bmTitle = document.getElementById('bm-title')!;
       const bmViews = document.getElementById('bm-views')!;
       const bmRead = document.getElementById('bm-read')!;
@@ -137,73 +137,67 @@ function fmtDate(d: Date) {
       const bmHero = document.getElementById('bm-hero') as HTMLImageElement;
       const bmBody = document.getElementById('bm-body')!;
 
-      // Open modal when maximize button is clicked
+      // Open modal
       document.querySelectorAll('.blog-card__maximize').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          e.preventDefault(); // Prevent following the card link
+          e.preventDefault();
           e.stopPropagation();
-          
+
           const postId = btn.getAttribute('data-post-id');
           const dataDiv = hiddenContainer.querySelector(`[data-content-id="${postId}"]`);
           if (!dataDiv) return;
 
-          // Populate modal
-          bmTitle!.textContent = dataDiv.querySelector('.hc-title')!.textContent;
-          bmViews!.textContent = dataDiv.querySelector('.hc-views')!.textContent;
-          bmRead!.textContent = dataDiv.querySelector('.hc-read')!.textContent;
-          bmDate!.textContent = dataDiv.querySelector('.hc-date')!.textContent;
-          
-          const imgSrc = dataDiv.querySelector('.hc-image')!.textContent;
+          bmTitle.textContent = dataDiv.querySelector('.hc-title')!.textContent;
+          bmViews.textContent = dataDiv.querySelector('.hc-views')!.textContent;
+          bmRead.textContent = dataDiv.querySelector('.hc-read')!.textContent;
+          bmDate.textContent = dataDiv.querySelector('.hc-date')!.textContent;
+
+          const imgSrc = dataDiv.querySelector('.hc-image')!.textContent?.trim();
           if (imgSrc) {
-            bmHero!.src = imgSrc;
-            bmHero!.style.display = 'block';
+            bmHero.src = imgSrc;
+            bmHero.style.display = 'block';
           } else {
-            bmHero!.style.display = 'none';
+            bmHero.style.display = 'none';
           }
 
-          bmBody!.innerHTML = dataDiv.querySelector('.hc-body')!.innerHTML;
+          bmBody.innerHTML = dataDiv.querySelector('.hc-body')!.innerHTML;
 
-          // Set translation vector for pop-out animation
-          const card = btn.closest('.blog-card');
-          if (card) {
-            const rect = card.getBoundingClientRect();
-            const cardCenterX = rect.left + rect.width / 2;
-            const cardCenterY = rect.top + rect.height / 2;
-            
-            const viewportCenterX = window.innerWidth / 2;
-            const viewportCenterY = window.innerHeight / 2;
-            
-            const tx = cardCenterX - viewportCenterX;
-            const ty = cardCenterY - viewportCenterY;
-            
-            const modalPanel = modal.querySelector('.blog-modal-panel') as HTMLElement;
-            if (modalPanel) {
-              modalPanel.style.setProperty('--tx', `${tx}px`);
-              modalPanel.style.setProperty('--ty', `${ty}px`);
-            }
-          }
-
-          // Show modal
           modal.classList.add('is-active');
-          document.body.style.overflow = 'hidden'; // lock scroll
+          document.body.style.overflow = 'hidden';
           document.body.classList.add('modal-open');
         });
       });
 
-      // Close modal logic
+      // Close modal
       const closeModal = () => {
         modal.classList.remove('is-active');
-        document.body.style.overflow = ''; // unlock scroll
+        document.body.style.overflow = '';
         document.body.classList.remove('modal-open');
       };
 
       closeBtn.addEventListener('click', closeModal);
       modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal(); // close if clicking overlay backdrop
+        if (e.target === modal) closeModal();
       });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
       });
+
+      // Header scroll hide/show logic
+      let lastScrollY = window.scrollY;
+      const header = document.querySelector('.blog-header');
+
+      window.addEventListener('scroll', () => {
+        if (!header) return;
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 150) {
+          header.classList.add('is-hidden');
+        } else {
+          header.classList.remove('is-hidden');
+        }
+        lastScrollY = currentScrollY;
+      }, { passive: true });
     });
   </script>
 </BlogLayout>
+
