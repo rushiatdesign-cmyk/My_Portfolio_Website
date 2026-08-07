@@ -19,7 +19,7 @@ body {
 /* ======================================================
    FIXED VIEWPORT FRAME
 ====================================================== */
-.blog-frame {
+/* .blog-frame {
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -28,10 +28,10 @@ body {
   border-style: solid;
   border-width: clamp(13px, 3.5vw, 44px);
   border-image-source: url('/images/frame/frame.PNG');
-  border-image-slice: 3% 3% 3% 3%;
+  border-image-slice: 8% 5% 7% 4%;
   border-image-repeat: round;
   border-image-width: clamp(13px, 3.5vw, 44px);
-}
+} */
 
 
 
@@ -48,7 +48,7 @@ body {
 
 body.modal-open .blog-deco {
   z-index: 999;
-  filter: blur(3px);
+
   /* 10% gaussian blur effect */
 }
 
@@ -82,7 +82,7 @@ body.modal-open .blog-deco {
 
 .blog-deco--lilly {
   bottom: clamp(4px, 2vw, 32px);
-  left: clamp(64px, 12vw, 180px);
+  right: clamp(6px, 12vw, 10px);
   width: clamp(100px, 15vw, 210px);
   height: auto;
   z-index: 115;
@@ -303,13 +303,15 @@ body.modal-open .blog-grid {
   border-image-repeat: stretch;
   overflow-y: auto;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  transform: translateY(20px);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(0.2);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   padding: clamp(24px, 5vw, 60px);
 }
 
 .blog-modal-overlay.is-active .blog-modal-panel {
-  transform: translateY(0);
+  transform: translate(0, 0) scale(1);
+  opacity: 1;
 }
 
 .blog-modal-close {

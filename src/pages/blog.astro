@@ -163,6 +163,26 @@ function fmtDate(d: Date) {
 
           bmBody!.innerHTML = dataDiv.querySelector('.hc-body')!.innerHTML;
 
+          // Set translation vector for pop-out animation
+          const card = btn.closest('.blog-card');
+          if (card) {
+            const rect = card.getBoundingClientRect();
+            const cardCenterX = rect.left + rect.width / 2;
+            const cardCenterY = rect.top + rect.height / 2;
+            
+            const viewportCenterX = window.innerWidth / 2;
+            const viewportCenterY = window.innerHeight / 2;
+            
+            const tx = cardCenterX - viewportCenterX;
+            const ty = cardCenterY - viewportCenterY;
+            
+            const modalPanel = modal.querySelector('.blog-modal-panel') as HTMLElement;
+            if (modalPanel) {
+              modalPanel.style.setProperty('--tx', `${tx}px`);
+              modalPanel.style.setProperty('--ty', `${ty}px`);
+            }
+          }
+
           // Show modal
           modal.classList.add('is-active');
           document.body.style.overflow = 'hidden'; // lock scroll
