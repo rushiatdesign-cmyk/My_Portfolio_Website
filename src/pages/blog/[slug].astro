@@ -1,0 +1,52 @@
+---
+import { getCollection, render } from 'astro:content';
+import { calcReadingTime } from '../../components/content/ReadingTime.ts';
+import BlogLayout from '../../layouts/BlogLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const readTime = calcReadingTime(post.body ?? '');
+const views = post.data.views ?? 0;
+const date = post.data.publishDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+---
+
+<BlogLayout pageTitle={`${post.data.title} — Blog`} description={post.data.description}>
+  
+  <article class="blog-post-content">
+    <a href="/blog" class="blog-post-back" style="display: inline-block; margin-bottom: 24px; color: #d64e2c; text-decoration: none; font-weight: bold;">
+      ← Back to Blog
+    </a>
+
+    <h1>{post.data.title}</h1>
+    
+    <div class="blog-post-meta">
+      <span class="blog-card__meta-item">
+        <img src="/images/frame/viewso.PNG" alt="Views" class="blog-card__icon" />
+        <span>{views} views</span>
+      </span>
+      <span class="blog-card__meta-item">
+        <img src="/images/frame/readtimeo.PNG" alt="Reading time" class="blog-card__icon" />
+        <span>{readTime}</span>
+      </span>
+      <span>{date}</span>
+    </div>
+
+    {post.data.image && (
+      <img src={post.data.image} alt="" class="blog-post-hero" />
+    )}
+
+    <div class="blog-post-body">
+      <Content />
+    </div>
+  </article>
+
+</BlogLayout>

@@ -1,14 +1,7 @@
 ---
-/**
- * blog.astro  — /blog
- * Uses BlogFrame (page shell) + FrameCard (card) components.
- * This file is now ONLY data-fetching + component composition.
- */
 import { getCollection, render } from 'astro:content';
 import { calcReadingTime } from '../components/content/ReadingTime.ts';
-import BlogFrame from '../components/content/BlogFrame.astro';
-import FrameCard from '../components/content/FrameCard.astro';
-import ContentModal from '../components/content/ContentModal.astro';
+import BlogLayout from '../layouts/BlogLayout.astro';
 
 const rawPosts = await getCollection('blog');
 const sortedPosts = rawPosts.sort(
@@ -22,90 +15,173 @@ const postsWithHtml = await Promise.all(
   })
 );
 
-const modalPosts = postsWithHtml.map(({ post }) => ({
-  id:          post.id,
-  title:       post.data.title,
-  description: post.data.description,
-  image:       post.data.image,
-  publishDate: post.data.publishDate.toISOString(),
-  tags:        post.data.tags ?? [],
-  views:       post.data.views ?? 0,
-  readingTime: calcReadingTime(post.body ?? ''),
-  bodyHtml:    null,
-}));
-
 function fmtDate(d: Date) {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 ---
 
-<BlogFrame
-  pageTitle="Blog — Portfolio"
-  description="Essays, notes, and observations on design, process, and making things."
-  logoSrc="/images/frame/bloglogo.PNG"
-  logoAlt="Blog"
-  bgColor="#f5ede0"
-  decos={{
-    frameSrc:      '/images/frame/frame.PNG',
-    frameSlice:    '7% 6% 6% 5%',
-    treeleftSrc:   '/images/frame/treeleft.PNG',
-    treeRightSrc:  '/images/frame/treeright.PNG',
-    frameLeftSrc:  '/images/frame/frameleft.PNG',
-    frameRightSrc: '/images/frame/frameright.PNG',
-    lillySrc:      '/images/frame/lilly.PNG',
-  }}
->
+<BlogLayout>
+  <!-- Blog logo banner — top center -->
+  <header class="blog-header">
+    <img src="/images/frame/bloglogo.PNG" class="blog-logo" alt="Blog" />
+  </header>
 
-  <!-- ── Cards (default slot → rendered into .bf-grid) ── -->
-  {sortedPosts.map((post) => (
-    <FrameCard
-      postId={post.id}
-      contentType="blog"
-      title={post.data.title}
-      image={post.data.image}
-      views={post.data.views ?? 0}
-      readingTime={calcReadingTime(post.body ?? '')}
-      date={fmtDate(post.data.publishDate)}
-      description={post.data.description}
+  <!-- Card grid -->
+  <section class="blog-grid" aria-label="Blog posts">
+    {sortedPosts.map((post) => {
+      const readTime = calcReadingTime(post.body ?? '');
+      const views    = post.data.views ?? 0;
+      const date     = fmtDate(post.data.publishDate);
+      
+      return (
+        <a href={`/blog/${post.id}`} class="blog-card" aria-label={`Read: ${post.data.title}`}>
+          <!-- Maximize icon sits above the border, top-right -->
+          <button class="blog-card__maximize" type="button" aria-label="Open in popup" data-post-id={post.id}>
+            <img src="/images/frame/maximizeo.PNG" alt="" />
+          </button>
 
-      borderSrc="/images/frame/blogborder.PNG"
-      borderSlice="16 13 16 13"
-      borderWidth="20px 17px 22px 17px"
-      clipVariant="octagon"
+          <!-- Hand-drawn card border (blogborder.PNG) -->
+          <div class="blog-card__inner">
 
-      viewsIconSrc="/images/frame/viewso.PNG"
-      readIconSrc="/images/frame/readtimeo.PNG"
-      expandIconSrc="/images/frame/maximizeo.PNG"
-      dividerSrc="/images/frame/cardbreak.PNG"
+            <!-- Photo — cut-corner shape via clip-path -->
+            <div class="blog-card__img-wrap">
+              <img
+                src={post.data.image}
+                alt={post.data.title}
+                class="blog-card__img"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
 
-      accentColor="#d64e2c"
-      cardBg="#f5ede0"
-    />
-  ))}
+            <!-- Text below image -->
+            <div class="blog-card__body">
+              <h2 class="blog-card__title">{post.data.title}</h2>
+              <span class="blog-card__divider" aria-hidden="true"></span>
+              <div class="blog-card__meta">
+                <span class="blog-card__meta-item">
+                  <img src="/images/frame/viewso.PNG" alt="Views" class="blog-card__icon" />
+                  <span>{views}</span>
+                </span>
+                <span class="blog-card__sep" aria-hidden="true">|</span>
+                <span class="blog-card__meta-item">
+                  <img src="/images/frame/readtimeo.PNG" alt="Reading time" class="blog-card__icon" />
+                  <span>{readTime}</span>
+                </span>
+                <span class="blog-card__sep" aria-hidden="true">|</span>
+                <span class="blog-card__date">{date}</span>
+              </div>
+            </div>
 
-  <!-- ── Modal + scripts (scripts slot) ── -->
-  <Fragment slot="scripts">
-    <ContentModal />
+          </div>
+        </a>
+      );
+    })}
+  </section>
 
-    <div id="post-bodies" hidden aria-hidden="true">
-      {postsWithHtml.map(({ post, Content }) => (
-        <div data-post-body={post.id}><Content /></div>
-      ))}
+  <!-- Modal Shell -->
+  <div id="blog-modal" class="blog-modal-overlay" aria-hidden="true">
+    <div class="blog-modal-panel" role="dialog" aria-modal="true">
+      <button id="blog-modal-close" class="blog-modal-close" aria-label="Close modal">
+        <img src="/images/frame/closeo.PNG" alt="Close" />
+      </button>
+      
+      <article class="blog-post-content">
+        <h1 id="bm-title"></h1>
+        <div class="blog-post-meta">
+          <span class="blog-card__meta-item">
+            <img src="/images/frame/viewso.PNG" alt="Views" class="blog-card__icon" />
+            <span id="bm-views"></span>
+          </span>
+          <span class="blog-card__meta-item">
+            <img src="/images/frame/readtimeo.PNG" alt="Reading time" class="blog-card__icon" />
+            <span id="bm-read"></span>
+          </span>
+          <span id="bm-date"></span>
+        </div>
+        <img id="bm-hero" src="" alt="" class="blog-post-hero" />
+        <div id="bm-body" class="blog-post-body"></div>
+      </article>
     </div>
+  </div>
 
-    <script define:vars={{ modalPosts }}>
-      const bc = document.getElementById('post-bodies');
-      window.__contentPosts = modalPosts.map(p => ({
-        ...p,
-        bodyHtml: bc?.querySelector(`[data-post-body="${p.id}"]`)?.innerHTML
-                  ?? `<p>${p.description}</p>`,
-      }));
-    </script>
+  <!-- Hidden Content for JS to read -->
+  <div id="blog-hidden-content" hidden>
+    {postsWithHtml.map(({ post, Content }) => {
+      const readTime = calcReadingTime(post.body ?? '');
+      const views = post.data.views ?? 0;
+      const date = fmtDate(post.data.publishDate);
+      return (
+        <div data-content-id={post.id}>
+          <div class="hc-title">{post.data.title}</div>
+          <div class="hc-views">{views} views</div>
+          <div class="hc-read">{readTime}</div>
+          <div class="hc-date">{date}</div>
+          <div class="hc-image">{post.data.image ?? ''}</div>
+          <div class="hc-body"><Content /></div>
+        </div>
+      );
+    })}
+  </div>
 
-    <script type="module">
-      import { initContentModal } from '/src/js/content-modal.js';
-      document.addEventListener('DOMContentLoaded', () => initContentModal());
-    </script>
-  </Fragment>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('blog-modal')!;
+      const closeBtn = document.getElementById('blog-modal-close')!;
+      const hiddenContainer = document.getElementById('blog-hidden-content')!;
+      
+      const bmTitle = document.getElementById('bm-title')!;
+      const bmViews = document.getElementById('bm-views')!;
+      const bmRead = document.getElementById('bm-read')!;
+      const bmDate = document.getElementById('bm-date')!;
+      const bmHero = document.getElementById('bm-hero') as HTMLImageElement;
+      const bmBody = document.getElementById('bm-body')!;
 
-</BlogFrame>
+      // Open modal when maximize button is clicked
+      document.querySelectorAll('.blog-card__maximize').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault(); // Prevent following the card link
+          e.stopPropagation();
+          
+          const postId = btn.getAttribute('data-post-id');
+          const dataDiv = hiddenContainer.querySelector(`[data-content-id="${postId}"]`);
+          if (!dataDiv) return;
+
+          // Populate modal
+          bmTitle!.textContent = dataDiv.querySelector('.hc-title')!.textContent;
+          bmViews!.textContent = dataDiv.querySelector('.hc-views')!.textContent;
+          bmRead!.textContent = dataDiv.querySelector('.hc-read')!.textContent;
+          bmDate!.textContent = dataDiv.querySelector('.hc-date')!.textContent;
+          
+          const imgSrc = dataDiv.querySelector('.hc-image')!.textContent;
+          if (imgSrc) {
+            bmHero!.src = imgSrc;
+            bmHero!.style.display = 'block';
+          } else {
+            bmHero!.style.display = 'none';
+          }
+
+          bmBody!.innerHTML = dataDiv.querySelector('.hc-body')!.innerHTML;
+
+          // Show modal
+          modal.classList.add('is-active');
+          document.body.style.overflow = 'hidden'; // lock scroll
+        });
+      });
+
+      // Close modal logic
+      const closeModal = () => {
+        modal.classList.remove('is-active');
+        document.body.style.overflow = ''; // unlock scroll
+      };
+
+      closeBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal(); // close if clicking overlay backdrop
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+      });
+    });
+  </script>
+</BlogLayout>

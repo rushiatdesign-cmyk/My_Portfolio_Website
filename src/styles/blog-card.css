@@ -1,0 +1,161 @@
+/* ======================================================
+   BLOG CARD
+====================================================== */
+.blog-card {
+  position: relative;
+  flex: 0 1 clamp(170px, 24vw, 260px);
+  min-width: 170px;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  text-decoration: none;
+  display: block;
+}
+
+.blog-card:hover {
+  transform: translateY(-7px);
+}
+
+/* Maximize button — top-right corner of card */
+.blog-card__maximize {
+  position: absolute;
+  /* Adjust TOP and RIGHT to change where the button sits */
+  top: 2px;
+  right: 2px;
+  /* Adjust WIDTH and HEIGHT to change the scale/size of the button */
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0.85;
+  transition: opacity 0.18s, transform 0.18s;
+}
+
+.blog-card__maximize:hover {
+  opacity: 1;
+  /* Adjust SCALE to change how much it grows when hovered (1.2 = 120%) */
+  transform: scale(1.2);
+}
+
+.blog-card__maximize img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Hand-drawn border */
+.blog-card__inner {
+  display: flex;
+  flex-direction: column;
+  border-style: solid;
+  border-width: 16px;
+  border-image-source: url('/images/frame/blogborder.PNG');
+  border-image-slice: 3% 6% 6% 6%;
+  border-image-repeat: round;
+}
+
+/* Image zone */
+.blog-card__img-wrap {
+  width: 100%;
+  aspect-ratio: 3 / 3.4;
+  overflow: hidden;
+  clip-path: polygon(10% 0%, 90% 0%,
+      100% 10%, 100% 90%,
+      90% 100%, 10% 100%,
+      0% 90%, 0% 10%);
+}
+
+.blog-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blog-card:hover .blog-card__img {
+  transform: scale(1.05);
+}
+
+/* Card body */
+.blog-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px 4px;
+}
+
+.blog-card__title {
+  font-family: inherit;
+  font-size: clamp(11px, 1.7vw, 14px);
+  font-weight: 700;
+  color: #d64e2c;
+  line-height: 1.25;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.blog-card__divider {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: url('/images/frame/cardbreak.PNG') center / 100% 100% no-repeat;
+  margin: 1px 0;
+}
+
+.blog-card__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px 4px;
+  font-size: clamp(9px, 1.15vw, 11px);
+  color: #d64e2c;
+  line-height: 1;
+}
+
+.blog-card__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.blog-card__icon {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
+.blog-card__sep {
+  opacity: 0.45;
+  font-size: 10px;
+}
+
+.blog-card__date {
+  white-space: nowrap;
+  font-size: clamp(9px, 1.1vw, 11px);
+  color: #d64e2c;
+  opacity: 0.9;
+}
+
+/* Responsive card sizing */
+@media (max-width: 720px) {
+  .blog-card {
+    flex: 0 1 calc(50% - 10px);
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 460px) {
+  .blog-card {
+    flex: 0 1 100%;
+    max-width: 280px;
+  }
+}

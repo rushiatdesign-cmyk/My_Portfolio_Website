@@ -1,0 +1,264 @@
+/* ======================================================
+   RESET & BASE
+====================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #f5ede0;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ======================================================
+   FIXED VIEWPORT FRAME
+====================================================== */
+.blog-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+
+  border-style: solid;
+  border-width: clamp(16px, 3.5vw, 44px);
+  border-image-source: url('/images/frame/frame.PNG');
+  border-image-slice: 7% 6% 6% 5% fill;
+  border-image-repeat: round;
+  border-image-width: clamp(16px, 3.5vw, 44px);
+}
+
+/* ======================================================
+   FIXED DECORATIVES
+====================================================== */
+.blog-deco {
+  position: fixed;
+  z-index: 110;
+  pointer-events: none;
+  user-select: none;
+}
+
+.blog-deco--treeleft {
+  top: -3%; left: -1%;
+  width: clamp(120px, 18vw, 260px);
+  height: auto;
+}
+.blog-deco--treeright {
+  top: -3%; right: -1%;
+  width: clamp(110px, 16vw, 240px);
+  height: auto;
+}
+.blog-deco--frameleft {
+  bottom: 0; left: 0;
+  width: clamp(80px, 14vw, 200px);
+  height: auto;
+}
+.blog-deco--frameright {
+  bottom: 0; right: 0;
+  width: clamp(44px, 7vw, 110px);
+  height: auto;
+}
+.blog-deco--lilly {
+  bottom: clamp(4px, 2vw, 32px);
+  left: clamp(64px, 12vw, 180px);
+  width: clamp(100px, 15vw, 210px);
+  height: auto;
+  z-index: 115;
+}
+
+/* ======================================================
+   PAGE LAYOUT
+====================================================== */
+.blog-layout-content {
+  position: relative;
+  z-index: 5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 4vh, 44px);
+  padding:
+    clamp(56px, 9vh, 100px)
+    clamp(48px, 9vw, 130px)
+    clamp(130px, 22vh, 230px)
+    clamp(48px, 9vw, 130px);
+}
+
+/* ======================================================
+   LOGO BANNER
+====================================================== */
+.blog-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.blog-logo {
+  width: clamp(200px, 48vw, 540px);
+  height: auto;
+  display: block;
+}
+
+/* ======================================================
+   CARD GRID
+====================================================== */
+.blog-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(14px, 3vw, 32px);
+  width: 100%;
+}
+
+
+/* ======================================================
+   SINGLE POST CONTENT LAYOUT
+====================================================== */
+.blog-post-content {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  color: #1a1a1a;
+}
+
+.blog-post-content h1 {
+  font-size: clamp(24px, 4vw, 42px);
+  color: #d64e2c;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.blog-post-hero {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 32px;
+}
+
+.blog-post-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 32px;
+  align-items: center;
+}
+
+.blog-post-body {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(16px, 2vw, 18px);
+  line-height: 1.6;
+}
+
+.blog-post-body p {
+  margin-bottom: 1.5em;
+}
+
+.blog-post-body h2 {
+  font-size: clamp(20px, 3vw, 28px);
+  color: #d64e2c;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+/* ======================================================
+   RESPONSIVE BREAKPOINTS
+====================================================== */
+@media (max-width: 720px) {
+  .blog-layout-content {
+    padding-left:  clamp(30px, 7vw, 72px);
+    padding-right: clamp(30px, 7vw, 72px);
+    padding-bottom: clamp(100px, 18vh, 180px);
+  }
+  .blog-deco--treeleft  { width: clamp(80px, 22vw, 150px); }
+  .blog-deco--treeright { width: clamp(75px, 20vw, 140px); }
+  .blog-deco--frameleft { width: clamp(56px, 16vw, 110px); }
+  .blog-deco--frameright{ width: clamp(36px, 10vw, 72px); }
+  .blog-deco--lilly     { width: clamp(76px, 17vw, 140px); left: clamp(46px, 13vw, 120px); }
+}
+
+@media (max-width: 460px) {
+  .blog-layout-content {
+    padding-left:  24px;
+    padding-right: 24px;
+    padding-bottom: 130px;
+  }
+  .blog-frame { border-width: 13px; }
+  .blog-deco--treeleft  { width: 85px; }
+  .blog-deco--treeright { width: 78px; }
+  .blog-deco--frameleft { width: 56px; }
+  .blog-deco--frameright{ width: 36px; }
+  .blog-deco--lilly     { width: 100px; left: 20px; }
+}
+
+/* ======================================================
+   MODAL POPUP
+====================================================== */
+.blog-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(245, 237, 224, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(20px, 4vw, 40px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.blog-modal-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.blog-modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  height: 90vh;
+  background: #f5ede0;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 16px 14px 18px 14px;
+  border-image-source: url('/images/frame/blogborder.PNG');
+  border-image-slice: 16 13 16 13 fill;
+  border-image-repeat: stretch;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  padding: clamp(24px, 5vw, 60px);
+}
+
+.blog-modal-overlay.is-active .blog-modal-panel {
+  transform: translateY(0);
+}
+
+.blog-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1010;
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.blog-modal-close:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.blog-modal-close img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}

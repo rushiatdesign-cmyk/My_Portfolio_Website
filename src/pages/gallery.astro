@@ -2,30 +2,13 @@
 /**
  * gallery.astro — /gallery
  */
-import { getCollection, render } from 'astro:content';
-import { calcReadingTime } from '../components/content/ReadingTime.ts';
-import ContentGrid from '../components/content/ContentGrid.astro';
-import ContentModal from '../components/content/ContentModal.astro';
-import '../styles/content-system.css';
+import { getCollection } from 'astro:content';
+import '../styles/gallery.css';
 
 const rawPosts = await getCollection('gallery');
 const sortedPosts = rawPosts.sort(
   (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
 );
-const postsWithHtml = await Promise.all(
-  sortedPosts.map(async (post) => ({ post, Content: (await render(post)).Content }))
-);
-const gridPosts = sortedPosts.map((post) => ({
-  id: post.id, title: post.data.title, description: post.data.description,
-  image: post.data.image, publishDate: post.data.publishDate,
-  tags: post.data.tags, views: post.data.views, body: post.body ?? '',
-}));
-const modalPosts = postsWithHtml.map(({ post }) => ({
-  id: post.id, title: post.data.title, description: post.data.description,
-  image: post.data.image, publishDate: post.data.publishDate.toISOString(),
-  tags: post.data.tags, views: post.data.views,
-  readingTime: calcReadingTime(post.body ?? ''), bodyHtml: null,
-}));
 ---
 
 <!doctype html>
@@ -35,44 +18,28 @@ const modalPosts = postsWithHtml.map(({ post }) => ({
   <link rel="icon" href="/favicon.ico" />
   <title>Gallery — Portfolio</title>
   <meta name="description" content="Photography, illustration, and visual work." />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    :root { --cs-font-serif: 'Playfair Display', Georgia, serif; --cs-font-mono: 'JetBrains Mono', monospace; }
-    * { box-sizing: border-box; } body { margin: 0; }
-  </style>
 </head>
-<body class="cs-page">
-  <nav class="cs-nav" aria-label="Site navigation">
-    <a href="/" class="cs-nav__logo">Portfolio</a>
-    <ul class="cs-nav__links">
+<body class="gallery-page">
+  <nav class="gallery-nav" aria-label="Site navigation">
+    <a href="/" class="gallery-nav__logo">Portfolio</a>
+    <ul class="gallery-nav__links">
       <li><a href="/blog">Blog</a></li>
       <li><a href="/work">Work</a></li>
       <li><a href="/gallery" aria-current="page">Gallery</a></li>
       <li><a href="/stuff">Stuff</a></li>
     </ul>
   </nav>
-  <main id="gallery-main">
-    <ContentGrid
-      posts={gridPosts} contentType="gallery"
-      heading="Gallery" subheading="Photography, illustration, and visual work."
-      borderVariant="stamp" maskVariant="ticket"
-    />
+  
+  <main class="gallery-main">
+    <h1>Gallery</h1>
+    <div class="gallery-grid">
+      {sortedPosts.map(post => (
+        <a href={`/gallery/${post.id}`} class="gallery-card">
+          <h2>{post.data.title}</h2>
+          {post.data.image && <img src={post.data.image} alt="" />}
+        </a>
+      ))}
+    </div>
   </main>
-  <ContentModal />
-  <div id="post-bodies" hidden aria-hidden="true">
-    {postsWithHtml.map(({ post, Content }) => (
-      <div data-post-body={post.id}><Content /></div>
-    ))}
-  </div>
-  <script define:vars={{ modalPosts }}>
-    const bc = document.getElementById('post-bodies');
-    window.__contentPosts = modalPosts.map(p => ({
-      ...p, bodyHtml: bc?.querySelector(`[data-post-body="${p.id}"]`)?.innerHTML ?? `<p>${p.description}</p>`,
-    }));
-  </script>
-  <script type="module">
-    import { initContentModal } from '/src/js/content-modal.js';
-    document.addEventListener('DOMContentLoaded', () => initContentModal());
-  </script>
 </body>
 </html>

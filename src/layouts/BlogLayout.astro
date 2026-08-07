@@ -1,0 +1,45 @@
+---
+import '../styles/blog.css';
+import '../styles/blog-card.css';
+
+export interface Props {
+  pageTitle?: string;
+  description?: string;
+}
+
+const {
+  pageTitle = 'Blog — Portfolio',
+  description = 'Essays, notes, and observations on design, process, and making things.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/favicon.ico" />
+  <title>{pageTitle}</title>
+  {description && <meta name="description" content={description} />}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- Fixed full-viewport hand-drawn frame border -->
+  <div class="blog-frame" aria-hidden="true"></div>
+
+  <!-- Fixed decorative elements -->
+  <img src="/images/frame/treeleft.PNG" class="blog-deco blog-deco--treeleft" alt="" aria-hidden="true" />
+  <img src="/images/frame/treeright.PNG" class="blog-deco blog-deco--treeright" alt="" aria-hidden="true" />
+  <img src="/images/frame/frameleft.PNG" class="blog-deco blog-deco--frameleft" alt="" aria-hidden="true" />
+  <img src="/images/frame/frameright.PNG" class="blog-deco blog-deco--frameright" alt="" aria-hidden="true" />
+  <img src="/images/frame/lilly.PNG" class="blog-deco blog-deco--lilly" alt="Lilly the dog" />
+
+  <!-- Scrollable page content -->
+  <main class="blog-layout-content">
+    <slot />
+  </main>
+</body>
+</html>
