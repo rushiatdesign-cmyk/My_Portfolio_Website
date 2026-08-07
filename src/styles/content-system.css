@@ -1,0 +1,167 @@
+/* ======================================================
+   CONTENT SYSTEM — Global CSS Custom Properties + Utilities
+   All cards, grids, and modals draw from this token set.
+   Import this once per page that uses the content system.
+====================================================== */
+
+/* ===========================
+   DESIGN TOKENS
+=========================== */
+:root {
+  /* --- Typography --- */
+  --cs-font-serif: 'Georgia', 'Times New Roman', serif;
+  --cs-font-body:  system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --cs-font-mono:  'Courier New', Courier, monospace;
+
+  /* --- Colour --- */
+  --cs-bg:          #f5f3ef;       /* page background: warm off-white */
+  --cs-card-bg:     #faf9f7;       /* card surface */
+  --cs-image-bg:    #e8e6e1;       /* image placeholder colour */
+  --cs-border-color:#1d1d1d;       /* all borders */
+  --cs-text:        #1d1d1d;       /* body text */
+  --cs-text-muted:  #666;          /* secondary text, meta */
+  --cs-accent:      #1d1d1d;       /* interactive accent */
+  --cs-focus-color: #1d1d1d;       /* focus ring */
+
+  /* --- Spacing --- */
+  --cs-gap:         24px;
+  --cs-page-pad:    56px 48px;
+  --cs-max-width:   1280px;
+
+  /* --- Motion --- */
+  --cs-transition-fast: 0.15s ease;
+  --cs-transition-base: 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  --cs-transition-slow: 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ===========================
+   PAGE BASE
+=========================== */
+.cs-page {
+  min-height: 100vh;
+  background: var(--cs-bg);
+  color: var(--cs-text);
+  font-family: var(--cs-font-body);
+}
+
+/* ===========================
+   MODAL INLINE META (injected by JS)
+=========================== */
+.cm-meta-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-size: 12px;
+  color: var(--cs-text-muted);
+  font-family: var(--cs-font-mono);
+  margin-top: 12px;
+}
+
+.cm-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.cm-tag {
+  padding: 2px 8px;
+  border: 1px solid var(--cs-border-color);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+
+/* ===========================
+   SCREEN READER ONLY
+=========================== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===========================
+   PAGE NAV BAR (top of each content page)
+=========================== */
+.cs-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  border-bottom: 2px solid var(--cs-border-color);
+  background: var(--cs-bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.cs-nav__logo {
+  font-size: 18px;
+  font-family: var(--cs-font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--cs-text);
+}
+
+.cs-nav__links {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cs-nav__links a {
+  font-size: 12px;
+  font-family: var(--cs-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  color: var(--cs-text-muted);
+  transition: color var(--cs-transition-fast);
+}
+
+.cs-nav__links a:hover,
+.cs-nav__links a[aria-current="page"] {
+  color: var(--cs-text);
+}
+
+@media (max-width: 600px) {
+  .cs-nav {
+    padding: 16px 20px;
+  }
+  .cs-nav__links {
+    gap: 16px;
+  }
+}
+
+/* ===========================
+   CARD HOVER — add subtle rotation jitter for editorial feel
+=========================== */
+@keyframes cs-card-enter {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.content-grid__item {
+  animation: cs-card-enter 0.5s var(--cs-transition-base) both;
+}
+
+/* Stagger children */
+.content-grid__item:nth-child(2) { animation-delay: 0.06s; }
+.content-grid__item:nth-child(3) { animation-delay: 0.12s; }
+.content-grid__item:nth-child(4) { animation-delay: 0.18s; }
+.content-grid__item:nth-child(5) { animation-delay: 0.24s; }
+.content-grid__item:nth-child(6) { animation-delay: 0.30s; }
+.content-grid__item:nth-child(n+7) { animation-delay: 0.36s; }

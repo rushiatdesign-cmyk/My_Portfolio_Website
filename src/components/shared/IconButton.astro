@@ -1,0 +1,75 @@
+---
+/**
+ * IconButton.astro
+ * Accessible button with an optional icon slot.
+ * Used for close, expand, share, copy-link actions.
+ */
+
+export interface Props {
+  label: string;           // aria-label text
+  id?: string;
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'ghost' | 'outline' | 'fill';
+  class?: string;
+  /** Additional data-* attributes passed as an object */
+  dataset?: Record<string, string>;
+}
+
+const {
+  label,
+  id,
+  type = 'button',
+  variant = 'ghost',
+  class: className = '',
+  dataset = {},
+} = Astro.props;
+
+const dataAttrs = Object.fromEntries(
+  Object.entries(dataset).map(([k, v]) => [`data-${k}`, v])
+);
+---
+
+<button
+  {id}
+  type={type}
+  aria-label={label}
+  class={`icon-btn icon-btn--${variant} ${className}`}
+  {...dataAttrs}
+>
+  <slot />
+</button>
+
+<style>
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1;
+    transition: opacity 0.15s ease, background 0.15s ease;
+  }
+
+  .icon-btn:focus-visible {
+    outline: 2px solid var(--cs-focus-color, #1d1d1d);
+    outline-offset: 3px;
+  }
+
+  .icon-btn--ghost:hover   { opacity: 0.65; }
+  .icon-btn--outline {
+    border: 2px solid currentColor;
+    padding: 6px 10px;
+  }
+  .icon-btn--outline:hover { background: rgba(0,0,0,0.06); }
+  .icon-btn--fill {
+    background: var(--cs-accent, #1d1d1d);
+    color: #fff;
+    padding: 8px 14px;
+  }
+  .icon-btn--fill:hover    { opacity: 0.85; }
+</style>

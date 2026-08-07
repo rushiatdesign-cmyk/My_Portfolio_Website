@@ -1,0 +1,124 @@
+---
+/**
+ * ContentMeta.astro
+ * Renders reading time, views, date, and tags for a content card.
+ * Fully passive — no JavaScript.
+ */
+
+export interface Props {
+  readingTime: string;
+  views: number;
+  publishDate: Date;
+  tags?: string[];
+  size?: 'sm' | 'lg';   // sm = card preview, lg = modal header
+}
+
+const {
+  readingTime,
+  views,
+  publishDate,
+  tags = [],
+  size = 'sm',
+} = Astro.props;
+
+const formattedDate = publishDate.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
+const formattedViews = views >= 1000
+  ? `${(views / 1000).toFixed(1)}k`
+  : String(views);
+---
+
+<div class={`content-meta content-meta--${size}`}>
+
+  <span class="content-meta__item" title="Reading time">
+    <!-- Clock icon (inline SVG — no external request) -->
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round"
+         stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+    <span>{readingTime}</span>
+  </span>
+
+  <span class="content-meta__sep" aria-hidden="true">·</span>
+
+  <span class="content-meta__item" title="Views">
+    <!-- Eye icon -->
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="2" stroke-linecap="round"
+         stroke-linejoin="round" aria-hidden="true">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+    <span>{formattedViews}</span>
+  </span>
+
+  <span class="content-meta__sep" aria-hidden="true">·</span>
+
+  <span class="content-meta__item content-meta__date">
+    <time datetime={publishDate.toISOString()}>{formattedDate}</time>
+  </span>
+
+  {tags.length > 0 && (
+    <div class="content-meta__tags" aria-label="Tags">
+      {tags.map(tag => (
+        <span class="content-meta__tag">{tag}</span>
+      ))}
+    </div>
+  )}
+
+</div>
+
+<style>
+  .content-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    font-size: 11px;
+    color: var(--cs-meta-color, #666);
+    letter-spacing: 0.03em;
+    font-family: var(--cs-font-mono, monospace);
+  }
+
+  .content-meta--lg {
+    font-size: 13px;
+    gap: 6px 12px;
+  }
+
+  .content-meta__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .content-meta__sep {
+    opacity: 0.4;
+  }
+
+  .content-meta__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .content-meta__tag {
+    padding: 2px 7px;
+    border: 1px solid currentColor;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+  }
+
+  .content-meta--lg .content-meta__tag {
+    font-size: 11px;
+  }
+</style>

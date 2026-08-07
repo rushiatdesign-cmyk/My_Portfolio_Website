@@ -1,0 +1,178 @@
+---
+/**
+ * ContentCard.astro
+ * Composes BorderFrame + ImageMask + ContentMeta + ExpandButton.
+ * Has zero design opinions — all are delegated to sub-components.
+ * Works for blog, work, gallery, stuff — whatever you pass in.
+ */
+import BorderFrame, { type BorderVariant } from './BorderFrame.astro';
+import ImageMask, { type MaskVariant } from './ImageMask.astro';
+import ContentMeta from './ContentMeta.astro';
+import ExpandButton from './ExpandButton.astro';
+import { calcReadingTime } from './ReadingTime.ts';
+
+export interface Props {
+  /** Unique slug / ID used to look up this post in the modal registry */
+  postId: string;
+  contentType: string;
+  title: string;
+  description: string;
+  image: string;
+  publishDate: Date;
+  tags?: string[];
+  views?: number;
+  /** Raw body string — used to auto-calculate reading time */
+  body?: string;
+  borderVariant?: BorderVariant;
+  maskVariant?: MaskVariant;
+}
+
+const {
+  postId,
+  contentType,
+  title,
+  description,
+  image,
+  publishDate,
+  tags = [],
+  views = 0,
+  body = '',
+  borderVariant = 'paper',
+  maskVariant = 'blob',
+} = Astro.props;
+
+const readingTime = calcReadingTime(body);
+---
+
+<article
+  class="content-card"
+  data-post-id={postId}
+  data-content-type={contentType}
+>
+  <BorderFrame variant={borderVariant}>
+
+    <div class="content-card__inner">
+
+      <!-- Image -->
+      <div class="content-card__image-wrap">
+        <ImageMask
+          src={image}
+          alt={title}
+          variant={maskVariant}
+        />
+      </div>
+
+      <!-- Body -->
+      <div class="content-card__body">
+
+        <header class="content-card__header">
+          <h2 class="content-card__title">{title}</h2>
+        </header>
+
+        <p class="content-card__desc">{description}</p>
+
+        <ContentMeta
+          readingTime={readingTime}
+          views={views}
+          publishDate={publishDate}
+          tags={tags}
+          size="sm"
+        />
+
+        <footer class="content-card__footer">
+          <ExpandButton
+            postId={postId}
+            contentType={contentType}
+            label={title}
+          />
+        </footer>
+
+      </div>
+
+    </div>
+
+  </BorderFrame>
+</article>
+
+<style>
+  .content-card {
+    /* Let the grid/flex parent control sizing */
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 280px;
+    max-width: 420px;
+    cursor: pointer;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .content-card:hover {
+    transform: translateY(-6px);
+  }
+
+  /* BorderFrame fills the card */
+  .content-card > :global(.border-frame) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--cs-card-bg, #faf9f7);
+    overflow: hidden;
+  }
+
+  .content-card__inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* ===========================
+     IMAGE ZONE
+  =========================== */
+  .content-card__image-wrap {
+    width: 100%;
+    overflow: hidden;
+    background: var(--cs-image-bg, #e8e6e1);
+  }
+
+  /* ===========================
+     BODY
+  =========================== */
+  .content-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 20px 20px;
+    flex: 1;
+  }
+
+  .content-card__header {
+    margin: 0;
+  }
+
+  .content-card__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    font-family: var(--cs-font-serif, Georgia, serif);
+    color: var(--cs-text, #1d1d1d);
+  }
+
+  .content-card__desc {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--cs-text-muted, #555);
+    /* Clamp to 3 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Push footer to bottom */
+  .content-card__footer {
+    margin-top: auto;
+    padding-top: 10px;
+  }
+</style>
