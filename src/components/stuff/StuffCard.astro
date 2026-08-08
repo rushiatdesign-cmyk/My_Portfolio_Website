@@ -1,0 +1,25 @@
+---
+export interface Props {
+  modalId: string;
+  title: string;
+  index?: number;
+}
+
+const { modalId, title } = Astro.props;
+---
+
+<button
+  class="stuff-card"
+  type="button"
+  aria-label={`Open ${title}`}
+  data-modal={modalId}
+>
+  <!-- Upper: illustration area (stuffcardinside.PNG) — add your image inside later -->
+  <div class="stuff-card__illustration"></div>
+
+  <!-- Thin divider line -->
+  <span class="stuff-card__divider" aria-hidden="true"></span>
+
+  <!-- Single-word title -->
+  <span class="stuff-card__title">{title}</span>
+</button>

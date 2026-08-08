@@ -1,0 +1,68 @@
+---
+import "../styles/stuff.css";
+
+export interface Props {
+  pageTitle?: string;
+  description?: string;
+}
+
+const {
+  pageTitle = "Stuff — Portfolio",
+  description = "A collection of things I love and care about.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Slackey&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="stuff-body">
+    <!-- Full-viewport frame border -->
+    <img
+      src="/images/stuff/stuffframe.PNG"
+      class="stuff-frame"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <!-- Sticky logo at top-center -->
+    <img
+      src="/images/stuff/stufflogo.PNG"
+      class="stuff-logo"
+      alt="Stuff"
+    />
+
+    <!-- Arrow navigation buttons -->
+    <button id="stuff-arrow-left" class="stuff-arrow stuff-arrow--left" aria-label="Scroll left">
+      <img src="/images/stuff/arrowleft.PNG" alt="←" />
+    </button>
+    <button id="stuff-arrow-right" class="stuff-arrow stuff-arrow--right" aria-label="Scroll right">
+      <img src="/images/stuff/arrowright.PNG" alt="→" />
+    </button>
+
+    <!-- Bottles decoration at bottom -->
+    <img
+      src="/images/stuff/bottles.PNG"
+      class="stuff-bottles"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <!-- Page content slot -->
+    <main class="stuff-layout-content">
+      <slot />
+    </main>
+  </body>
+</html>

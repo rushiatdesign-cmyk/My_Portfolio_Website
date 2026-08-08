@@ -1,44 +1,186 @@
 ---
-/**
- * stuff.astro — /stuff
- */
-import { getCollection } from 'astro:content';
-import '../styles/stuff.css';
+import StuffLayout from '../layouts/StuffLayout.astro';
+import StuffCard from '../components/stuff/StuffCard.astro';
+import StuffModal from '../components/stuff/StuffModal.astro';
+import MoviesContent from '../components/stuff/popups/MoviesContent.astro';
+import MusicContent from '../components/stuff/popups/MusicContent.astro';
+import BooksContent from '../components/stuff/popups/BooksContent.astro';
+import PlacesContent from '../components/stuff/popups/PlacesContent.astro';
+import ObsidianContent from '../components/stuff/popups/ObsidianContent.astro';
 
-const rawPosts = await getCollection('stuff');
-const sortedPosts = rawPosts.sort(
-  (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
-);
+const cards = [
+  { id: 'stuff-modal-movies',   title: 'Movies',   emoji: '🎬', index: 0 },
+  { id: 'stuff-modal-music',    title: 'Music',    emoji: '🎵', index: 1 },
+  { id: 'stuff-modal-books',    title: 'Books',    emoji: '📚', index: 2 },
+  { id: 'stuff-modal-places',   title: 'Places',   emoji: '🗺️', index: 3 },
+  { id: 'stuff-modal-obsidian', title: 'Obsidian', emoji: '💎', index: 4 },
+];
 ---
 
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width" />
-  <link rel="icon" href="/favicon.ico" />
-  <title>Stuff — Portfolio</title>
-  <meta name="description" content="Assorted things." />
-</head>
-<body class="stuff-page">
-  <nav class="stuff-nav" aria-label="Site navigation">
-    <a href="/" class="stuff-nav__logo">Portfolio</a>
-    <ul class="stuff-nav__links">
-      <li><a href="/blog">Blog</a></li>
-      <li><a href="/work">Work</a></li>
-      <li><a href="/gallery">Gallery</a></li>
-      <li><a href="/stuff" aria-current="page">Stuff</a></li>
-    </ul>
-  </nav>
-  
-  <main class="stuff-main">
-    <h1>Stuff</h1>
-    <div class="stuff-grid">
-      {sortedPosts.map(post => (
-        <a href={`/stuff/${post.id}`} class="stuff-card">
-          <h2>{post.data.title}</h2>
-        </a>
+<StuffLayout>
+  <!-- Card carousel -->
+  <div class="stuff-carousel-wrap">
+    <div id="stuff-track" class="stuff-track">
+      {cards.map(c => (
+        <StuffCard
+          modalId={c.id}
+          title={c.title}
+          emoji={c.emoji}
+          index={c.index}
+        />
       ))}
     </div>
-  </main>
-</body>
-</html>
+  </div>
+
+  <!-- One modal per card -->
+  <StuffModal id="stuff-modal-movies" borderColor="#F5C842">
+    <MoviesContent />
+  </StuffModal>
+
+  <StuffModal id="stuff-modal-music" borderColor="#F5C842">
+    <MusicContent />
+  </StuffModal>
+
+  <StuffModal id="stuff-modal-books" borderColor="#F5C842">
+    <BooksContent />
+  </StuffModal>
+
+  <StuffModal id="stuff-modal-places" borderColor="#F5C842">
+    <PlacesContent />
+  </StuffModal>
+
+  <StuffModal id="stuff-modal-obsidian" borderColor="#F5C842">
+    <ObsidianContent />
+  </StuffModal>
+</StuffLayout>
+
+<script>
+  import gsap from 'gsap';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    /* ─── Horizontal card carousel ─── */
+    const track = document.getElementById('stuff-track') as HTMLElement;
+    const leftBtn = document.getElementById('stuff-arrow-left') as HTMLButtonElement;
+    const rightBtn = document.getElementById('stuff-arrow-right') as HTMLButtonElement;
+
+    let currentIndex = 0;
+    const VISIBLE = 3;
+    const TOTAL = 5;
+    const MAX_INDEX = TOTAL - VISIBLE; // = 2
+
+    const getCardWidth = () => {
+      const card = track.querySelector<HTMLElement>('.stuff-card');
+      if (!card) return 0;
+      const gap = parseFloat(getComputedStyle(track).gap || '0');
+      return card.offsetWidth + gap;
+    };
+
+    const slide = () => {
+      gsap.to(track, {
+        x: -(currentIndex * getCardWidth()),
+        duration: 0.65,
+        ease: 'power2.inOut',
+      });
+    };
+
+    const updateArrows = () => {
+      leftBtn.style.opacity = currentIndex === 0 ? '0.35' : '1';
+      rightBtn.style.opacity = currentIndex >= MAX_INDEX ? '0.35' : '1';
+    };
+
+    rightBtn.addEventListener('click', () => {
+      if (currentIndex >= MAX_INDEX) return;
+      currentIndex++;
+      slide();
+      updateArrows();
+    });
+
+    leftBtn.addEventListener('click', () => {
+      if (currentIndex <= 0) return;
+      currentIndex--;
+      slide();
+      updateArrows();
+    });
+
+    updateArrows();
+
+    /* ─── Wheel / Trackpad Scroll ─── */
+    let isWheeling = false;
+    let wheelTimeout: ReturnType<typeof setTimeout>;
+
+    document.addEventListener('wheel', (e) => {
+      // Disable if a modal is open
+      if (document.body.style.overflow === 'hidden') return;
+
+      // Ignore tiny scrolls to avoid overtriggering
+      if (Math.abs(e.deltaY) < 10 && Math.abs(e.deltaX) < 10) return;
+
+      if (!isWheeling) {
+        isWheeling = true;
+        
+        // Support both vertical scroll wheel and horizontal trackpad
+        const isRight = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX > 0 : e.deltaY > 0;
+        
+        if (isRight && currentIndex < MAX_INDEX) {
+          currentIndex++;
+          slide();
+          updateArrows();
+        } else if (!isRight && currentIndex > 0) {
+          currentIndex--;
+          slide();
+          updateArrows();
+        }
+      }
+      
+      clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => {
+        isWheeling = false;
+      }, 400); // debounce scroll so one swipe = one card
+    });
+
+    /* ─── Modal open / close ─── */
+    const allModals = document.querySelectorAll<HTMLElement>('[data-stuff-modal]');
+
+    const openModal = (id: string) => {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.classList.add('is-active');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeModal = (modal: HTMLElement) => {
+      modal.classList.remove('is-active');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    document.querySelectorAll<HTMLElement>('.stuff-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.dataset.modal;
+        if (id) openModal(id);
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-stuff-close]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const modal = btn.closest<HTMLElement>('[data-stuff-modal]');
+        if (modal) closeModal(modal);
+      });
+    });
+
+    allModals.forEach(modal => {
+      modal.addEventListener('click', e => {
+        if (e.target === modal) closeModal(modal);
+      });
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        allModals.forEach(modal => {
+          if (modal.classList.contains('is-active')) closeModal(modal);
+        });
+      }
+    });
+  });
+</script>

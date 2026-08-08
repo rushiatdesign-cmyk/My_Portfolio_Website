@@ -1,0 +1,45 @@
+---
+export interface Props {
+  /** Unique id used to open this modal via data-modal="id" */
+  id: string;
+  /** Border and outline color. Defaults to gold. */
+  borderColor?: string;
+  /** Path to the close icon image */
+  closeIcon?: string;
+}
+
+const {
+  id,
+  borderColor = "#F5C842",
+  closeIcon = "/images/frame/closeo.PNG",
+} = Astro.props;
+---
+
+<div
+  id={id}
+  class="stuff-modal-overlay"
+  aria-hidden="true"
+  data-stuff-modal
+>
+  <div
+    class="stuff-modal-panel"
+    role="dialog"
+    aria-modal="true"
+    style={`border-color: ${borderColor}; outline-color: ${borderColor};`}
+  >
+    <!-- Sticky close bar -->
+    <button
+      class="stuff-modal-close"
+      aria-label="Close"
+      data-stuff-close
+      style={`background: #0D1855;`}
+    >
+      <img src={closeIcon} alt="Close" />
+    </button>
+
+    <!-- Popup body content (injected per-card via slot) -->
+    <div class="stuff-modal-body">
+      <slot />
+    </div>
+  </div>
+</div>
