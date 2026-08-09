@@ -1,828 +1,310 @@
 ---
-// Photographs popup content
-// Configuration for the robust Cell-Jitter algorithm
-const numPhotos = 50;
-const canvasWidth = 2000; // Increased to give more breathing room
-const canvasHeight = 1400;
-
-// Calculate grid dimensions
-const cols = Math.ceil(Math.sqrt(numPhotos * (canvasWidth / canvasHeight)));
-const rows = Math.ceil(numPhotos / cols);
-
-const cellWidth = canvasWidth / cols;
-const cellHeight = canvasHeight / rows;
+// Photographs popup content - GSAP Vertical Scroll Edition
+const numPhotos = 12;
+const staggers = [
+  "-24vw", "14vw", "-18vw", "22vw", "-26vw", "28vw", "-20vw", "8vw", "-12vw", "15vw", "-24vw", "26vw"
+];
+const widths = [
+  "290px", "330px", "270px", "450px", "300px", "150px", "230px", "460px", "270px", "250px", "390px", "160px"
+];
 
 const photos = Array.from({ length: numPhotos }).map((_, i) => {
-  // 1. Assign to a cell
-  const col = i % cols;
-  const row = Math.floor(i / cols);
-
-  // 2. Find the center of that cell
-  const baseLeft = col * cellWidth + cellWidth / 2;
-  const baseTop = row * cellHeight + cellHeight / 2;
-
-  // 3. Apply a controlled random jitter (up to 35% of the cell size away from center)
-  // This guarantees they look scattered but can never clump or leave massive voids
-  const jitterX = (((i * 137) % 100) / 100 - 0.5) * (cellWidth * 0.75);
-  const jitterY = (((i * 211) % 100) / 100 - 0.5) * (cellHeight * 0.75);
-
-  // 4. Calculate final position
-  const finalLeft = baseLeft + jitterX;
-  const finalTop = baseTop + jitterY;
-
-  const scale = 0.6 + (((i * 43) % 100) / 100) * 0.8; // Random scale 0.6 to 1.4
-  const rotation = ((i * 17) % 35) - 17; // Random rotation -17 to 17 deg
-
   return {
     id: i + 1,
     image: `https://picsum.photos/seed/photograph${i}/1200/800`,
-    rotation: rotation,
-    x: finalLeft, // Absolute X pixel coordinate inside the base tile
-    y: finalTop, // Absolute Y pixel coordinate inside the base tile
-    scale: scale,
-    ease: 0.6 + (((i * 97) % 100) / 100) * 0.4, // Individual parallax easing factor
+    caption: `Photograph ${i + 1}`,
   };
 });
-const photoUrls = photos.map((p) => p.image);
 ---
 
+<section class="stuff-popup-content photos-container">
+  <div class="gallery">
+    {photos.map((item, idx) => (
+      <figure class="gallery__slide" style={`--stagger: ${staggers[idx % staggers.length]}; --img-w: ${widths[idx % widths.length]};`}>
+        <div class="gallery__img-wrapper">
+          <img
+            class="gallery__img"
+            src={item.image}
+            alt={item.caption}
+            loading="eager"
+          />
+        </div>
+        <figcaption>{item.caption}</figcaption>
+      </figure>
+    ))}
+  </div>
+
+  <div class="content">
+    <div class="content-wrapper">
+      <figure class="content__preview-img">
+        <img alt="" />
+      </figure>
+      <div class="content__group-list">
+        <button class="content__back" type="button">&larr; back [ESC]</button>
+        {photos.map((item, idx) => (
+          <div class="content__group" data-index={idx}>
+            <div class="content__title">{item.caption}</div>
+            <div class="content__description">
+              A detailed description for {item.caption} goes here. This represents the content associated with the photograph.
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
 <style>
-  /* The popup content area should now act as the container */
-  .stuff-popup-content.photos-container {
+  /* Base Container */
+  .photos-container {
     padding: 0;
-    margin: 0 calc(-1 * clamp(24px, 5vw, 64px))
-      calc(-1 * clamp(40px, 6vh, 80px)); /* Pull to edges */
+    margin: 0 calc(-1 * clamp(24px, 5vw, 64px)) calc(-1 * clamp(40px, 6vh, 80px)); /* Pull to edges */
+    height: 84vh;
     overflow: hidden; /* Hide scrollbars, JS takes over */
-    background: transparent !important; /* Inherits yellow from modal */
-  }
-
-  .photos-viewport {
+    background: transparent !important;
     position: relative;
+    /* Use the font styles from the reference */
+    --color-text: #0D1855;
+    --color-bg: #F5C842;
+    --color-link: #0D1855;
+    --color-link-hover: #ffffff;
+    --color-desc: #0D1855;
+    --page-padding: 1.5rem;
+  }
+
+  /* Gallery */
+  .gallery {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12vh;
     width: 100%;
-    height: 84vh; /* Fixed height for the parallax viewport to work */
+    padding-top: 14vh;
+  }
+
+  .gallery__slide {
+    flex-shrink: 0;
+    transform: translateX(var(--stagger, 0vw));
+    cursor: pointer;
+    outline: none;
+    
+    /* INK FRAME LOGIC */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 16px 16px 42px 16px;
+    background-color: #F5C842;
+  }
+
+  .gallery__slide::after {
+    content: "";
+    position: absolute;
+    inset: -30px;
+    z-index: 10;
+    pointer-events: none;
+    -webkit-mask-box-image: url("/images/blogborder.PNG") 100 100 100 100 round;
+    mask-border: url("/images/blogborder.PNG") 100 100 100 100 round;
+    -webkit-mask-box-image-width: 32px;
+    mask-border-width: 32px;
+    background-color: #0D1855;
+  }
+
+  .gallery__slide figcaption {
+    display: block;
+    margin-top: 1.5rem;
+    color: var(--color-desc);
+    font-family: var(--font-display, "Slackey"), cursive;
+    font-size: 1.2rem;
+    z-index: 2;
+  }
+
+  .gallery__img-wrapper {
+    position: relative;
+    margin: 0;
+    width: var(--img-w, 200px);
+    height: auto;
+    aspect-ratio: 0.8;
     overflow: hidden;
-    cursor: grab;
-    touch-action: none;
+    pointer-events: none;
+    user-select: none;
+    z-index: 2;
   }
 
-  .photos-viewport.is-dragging {
-    cursor: grabbing;
-  }
-
-  .photos-track {
+  .gallery__img-wrapper img {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; /* Let the viewport catch drag events */
+    object-fit: cover;
+    transform: scale(1.2);
   }
 
-  :global(.photo-card) {
+  /**
+   * Content: Fixed popup overlay
+   */
+  .content {
+    display: none;
     position: absolute;
+    inset: 0;
+    z-index: 1000;
+    background: #F5C842; /* Full background when open */
+  }
+
+  /**
+   * Content: Clicked image lands here
+   */
+  .content__preview-img {
+    position: absolute;
+    margin: 0;
     top: 0;
     left: 0;
-    width: 180px; /* Base width */
-
-    /* Removed aspect-ratio to let the card adopt a Polaroid shape (taller than wide) */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-
-    user-select: none;
-    z-index: 1;
-    padding: 16px 16px 42px 16px; /* Increased padding to support the thicker border */
-    cursor: pointer; /* Affordance for lightbox */
-    pointer-events: auto;
-
-    /* Solid yellow background so cards block the ones behind them when overlapping */
-    background-color: #f5c842;
+    height: 100%;
+    aspect-ratio: 0.8;
+    overflow: hidden;
+    z-index: 2;
+    padding: 16px 16px 42px 16px; /* Ink frame padding */
+    background-color: #F5C842;
   }
 
-  /* Ink frame mask using blogborder */
-  :global(.photo-card::after) {
+  .content__preview-img::after {
     content: "";
     position: absolute;
-    inset: 0;
-    background: #0d1855; /* Blue color */
-    pointer-events: none;
-    z-index: 2;
-
-    -webkit-mask-box-image-source: url("/images/frame/blogborder.PNG");
-    -webkit-mask-box-image-slice: 12%;
-    -webkit-mask-box-image-width: 16px; /* Significantly thicker frame */
-    -webkit-mask-box-image-repeat: stretch;
-
-    mask-border-source: url("/images/frame/blogborder.PNG");
-    mask-border-slice: 12%;
-    mask-border-width: 16px; /* Significantly thicker frame */
-    mask-border-repeat: stretch;
-  }
-
-  :global(.photo-card__image-wrap) {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4 / 3; /* Force the image area to remain landscape */
-    overflow: hidden;
-    z-index: 1;
-    box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.7);
-    transition: box-shadow 0.25s ease;
-
-    /* Using the blog image mask so the photo fits nicely */
-    -webkit-mask-image: url("/images/frame/blogimagemask.PNG");
-    mask-image: url("/images/frame/blogimagemask.PNG");
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
-    -webkit-mask-position: center;
-    mask-position: center;
-  }
-
-  :global(.photo-card__image) {
-    position: absolute;
-    top: -10%;
-    left: -10%;
-    width: 120%;
-    height: 120%;
-    object-fit: cover;
-    display: block;
-    pointer-events: none;
-  }
-
-  :global(.photo-card__caption) {
-    position: absolute;
-    bottom: 12px;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 0.8rem;
-    font-family: var(--font-display, "Slackey"), cursive;
-    color: #111010;
-    pointer-events: none;
-    z-index: 3;
-    opacity: 0.85;
-  }
-
-  /* Hint styling */
-  .photos-hint {
-    position: absolute;
-    left: 50%;
-    bottom: 32px;
-    transform: translateX(-50%);
-    margin: 0;
-    padding: 8px 16px;
-    border: 1px solid rgba(17, 16, 16, 0.25);
-    border-radius: 999px;
-    font-family: var(--font-display, "Slackey");
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #111010;
-    background: rgba(245, 200, 66, 0.6);
-    backdrop-filter: blur(6px);
-    pointer-events: none;
-    opacity: 1;
-    transition: opacity 0.6s ease;
-    z-index: 3;
-  }
-
-  .photos-hint.is-hidden {
-    opacity: 0;
-  }
-
-  /* Lightbox Styles */
-  .photos-lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(13, 24, 85, 0.92); /* Dark blue overlay */
-    backdrop-filter: blur(10px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-
-  .photos-lightbox.is-open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .photos-lightbox__content {
-    position: relative;
-    max-width: 85vw;
-    max-height: 85vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .photos-lightbox__image {
-    max-width: 100%;
-    max-height: 85vh;
-    object-fit: contain;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    transition:
-      opacity 0.2s ease,
-      transform 0.2s ease;
-  }
-
-  .photos-lightbox__image.is-loading {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-
-  .photos-lightbox__btn {
-    position: absolute;
-    background: none;
-    border: none;
-    color: #f5c842;
-    font-size: 3.5rem;
-    font-family: var(--font-display, "Slackey");
-    cursor: pointer;
-    padding: 20px;
-    transition:
-      transform 0.2s ease,
-      color 0.2s ease;
+    inset: -30px;
     z-index: 10;
+    pointer-events: none;
+    -webkit-mask-box-image: url("/images/blogborder.PNG") 100 100 100 100 round;
+    mask-border: url("/images/blogborder.PNG") 100 100 100 100 round;
+    -webkit-mask-box-image-width: 32px;
+    mask-border-width: 32px;
+    background-color: #0D1855;
+  }
+
+  .content__preview-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.2);
+  }
+
+  .content__group-list {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    min-height: 100%;
+    padding-left: calc(80vh + 5vw); /* Provide space for the image */
+    padding-right: var(--page-padding);
+    padding-top: var(--page-padding);
+    padding-bottom: var(--page-padding);
   }
 
-  .photos-lightbox__btn:hover {
-    transform: scale(1.15);
-    color: #fff;
+  .content__back {
+    font-family: var(--font-display, "Slackey"), cursive;
+    font-size: 1.5rem;
+    align-self: flex-start;
+    border: none;
+    background: none;
+    color: #0D1855;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 2rem;
+    transition: transform 0.2s ease;
+  }
+  
+  .content__back:hover {
+    transform: scale(1.05);
   }
 
-  .photos-lightbox__btn:active {
-    transform: scale(0.95);
+  .content__group {
+    display: none;
   }
 
-  .photos-lightbox__btn--close {
-    top: 20px;
-    right: 20px;
-    position: fixed;
-    font-size: 3rem;
+  .content__group.active {
+    display: block;
   }
 
-  .photos-lightbox__btn--prev {
-    left: 2vw;
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  .photos-lightbox__btn--prev:hover {
-    transform: translateY(-50%) scale(1.15);
+  .content__title {
+    font-family: var(--font-display, "Slackey"), cursive;
+    font-weight: 400;
+    font-size: clamp(2rem, 6vw, 4rem);
+    line-height: 1;
+    margin-bottom: 2rem;
+    margin-top: 10vh;
+    color: #0D1855;
   }
 
-  .photos-lightbox__btn--next {
-    right: 2vw;
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  .photos-lightbox__btn--next:hover {
-    transform: translateY(-50%) scale(1.15);
+  .content__description {
+    max-width: 50ch;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: #0D1855;
+    line-height: 1.5;
   }
 </style>
 
-<section class="stuff-popup-content photos-container">
-  <div
-    class="photos-viewport"
-    id="photos-viewport"
-    data-tilesize-w={canvasWidth}
-    data-tilesize-h={canvasHeight}
-  >
-    <div
-      class="photos-track"
-      id="photos-track"
-      data-items={JSON.stringify(photos)}
-      data-urls={JSON.stringify(photoUrls)}
-    >
-      <!-- The JS engine will construct the 2x2 wrapping grid here -->
-    </div>
-    <p class="photos-hint" id="photos-hint" aria-hidden="true">
-      scroll / drag to move
-    </p>
-  </div>
-</section>
-
-<!-- Lightbox DOM -->
-<div
-  class="photos-lightbox"
-  id="photos-lightbox"
-  aria-hidden="true"
-  role="dialog"
->
-  <button
-    class="photos-lightbox__btn photos-lightbox__btn--close"
-    id="lightbox-close"
-    aria-label="Close Lightbox">×</button
-  >
-  <button
-    class="photos-lightbox__btn photos-lightbox__btn--prev"
-    id="lightbox-prev"
-    aria-label="Previous Photo">‹</button
-  >
-  <div class="photos-lightbox__content" id="lightbox-backdrop">
-    <img
-      class="photos-lightbox__image"
-      id="lightbox-image"
-      src=""
-      alt="Full size photograph"
-    />
-  </div>
-  <button
-    class="photos-lightbox__btn photos-lightbox__btn--next"
-    id="lightbox-next"
-    aria-label="Next Photo">›</button
-  >
-</div>
-
 <script>
-  // @ts-nocheck
-  import gsap from "gsap";
+  import imagesLoaded from "imagesloaded";
+  import Reveal from "./verticalscroll/Reveal.js";
+  import Slider from "./verticalscroll/Slider.js";
+  import Transition from "./verticalscroll/Transition.js";
 
-  // Robust Modal Scroll Lock to completely isolate interactions
-  function photoLockPageScroll() {
-    if (document.documentElement.classList.contains("photos-modal-lock"))
-      return;
+  function initPhotosVertical() {
+    const container = document.querySelector(".photos-container");
+    if (!container) return;
+    
+    // Check if initialized
+    if (container.dataset.initialized === "true") return;
+    container.dataset.initialized = "true";
 
-    const scrollY = window.scrollY;
-    document.body.dataset.photosScrollY = scrollY.toString();
+    imagesLoaded(container, () => {
+      // Image-to-content transition; hands the gallery back when it is done
+      const transition = new Transition({ onClose: () => slider.start() });
 
-    // Save original styles
-    document.body.dataset.origPosition = document.body.style.position || "";
-    document.body.dataset.origTop = document.body.style.top || "";
-    document.body.dataset.origLeft = document.body.style.left || "";
-    document.body.dataset.origRight = document.body.style.right || "";
-    document.body.dataset.origWidth = document.body.style.width || "";
+      // Slide reveals
+      const reveal = new Reveal();
 
-    // Lock the page exactly where it is
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.width = "100%";
+      // Infinite slider
+      const slider = new Slider({
+        enabled: () => transition.state === "closed",
+        onToggle: (changes) => reveal.toggle(changes),
+      });
 
-    document.documentElement.classList.add("photos-modal-lock");
-  }
+      // Gallery slides
+      const slides = [...document.querySelectorAll(".gallery__slide")];
 
-  function photoUnlockPageScroll() {
-    if (!document.documentElement.classList.contains("photos-modal-lock"))
-      return;
+      slides.forEach((slide, index) => {
+        slide.setAttribute("tabindex", "0");
+        slide.setAttribute("role", "button");
 
-    const scrollY = parseFloat(document.body.dataset.photosScrollY || "0");
+        // Only give up the gallery if the transition is going to hand it back
+        const open = () => {
+          if (transition.state !== "closed") return;
 
-    // Restore previous styles
-    document.body.style.position = document.body.dataset.origPosition;
-    document.body.style.top = document.body.dataset.origTop;
-    document.body.style.left = document.body.dataset.origLeft;
-    document.body.style.right = document.body.dataset.origRight;
-    document.body.style.width = document.body.dataset.origWidth;
+          slider.stop();
+          transition.open(slide, index);
+        };
 
-    document.documentElement.classList.remove("photos-modal-lock");
+        slide.addEventListener("click", open);
 
-    // Restore scroll position
-    window.scrollTo(0, scrollY);
-  }
-
-  function initPhotosCanvas() {
-    console.log("initPhotosCanvas running!");
-    const V = document.getElementById("photos-viewport");
-    const T = document.getElementById("photos-track");
-    const H = document.getElementById("photos-hint");
-    if (!V || !T) {
-      console.log("initPhotosCanvas aborted: V or T missing");
-      return;
-    }
-
-    // Prevent duplicate initialization
-    if (V.dataset.initialized === "true") return;
-    V.dataset.initialized = "true";
-
-    // Setup Modal Lifecycle
-    const overlay = V.closest(".stuff-modal-overlay");
-    if (overlay) {
-      const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-          if (mutation.attributeName === "aria-hidden") {
-            if (overlay.getAttribute("aria-hidden") === "false") {
-              photoLockPageScroll();
-            } else {
-              photoUnlockPageScroll();
-            }
+        slide.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            open();
           }
-        }
-      });
-      observer.observe(overlay, { attributes: true });
-
-      if (overlay.getAttribute("aria-hidden") === "false") {
-        photoLockPageScroll();
-      }
-    }
-
-    // Load Data
-    const baseItems = JSON.parse(T.getAttribute("data-items") || "[]");
-    const tileW = parseFloat(V.getAttribute("data-tilesize-w"));
-    const tileH = parseFloat(V.getAttribute("data-tilesize-h"));
-
-    // Infinite Grid State
-    const scroll = {
-      ease: 0.08,
-      current: { x: 0, y: 0 },
-      target: { x: 0, y: 0 },
-      last: { x: 0, y: 0 },
-      delta: { x: { c: 0, t: 0 }, y: { c: 0, t: 0 } },
-    };
-
-    const mouse = {
-      x: { t: 0.5, c: 0.5 },
-      y: { t: 0.5, c: 0.5 },
-    };
-
-    const drag = {
-      isActive: false,
-      startX: 0,
-      startY: 0,
-      scrollX: 0,
-      scrollY: 0,
-    };
-
-    let items = [];
-    let winW = V.clientWidth;
-    let winH = V.clientHeight;
-
-    // Build the 2x2 wrapping DOM
-    // We clone each item 4 times: [0,0], [W,0], [0,H], [W,H]
-    const repsX = [0, tileW];
-    const repsY = [0, tileH];
-
-    baseItems.forEach((base) => {
-      repsX.forEach((offsetX) => {
-        repsY.forEach((offsetY) => {
-          // Construct Card DOM
-          const card = document.createElement("div");
-          card.classList.add("photo-card");
-          card.style.width = `${160 * base.scale}px`; // Apply initial base scale here for CSS
-
-          const wrap = document.createElement("div");
-          wrap.classList.add("photo-card__image-wrap");
-
-          const img = document.createElement("img");
-          img.classList.add("photo-card__image");
-          img.src = base.image;
-          img.alt = `Photograph ${base.id}`;
-          img.loading = "lazy";
-          img.draggable = false;
-
-          wrap.appendChild(img);
-          card.appendChild(wrap);
-
-          const cap = document.createElement("div");
-          cap.classList.add("photo-card__caption");
-          cap.textContent = `Photo ${base.id}`;
-          card.appendChild(cap);
-
-          T.appendChild(card);
-
-          // Store engine data
-          items.push({
-            el: card,
-            img: img,
-            baseX: base.x + offsetX,
-            baseY: base.y + offsetY,
-            extraX: 0,
-            extraY: 0,
-            rotation: base.rotation,
-            ease: base.ease,
-            data: base, // store original data
-          });
-        });
-      });
-    });
-
-    const fullTileW = tileW * 2;
-    const fullTileH = tileH * 2;
-
-    // Start slightly offset to feel natural
-    scroll.target.x = -winW * 0.1;
-    scroll.target.y = -winH * 0.1;
-    scroll.current.x = scroll.target.x;
-    scroll.current.y = scroll.target.y;
-
-    // Initialize GSAP properties on cards
-    items.forEach((item) => {
-      gsap.set(item.el, {
-        xPercent: -50,
-        yPercent: -50,
-        rotation: item.rotation,
-        scale: 1,
-      });
-    });
-
-    function dismissHint() {
-      if (H && !H.classList.contains("is-hidden")) {
-        H.classList.add("is-hidden");
-      }
-    }
-
-    // ----------------------------------------------------
-    // GSAP TICKER RENDER LOOP
-    // ----------------------------------------------------
-    function render() {
-      // 1. Smoothly interpolate scroll
-      scroll.current.x += (scroll.target.x - scroll.current.x) * scroll.ease;
-      scroll.current.y += (scroll.target.y - scroll.current.y) * scroll.ease;
-
-      // 2. Smoothly calculate scroll delta for parallax floating
-      scroll.delta.x.t = scroll.current.x - scroll.last.x;
-      scroll.delta.y.t = scroll.current.y - scroll.last.y;
-      scroll.delta.x.c += (scroll.delta.x.t - scroll.delta.x.c) * 0.05;
-      scroll.delta.y.c += (scroll.delta.y.t - scroll.delta.y.c) * 0.05;
-
-      // 3. Smooth mouse position
-      mouse.x.c += (mouse.x.t - mouse.x.c) * 0.05;
-      mouse.y.c += (mouse.y.t - mouse.y.c) * 0.05;
-
-      const dirX = scroll.current.x > scroll.last.x ? "right" : "left";
-      const dirY = scroll.current.y > scroll.last.y ? "down" : "up";
-
-      // 4. Update each item
-      items.forEach((item) => {
-        // Momentum parallax offsets
-        const parallaxX = 8 * scroll.delta.x.c * item.ease;
-        const parallaxY = 8 * scroll.delta.y.c * item.ease;
-
-        // Mouse parallax offsets
-        const mouseParallaxX = (mouse.x.c - 0.5) * 40 * item.ease;
-        const mouseParallaxY = (mouse.y.c - 0.5) * 40 * item.ease;
-
-        const posX =
-          item.baseX +
-          scroll.current.x +
-          item.extraX +
-          parallaxX +
-          mouseParallaxX;
-        const posY =
-          item.baseY +
-          scroll.current.y +
-          item.extraY +
-          parallaxY +
-          mouseParallaxY;
-
-        // Card dimensions (approximate for wrapping calculations)
-        const cardW = 160 * item.data.scale * 1.5; // include rotation bounds padding
-        const cardH = 160 * item.data.scale * 1.5;
-
-        // 5. Infinite Wrapping Logic
-        if (dirX === "right" && posX > winW + cardW) {
-          item.extraX -= fullTileW;
-        } else if (dirX === "left" && posX < -cardW) {
-          item.extraX += fullTileW;
-        }
-
-        if (dirY === "down" && posY > winH + cardH) {
-          item.extraY -= fullTileH;
-        } else if (dirY === "up" && posY < -cardH) {
-          item.extraY += fullTileH;
-        }
-
-        // Calculate final wrapped position
-        const fx =
-          item.baseX +
-          scroll.current.x +
-          item.extraX +
-          parallaxX +
-          mouseParallaxX;
-        const fy =
-          item.baseY +
-          scroll.current.y +
-          item.extraY +
-          parallaxY +
-          mouseParallaxY;
-
-        // Render positions using GSAP (preserves xPercent, yPercent, rotation, scale)
-        gsap.set(item.el, { x: fx, y: fy });
-
-        // Inner image parallax (opposite direction)
-        gsap.set(item.img, {
-          x: -mouse.x.c * item.ease * 12,
-          y: -mouse.y.c * item.ease * 12,
         });
       });
 
-      scroll.last.x = scroll.current.x;
-      scroll.last.y = scroll.current.y;
-    }
+      document.querySelector(".content__back").addEventListener("click", () => transition.close());
 
-    gsap.ticker.add(render);
-
-    // ----------------------------------------------------
-    // INPUT HANDLERS
-    // ----------------------------------------------------
-
-    function onWheel(e) {
-      e.preventDefault();
-      dismissHint();
-      scroll.target.x -= e.deltaX * 0.5;
-      scroll.target.y -= e.deltaY * 0.5;
-    }
-
-    function onPointerDown(e) {
-      // Don't drag if lightbox is open
-      if (
-        document
-          .getElementById("photos-lightbox")
-          ?.classList.contains("is-open")
-      )
-        return;
-
-      e.preventDefault();
-      dismissHint();
-      drag.isActive = true;
-      V.classList.add("is-dragging");
-      drag.startX = e.clientX;
-      drag.startY = e.clientY;
-      drag.scrollX = scroll.target.x;
-      drag.scrollY = scroll.target.y;
-    }
-
-    function onPointerMove(e) {
-      mouse.x.t = e.clientX / window.innerWidth;
-      mouse.y.t = e.clientY / window.innerHeight;
-
-      if (drag.isActive) {
-        const dx = e.clientX - drag.startX;
-        const dy = e.clientY - drag.startY;
-        scroll.target.x = drag.scrollX + dx;
-        scroll.target.y = drag.scrollY + dy;
-      }
-    }
-
-    function onPointerUp(e) {
-      if (drag.isActive) {
-        drag.isActive = false;
-        V.classList.remove("is-dragging");
-      }
-    }
-
-    V.addEventListener("wheel", onWheel, { passive: false });
-    V.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("pointerup", onPointerUp);
-    window.addEventListener("pointercancel", onPointerUp);
-
-    // Resize observer
-    window.addEventListener("resize", () => {
-      winW = V.clientWidth;
-      winH = V.clientHeight;
-    });
-
-    // ----------------------------------------------------
-    // LIGHTBOX LOGIC
-    // ----------------------------------------------------
-    const lightbox = document.getElementById("photos-lightbox");
-    const lbImage = document.getElementById("lightbox-image");
-    const btnClose = document.getElementById("lightbox-close");
-    const btnPrev = document.getElementById("lightbox-prev");
-    const btnNext = document.getElementById("lightbox-next");
-    const urlsStr = T.getAttribute("data-urls");
-    const urls = urlsStr ? JSON.parse(urlsStr) : [];
-
-    let currentIndex = 0;
-    let isLightboxOpen = false;
-
-    function openLightbox(index) {
-      if (urls.length === 0 || !lightbox || !lbImage) return;
-      currentIndex = index;
-      isLightboxOpen = true;
-      lightbox.classList.add("is-open");
-      updateLightboxImage();
-      document.addEventListener("keydown", onLightboxKeydown);
-    }
-
-    function closeLightbox() {
-      if (!lightbox) return;
-      isLightboxOpen = false;
-      lightbox.classList.remove("is-open");
-      document.removeEventListener("keydown", onLightboxKeydown);
-    }
-
-    function updateLightboxImage() {
-      if (!lbImage) return;
-      lbImage.classList.add("is-loading");
-      const newImg = new Image();
-      newImg.src = urls[currentIndex];
-      newImg.onload = () => {
-        lbImage.src = newImg.src;
-        lbImage.classList.remove("is-loading");
-      };
-    }
-
-    function nextImage() {
-      currentIndex = (currentIndex + 1) % urls.length;
-      updateLightboxImage();
-    }
-
-    function prevImage() {
-      currentIndex = (currentIndex - 1 + urls.length) % urls.length;
-      updateLightboxImage();
-    }
-
-    function onLightboxKeydown(e) {
-      if (!isLightboxOpen) return;
-      if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowRight") nextImage();
-      if (e.key === "ArrowLeft") prevImage();
-    }
-
-    if (lightbox) {
-      btnClose?.addEventListener("click", closeLightbox);
-      btnNext?.addEventListener("click", nextImage);
-      btnPrev?.addEventListener("click", prevImage);
-      lightbox.addEventListener("click", (e) => {
-        if (
-          e.target === lightbox ||
-          e.target === document.getElementById("lightbox-backdrop")
-        ) {
-          closeLightbox();
-        }
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") transition.close();
       });
-    }
-
-    // ----------------------------------------------------
-    // GSAP HOVER & LIGHTBOX INTERACTION
-    // ----------------------------------------------------
-    let clickTarget = null;
-    let dragDistance = 0;
-
-    items.forEach((item) => {
-      // Smooth Hover Zoom
-      item.el.addEventListener("mouseenter", () => {
-        if (drag.isActive || isLightboxOpen) return;
-        gsap.to(item.el, {
-          scale: 1.06,
-          rotation: 0,
-          yPercent: -52, // slight lift
-          zIndex: 10,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-        gsap.to(item.img, {
-          scale: 1.08,
-          duration: 0.6,
-          ease: "power3.out",
-        });
-      });
-
-      item.el.addEventListener("mouseleave", () => {
-        gsap.to(item.el, {
-          scale: 1,
-          rotation: item.rotation,
-          yPercent: -50,
-          zIndex: 1,
-          duration: 0.8,
-          ease: "power3.out",
-        });
-        gsap.to(item.img, {
-          scale: 1,
-          duration: 0.8,
-          ease: "power3.out",
-        });
-      });
-
-      // Lightbox Support
-      item.el.addEventListener("pointerdown", (e) => {
-        clickTarget = item;
-        dragDistance = 0;
-      });
-
-      item.el.addEventListener("pointerup", (e) => {
-        if (clickTarget === item && dragDistance < 10 && !isLightboxOpen) {
-          // Open lightbox. We map the ID back to zero-indexed array
-          openLightbox(item.data.id - 1);
-        }
-        clickTarget = null;
-      });
-    });
-
-    window.addEventListener("pointermove", (e) => {
-      if (drag.isActive) {
-        dragDistance += Math.abs(e.movementX) + Math.abs(e.movementY);
-      }
     });
   }
 
-  console.log("PhotographsContent top level code running!");
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initPhotosCanvas);
+    document.addEventListener("DOMContentLoaded", initPhotosVertical);
   } else {
-    initPhotosCanvas();
+    initPhotosVertical();
   }
 </script>
