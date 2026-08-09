@@ -31,13 +31,14 @@ const {
     aria-modal="true"
     style={`border-color: ${borderColor}; outline-color: ${borderColor}; background-color: ${bgColor};`}
   >
-    <!-- Sticky close bar -->
-    <button
-      class="stuff-modal-close"
-      aria-label="Close"
-      data-stuff-close
-      style={`background-color: ${closeBtnBg};`}
-    >
+    <!-- Sticky close wrapper with zero height so it doesn't push content down -->
+    <div class="stuff-modal-close-wrapper">
+      <button
+        class="stuff-modal-close"
+        aria-label="Close"
+        data-stuff-close
+        style={`background-color: ${closeBtnBg};`}
+      >
       <div
         style={`
         width: 32px;
@@ -49,6 +50,7 @@ const {
       >
       </div>
     </button>
+    </div>
 
     <!-- Popup body content (injected per-card via slot) -->
     <div class="stuff-modal-body">

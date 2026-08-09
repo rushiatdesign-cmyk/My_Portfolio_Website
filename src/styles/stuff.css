@@ -299,18 +299,22 @@
 /* ======================================================
    STICKY CLOSE BUTTON
 ====================================================== */
-.stuff-modal-close {
+.stuff-modal-close-wrapper {
   position: sticky;
   top: 0;
+  height: 0;
   display: flex;
   justify-content: flex-end;
-  padding: 14px 16px 8px;
-  width: 100%;
   z-index: 10;
-  box-sizing: border-box;
+}
+
+.stuff-modal-close {
+  padding: 14px 16px 8px;
   border: none;
   cursor: pointer;
   opacity: 1;
+  /* Ensure the button doesn't stretch */
+  flex-shrink: 0;
 }
 
 .stuff-modal-close img {

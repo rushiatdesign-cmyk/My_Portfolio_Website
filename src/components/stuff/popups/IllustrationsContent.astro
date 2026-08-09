@@ -4,27 +4,27 @@
 const originalSize = { w: 1522, h: 1238 };
 
 const referenceData = [
-  {x: 71, y: 58, w: 400, h: 270},
-  {x: 211, y: 255, w: 540, h: 360},
-  {x: 631, y: 158, w: 400, h: 270},
-  {x: 1191, y: 245, w: 260, h: 195},
-  {x: 351, y: 687, w: 260, h: 290},
-  {x: 751, y: 824, w: 205, h: 154},
-  {x: 911, y: 540, w: 260, h: 350},
-  {x: 1051, y: 803, w: 400, h: 300},
-  {x: 71, y: 922, w: 350, h: 260},
+  { x: 71, y: 58, w: 400, h: 270 },
+  { x: 211, y: 255, w: 540, h: 360 },
+  { x: 631, y: 158, w: 400, h: 270 },
+  { x: 1191, y: 245, w: 260, h: 195 },
+  { x: 351, y: 687, w: 260, h: 290 },
+  { x: 751, y: 824, w: 205, h: 154 },
+  { x: 911, y: 540, w: 260, h: 350 },
+  { x: 1051, y: 803, w: 400, h: 300 },
+  { x: 71, y: 922, w: 350, h: 260 },
 ];
 
 const sources = [
-  {src: 'image-1.jpg', caption: '30 knots <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2021'},
-  {src: 'image-2.jpg', caption: 'Sad Mis-Step <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2024'},
-  {src: 'image-3.jpg', caption: 'Mini Orange <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2014'},
-  {src: 'image-4.jpg', caption: 'After Storm <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2022'},
-  {src: 'image-5.jpg', caption: 'Untitled <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2016'},
-  {src: 'image-6.jpg', caption: 'Toilet Paper <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2022'},
-  {src: 'image-7.jpg', caption: 'Cocoa Eggplant Tomato <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2025'},
-  {src: 'image-8.jpg', caption: 'Toilet Paper <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2022'},
-  {src: 'image-9.jpg', caption: 'Production Fun Fact (Eggs) <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2024'},
+  { src: "image-1.jpg", caption: "30 Knots" },
+  { src: "image-2.jpg", caption: "Sad Mis-Step" },
+  { src: "image-3.jpg", caption: "Mini Orange" },
+  { src: "image-4.jpg", caption: "After Storm" },
+  { src: "image-5.jpg", caption: "Untitled" },
+  { src: "image-6.jpg", caption: "Toilet Paper" },
+  { src: "image-7.jpg", caption: "Cocoa Eggplant" },
+  { src: "image-8.jpg", caption: "Toilet Paper 2" },
+  { src: "image-9.jpg", caption: "Production Eggs" },
 ];
 
 const illustrations = referenceData.map((d, i) => {
@@ -39,19 +39,35 @@ const illustrations = referenceData.map((d, i) => {
     ease: Math.random() * 0.5 + 0.5,
   };
 });
+const photoUrls = illustrations.map((p) => p.image);
 ---
 
 <section class="stuff-popup-content illustrations-container">
-  <div id="ill-viewport" class="ill-viewport" data-orig-w={originalSize.w} data-orig-h={originalSize.h}>
-    <div id="ill-track" class="ill-track" data-items={JSON.stringify(illustrations)}>
+  <div
+    id="ill-viewport"
+    class="ill-viewport"
+    data-orig-w={originalSize.w}
+    data-orig-h={originalSize.h}
+  >
+    <div
+      id="ill-track"
+      class="ill-track"
+      data-items={JSON.stringify(illustrations)}
+      data-urls={JSON.stringify(photoUrls)}
+    >
       <!-- The JS engine will construct the 2x2 wrapping grid here -->
     </div>
 
     <!-- User hint -->
     <div id="ill-hint" class="ill-hint">
       <div class="ill-hint__icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7" />
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7"></path>
         </svg>
       </div>
       <span>Pan around infinitely</span>
@@ -59,19 +75,46 @@ const illustrations = referenceData.map((d, i) => {
   </div>
 </section>
 
+<!-- Lightbox DOM -->
+<div class="ill-lightbox" id="ill-lightbox" aria-hidden="true" role="dialog">
+  <button
+    class="ill-lightbox__btn ill-lightbox__btn--close"
+    id="ill-lightbox-close"
+    aria-label="Close Lightbox">×</button
+  >
+  <button
+    class="ill-lightbox__btn ill-lightbox__btn--prev"
+    id="ill-lightbox-prev"
+    aria-label="Previous Illustration">‹</button
+  >
+  <div class="ill-lightbox__content" id="ill-lightbox-backdrop">
+    <img
+      class="ill-lightbox__image"
+      id="ill-lightbox-image"
+      src=""
+      alt="Full size illustration"
+    />
+  </div>
+  <button
+    class="ill-lightbox__btn ill-lightbox__btn--next"
+    id="ill-lightbox-next"
+    aria-label="Next Illustration">›</button
+  >
+</div>
+
 <style>
   .illustrations-container {
     padding: 0;
     margin: 0 calc(-1 * clamp(24px, 5vw, 64px))
       calc(-1 * clamp(40px, 6vh, 80px)); /* Pull to edges */
     overflow: hidden;
-    background-color: #f5c842 !important; /* Set popup background to yellow */
+    background-color: #f3f1d6 !important; /* Set popup background to yellow */
   }
 
   .ill-viewport {
     position: relative;
     width: 100%;
-    height: 80vh;
+    height: 84vh;
     overflow: hidden;
     cursor: grab;
     touch-action: none; /* Required for native touch drag prevention */
@@ -95,22 +138,41 @@ const illustrations = referenceData.map((d, i) => {
     position: absolute;
     top: 0;
     left: 0;
-    
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 10px 10px 38px 10px; /* Polaroid style */
-    
-    background-color: #0d1855; /* User requested blue cards */
-    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
-    
+    padding: 8px 8px 36px 8px; /* Reduced gap between outer and inner frame */
+
+    background-color: #f5c842; /* Changed to yellow background */
+
     user-select: none;
     pointer-events: auto; /* Enable hover/click on the cards themselves */
     cursor: pointer;
     z-index: 1;
 
     /* No CSS transitions on transform, GSAP handles all movement */
+  }
+
+  /* Ink frame mask using blogborder */
+  :global(.ill-card::after) {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #0d1855; /* Blue color for the ink lines */
+    pointer-events: none;
+    z-index: 2;
+
+    -webkit-mask-box-image-source: url("/images/frame/blogborder.PNG");
+    -webkit-mask-box-image-slice: 12%;
+    -webkit-mask-box-image-width: 16px;
+    -webkit-mask-box-image-repeat: stretch;
+
+    mask-border-source: url("/images/frame/blogborder.PNG");
+    mask-border-slice: 12%;
+    mask-border-width: 16px;
+    mask-border-repeat: stretch;
   }
 
   :global(.ill-card__image-wrap) {
@@ -120,6 +182,16 @@ const illustrations = referenceData.map((d, i) => {
     overflow: hidden;
     z-index: 1;
     box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.7);
+
+    /* Using the blog image mask so the photo fits nicely */
+    -webkit-mask-image: url("/images/frame/blogimagemask.PNG");
+    mask-image: url("/images/frame/blogimagemask.PNG");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-position: center;
+    mask-position: center;
   }
 
   :global(.ill-card__image) {
@@ -135,16 +207,20 @@ const illustrations = referenceData.map((d, i) => {
 
   :global(.ill-card__caption) {
     position: absolute;
-    bottom: 12px;
+    bottom: 8px;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 0.7rem;
-    font-family: var(--font-body, "Outfit"), sans-serif;
-    color: #f5c842; /* Yellow text on blue card */
+    font-size: 0.9rem;
+    font-family: var(--font-display, "Slackey"), cursive;
+    color: #111010; /* Dark text for yellow card */
     pointer-events: none;
     z-index: 3;
-    opacity: 0.9;
+    opacity: 0.95;
+    padding: 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Hint styling */
@@ -183,8 +259,111 @@ const illustrations = referenceData.map((d, i) => {
   }
 
   @keyframes pan-hint {
-    0%, 100% { transform: translateX(-4px); }
-    50% { transform: translateX(4px); }
+    0%,
+    100% {
+      transform: translateX(-4px);
+    }
+    50% {
+      transform: translateX(4px);
+    }
+  }
+
+  /* Lightbox Styles */
+  .ill-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13, 24, 85, 0.92); /* Dark blue overlay */
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .ill-lightbox.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .ill-lightbox__content {
+    position: relative;
+    max-width: 85vw;
+    max-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ill-lightbox__image {
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .ill-lightbox__image.is-loading {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  .ill-lightbox__btn {
+    position: absolute;
+    background: none;
+    border: none;
+    color: #f5c842;
+    font-size: 3.5rem;
+    font-family: var(--font-display, "Slackey");
+    cursor: pointer;
+    padding: 20px;
+    transition:
+      transform 0.2s ease,
+      color 0.2s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ill-lightbox__btn:hover {
+    transform: scale(1.15);
+    color: #fff;
+  }
+
+  .ill-lightbox__btn:active {
+    transform: scale(0.95);
+  }
+
+  .ill-lightbox__btn--close {
+    top: 20px;
+    right: 20px;
+    position: fixed;
+    font-size: 3rem;
+  }
+
+  .ill-lightbox__btn--prev {
+    left: 2vw;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .ill-lightbox__btn--prev:hover {
+    transform: translateY(-50%) scale(1.15);
+  }
+
+  .ill-lightbox__btn--next {
+    right: 2vw;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .ill-lightbox__btn--next:hover {
+    transform: translateY(-50%) scale(1.15);
   }
 </style>
 
@@ -195,10 +374,10 @@ const illustrations = referenceData.map((d, i) => {
   // Robust Modal Scroll Lock to completely isolate interactions
   function illLockPageScroll() {
     if (document.documentElement.classList.contains("ill-modal-lock")) return;
-    
+
     const scrollY = window.scrollY;
     document.body.dataset.illScrollY = scrollY.toString();
-    
+
     // Save original styles
     document.body.dataset.origPosition = document.body.style.position || "";
     document.body.dataset.origTop = document.body.style.top || "";
@@ -212,24 +391,24 @@ const illustrations = referenceData.map((d, i) => {
     document.body.style.left = "0";
     document.body.style.right = "0";
     document.body.style.width = "100%";
-    
+
     document.documentElement.classList.add("ill-modal-lock");
   }
 
   function illUnlockPageScroll() {
     if (!document.documentElement.classList.contains("ill-modal-lock")) return;
-    
+
     const scrollY = parseFloat(document.body.dataset.illScrollY || "0");
-    
+
     // Restore previous styles
     document.body.style.position = document.body.dataset.origPosition;
     document.body.style.top = document.body.dataset.origTop;
     document.body.style.left = document.body.dataset.origLeft;
     document.body.style.right = document.body.dataset.origRight;
     document.body.style.width = document.body.dataset.origWidth;
-    
+
     document.documentElement.classList.remove("ill-modal-lock");
-    
+
     // Restore scroll position
     window.scrollTo(0, scrollY);
   }
@@ -290,12 +469,12 @@ const illustrations = referenceData.map((d, i) => {
       current: { x: 0, y: 0 },
       target: { x: 0, y: 0 },
       last: { x: 0, y: 0 },
-      delta: { x: { c: 0, t: 0 }, y: { c: 0, t: 0 } }
+      delta: { x: { c: 0, t: 0 }, y: { c: 0, t: 0 } },
     };
 
     const mouse = {
       x: { t: 0.5, c: 0.5 },
-      y: { t: 0.5, c: 0.5 }
+      y: { t: 0.5, c: 0.5 },
     };
 
     const drag = {
@@ -303,7 +482,7 @@ const illustrations = referenceData.map((d, i) => {
       startX: 0,
       startY: 0,
       scrollX: 0,
-      scrollY: 0
+      scrollY: 0,
     };
 
     let items = [];
@@ -358,7 +537,7 @@ const illustrations = referenceData.map((d, i) => {
             extraX: 0,
             extraY: 0,
             ease: base.ease,
-            data: base
+            data: base,
           });
         });
       });
@@ -374,12 +553,12 @@ const illustrations = referenceData.map((d, i) => {
     scroll.current.y = scroll.target.y;
 
     // Initialize GSAP properties on cards without rotation
-    items.forEach(item => {
-      gsap.set(item.el, { 
+    items.forEach((item) => {
+      gsap.set(item.el, {
         xPercent: 0, // Reference does not translate -50% from center
-        yPercent: 0, 
+        yPercent: 0,
         rotation: 0,
-        scale: 1 
+        scale: 1,
       });
     });
 
@@ -411,17 +590,27 @@ const illustrations = referenceData.map((d, i) => {
       const dirY = scroll.current.y > scroll.last.y ? "down" : "up";
 
       // 4. Update each item
-      items.forEach(item => {
+      items.forEach((item) => {
         // Momentum parallax offsets
         const parallaxX = 8 * scroll.delta.x.c * item.ease;
         const parallaxY = 8 * scroll.delta.y.c * item.ease;
-        
+
         // Mouse parallax offsets
         const mouseParallaxX = (mouse.x.c - 0.5) * 40 * item.ease;
         const mouseParallaxY = (mouse.y.c - 0.5) * 40 * item.ease;
 
-        const posX = item.baseX + scroll.current.x + item.extraX + parallaxX + mouseParallaxX;
-        const posY = item.baseY + scroll.current.y + item.extraY + parallaxY + mouseParallaxY;
+        const posX =
+          item.baseX +
+          scroll.current.x +
+          item.extraX +
+          parallaxX +
+          mouseParallaxX;
+        const posY =
+          item.baseY +
+          scroll.current.y +
+          item.extraY +
+          parallaxY +
+          mouseParallaxY;
 
         // 5. Infinite Wrapping Logic
         if (dirX === "right" && posX > winW) {
@@ -437,16 +626,26 @@ const illustrations = referenceData.map((d, i) => {
         }
 
         // Calculate final wrapped position
-        const fx = item.baseX + scroll.current.x + item.extraX + parallaxX + mouseParallaxX;
-        const fy = item.baseY + scroll.current.y + item.extraY + parallaxY + mouseParallaxY;
+        const fx =
+          item.baseX +
+          scroll.current.x +
+          item.extraX +
+          parallaxX +
+          mouseParallaxX;
+        const fy =
+          item.baseY +
+          scroll.current.y +
+          item.extraY +
+          parallaxY +
+          mouseParallaxY;
 
         // Render positions using GSAP
         gsap.set(item.el, { x: fx, y: fy });
-        
+
         // Inner image parallax (opposite direction)
-        gsap.set(item.img, { 
-          x: -mouse.x.c * item.ease * 12, 
-          y: -mouse.y.c * item.ease * 12 
+        gsap.set(item.img, {
+          x: -mouse.x.c * item.ease * 12,
+          y: -mouse.y.c * item.ease * 12,
         });
       });
 
@@ -459,7 +658,7 @@ const illustrations = referenceData.map((d, i) => {
     // ----------------------------------------------------
     // INPUT HANDLERS
     // ----------------------------------------------------
-    
+
     function onWheel(e) {
       e.preventDefault();
       dismissHint();
@@ -470,6 +669,12 @@ const illustrations = referenceData.map((d, i) => {
     }
 
     function onPointerDown(e) {
+      // Don't drag if lightbox is open
+      if (
+        document.getElementById("ill-lightbox")?.classList.contains("is-open")
+      )
+        return;
+
       e.preventDefault();
       dismissHint();
       drag.isActive = true;
@@ -501,7 +706,7 @@ const illustrations = referenceData.map((d, i) => {
     }
 
     // Bind listeners directly to viewport.
-    // Because the document body is strictly locked when modal is open, 
+    // Because the document body is strictly locked when modal is open,
     // we don't need excessive propagation stoppers here.
     V.addEventListener("wheel", onWheel, { passive: false });
     V.addEventListener("pointerdown", onPointerDown);
@@ -520,7 +725,7 @@ const illustrations = referenceData.map((d, i) => {
     // ----------------------------------------------------
     let clickTarget = null;
     let dragDistance = 0;
-    
+
     items.forEach((item) => {
       // Smooth Hover Zoom without rotation
       item.el.addEventListener("mouseenter", () => {
@@ -560,17 +765,7 @@ const illustrations = referenceData.map((d, i) => {
 
       item.el.addEventListener("pointerup", (e) => {
         if (clickTarget === item && dragDistance < 10) {
-          // It's a clean click, open the lightbox!
-          const imgRect = item.img.getBoundingClientRect();
-          document.dispatchEvent(
-            new CustomEvent("openLightbox", {
-              detail: {
-                id: item.data.id,
-                src: item.data.image,
-                rect: imgRect, // Origin rect for GSAP Flip in lightbox
-              },
-            })
-          );
+          openLightbox(items.indexOf(item) % urls.length);
         }
         clickTarget = null;
       });
@@ -583,6 +778,77 @@ const illustrations = referenceData.map((d, i) => {
       }
     });
 
+    // ----------------------------------------------------
+    // LIGHTBOX LOGIC
+    // ----------------------------------------------------
+    const lightbox = document.getElementById("ill-lightbox");
+    const lbImage = document.getElementById("ill-lightbox-image");
+    const btnClose = document.getElementById("ill-lightbox-close");
+    const btnPrev = document.getElementById("ill-lightbox-prev");
+    const btnNext = document.getElementById("ill-lightbox-next");
+    const urlsStr = T.getAttribute("data-urls");
+    const urls = urlsStr ? JSON.parse(urlsStr) : [];
+
+    let currentIndex = 0;
+    let isLightboxOpen = false;
+
+    function openLightbox(index) {
+      if (urls.length === 0 || !lightbox || !lbImage) return;
+      currentIndex = index;
+      isLightboxOpen = true;
+      lightbox.classList.add("is-open");
+      updateLightboxImage();
+      document.addEventListener("keydown", onLightboxKeydown);
+    }
+
+    function closeLightbox() {
+      if (!lightbox) return;
+      isLightboxOpen = false;
+      lightbox.classList.remove("is-open");
+      document.removeEventListener("keydown", onLightboxKeydown);
+    }
+
+    function updateLightboxImage() {
+      if (!lbImage) return;
+      lbImage.classList.add("is-loading");
+      const newImg = new Image();
+      newImg.src = urls[currentIndex];
+      newImg.onload = () => {
+        lbImage.src = newImg.src;
+        lbImage.classList.remove("is-loading");
+      };
+    }
+
+    function nextImage() {
+      currentIndex = (currentIndex + 1) % urls.length;
+      updateLightboxImage();
+    }
+
+    function prevImage() {
+      currentIndex = (currentIndex - 1 + urls.length) % urls.length;
+      updateLightboxImage();
+    }
+
+    function onLightboxKeydown(e) {
+      if (!isLightboxOpen) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") nextImage();
+      if (e.key === "ArrowLeft") prevImage();
+    }
+
+    if (lightbox) {
+      btnClose?.addEventListener("click", closeLightbox);
+      btnNext?.addEventListener("click", nextImage);
+      btnPrev?.addEventListener("click", prevImage);
+      lightbox.addEventListener("click", (e) => {
+        if (
+          e.target === lightbox ||
+          e.target === document.getElementById("ill-lightbox-backdrop")
+        ) {
+          closeLightbox();
+        }
+      });
+    }
   }
 
   console.log("IllustrationsContent top level code running!");
