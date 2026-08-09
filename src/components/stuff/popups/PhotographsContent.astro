@@ -2,8 +2,8 @@
 // Photographs popup content
 // Configuration for the robust Cell-Jitter algorithm
 const numPhotos = 50;
-const canvasWidth = 1800;
-const canvasHeight = 1300;
+const canvasWidth = 2000; // Increased to give more breathing room
+const canvasHeight = 1400;
 
 // Calculate grid dimensions
 const cols = Math.ceil(Math.sqrt(numPhotos * (canvasWidth / canvasHeight)));
@@ -23,8 +23,8 @@ const photos = Array.from({ length: numPhotos }).map((_, i) => {
 
   // 3. Apply a controlled random jitter (up to 35% of the cell size away from center)
   // This guarantees they look scattered but can never clump or leave massive voids
-  const jitterX = (((i * 137) % 100) / 100 - 0.5) * (cellWidth * 0.7);
-  const jitterY = (((i * 211) % 100) / 100 - 0.5) * (cellHeight * 0.7);
+  const jitterX = (((i * 137) % 100) / 100 - 0.5) * (cellWidth * 0.75);
+  const jitterY = (((i * 211) % 100) / 100 - 0.5) * (cellHeight * 0.75);
 
   // 4. Calculate final position
   const finalLeft = baseLeft + jitterX;
@@ -36,10 +36,11 @@ const photos = Array.from({ length: numPhotos }).map((_, i) => {
   return {
     id: i + 1,
     image: `https://picsum.photos/seed/photograph${i}/1200/800`,
-    jitter: rotation,
-    x: finalLeft.toFixed(2), // Absolute X pixel coordinate
-    y: finalTop.toFixed(2), // Absolute Y pixel coordinate
-    scale: scale.toFixed(2),
+    rotation: rotation,
+    x: finalLeft, // Absolute X pixel coordinate inside the base tile
+    y: finalTop, // Absolute Y pixel coordinate inside the base tile
+    scale: scale,
+    ease: 0.6 + (((i * 97) % 100) / 100) * 0.4, // Individual parallax easing factor
   };
 });
 const photoUrls = photos.map((p) => p.image);
@@ -72,21 +73,17 @@ const photoUrls = photos.map((p) => p.image);
     position: absolute;
     top: 0;
     left: 0;
-    width: var(--track-width);
-    height: var(--track-height);
-
-    will-change: transform;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let the viewport catch drag events */
   }
 
-  .photo-card {
+  :global(.photo-card) {
     position: absolute;
-    /* Use exact pixel coordinates from the algorithm, centered on the coordinate */
-    left: calc(var(--x) * 1px);
-    top: calc(var(--y) * 1px);
-    /* The transform handles both the centering offset and the rotation */
-    transform: translate(-50%, -50%) rotate(calc(var(--jitter) * 1deg));
+    top: 0;
+    left: 0;
+    width: 180px; /* Base width */
 
-    width: calc(160px * var(--scale));
     /* Removed aspect-ratio to let the card adopt a Polaroid shape (taller than wide) */
     display: flex;
     flex-direction: column;
@@ -97,13 +94,14 @@ const photoUrls = photos.map((p) => p.image);
     z-index: 1;
     padding: 16px 16px 42px 16px; /* Increased padding to support the thicker border */
     cursor: pointer; /* Affordance for lightbox */
+    pointer-events: auto;
 
     /* Solid yellow background so cards block the ones behind them when overlapping */
     background-color: #f5c842;
   }
 
   /* Ink frame mask using blogborder */
-  .photo-card::after {
+  :global(.photo-card::after) {
     content: "";
     position: absolute;
     inset: 0;
@@ -122,9 +120,7 @@ const photoUrls = photos.map((p) => p.image);
     mask-border-repeat: stretch;
   }
 
-  /* Hover effect now handled smoothly by GSAP in the script! */
-
-  .photo-card__image-wrap {
+  :global(.photo-card__image-wrap) {
     position: relative;
     width: 100%;
     aspect-ratio: 4 / 3; /* Force the image area to remain landscape */
@@ -144,7 +140,7 @@ const photoUrls = photos.map((p) => p.image);
     mask-position: center;
   }
 
-  .photo-card__image {
+  :global(.photo-card__image) {
     position: absolute;
     top: -10%;
     left: -10%;
@@ -152,14 +148,10 @@ const photoUrls = photos.map((p) => p.image);
     height: 120%;
     object-fit: cover;
     display: block;
-    /* Apply the inner parallax variables set by JS */
-    transform: translate3d(var(--inner-px, 0px), var(--inner-py, 0px), 0)
-      scale(1);
-    /* Transition removed so GSAP can take over smoothly on hover, 
-       but we keep it for the inner parallax if we want, but better to let GSAP handle scale */
+    pointer-events: none;
   }
 
-  .photo-card__caption {
+  :global(.photo-card__caption) {
     position: absolute;
     bottom: 12px;
     left: 0;
@@ -297,43 +289,22 @@ const photoUrls = photos.map((p) => p.image);
   .photos-lightbox__btn--next:hover {
     transform: translateY(-50%) scale(1.15);
   }
-
-  /* Responsive Track - keep canvas large for dragging, but make cards slightly smaller on mobile */
-  @media (max-width: 720px) {
-    .photo-card {
-      width: clamp(180px, 30vw, 260px);
-    }
-  }
 </style>
 
 <section class="stuff-popup-content photos-container">
-  <div class="photos-viewport" id="photos-viewport">
+  <div
+    class="photos-viewport"
+    id="photos-viewport"
+    data-tilesize-w={canvasWidth}
+    data-tilesize-h={canvasHeight}
+  >
     <div
       class="photos-track"
       id="photos-track"
-      data-images={JSON.stringify(photoUrls)}
-      style={`--track-width: ${canvasWidth}px; --track-height: ${canvasHeight}px;`}
+      data-items={JSON.stringify(photos)}
+      data-urls={JSON.stringify(photoUrls)}
     >
-      {
-        photos.map((photo, index) => (
-          <div
-            class="photo-card"
-            data-index={index}
-            style={`--jitter: ${photo.jitter}; --x: ${photo.x}; --y: ${photo.y}; --scale: ${photo.scale};`}
-          >
-            <div class="photo-card__image-wrap">
-              <img
-                class="photo-card__image"
-                src={photo.image}
-                alt={`Photograph ${photo.id}`}
-                loading="lazy"
-                draggable="false"
-              />
-            </div>
-            <div class="photo-card__caption">Photo {photo.id}</div>
-          </div>
-        ))
-      }
+      <!-- The JS engine will construct the 2x2 wrapping grid here -->
     </div>
     <p class="photos-hint" id="photos-hint" aria-hidden="true">
       scroll / drag to move
@@ -376,431 +347,353 @@ const photoUrls = photos.map((p) => p.image);
 <script>
   // @ts-nocheck
   import gsap from "gsap";
-  // Vanilla drag + momentum + edge bounce-back for the photographs canvas.
 
-  function lockPageScroll() {
-    document.body.style.overflow = "hidden";
-    document.body.style.touchAction = "none";
+  // Robust Modal Scroll Lock to completely isolate interactions
+  function photoLockPageScroll() {
+    if (document.documentElement.classList.contains("photos-modal-lock"))
+      return;
+
+    const scrollY = window.scrollY;
+    document.body.dataset.photosScrollY = scrollY.toString();
+
+    // Save original styles
+    document.body.dataset.origPosition = document.body.style.position || "";
+    document.body.dataset.origTop = document.body.style.top || "";
+    document.body.dataset.origLeft = document.body.style.left || "";
+    document.body.dataset.origRight = document.body.style.right || "";
+    document.body.dataset.origWidth = document.body.style.width || "";
+
+    // Lock the page exactly where it is
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+
+    document.documentElement.classList.add("photos-modal-lock");
   }
 
-  function unlockPageScroll() {
-    document.body.style.overflow = "";
-    document.body.style.touchAction = "";
+  function photoUnlockPageScroll() {
+    if (!document.documentElement.classList.contains("photos-modal-lock"))
+      return;
+
+    const scrollY = parseFloat(document.body.dataset.photosScrollY || "0");
+
+    // Restore previous styles
+    document.body.style.position = document.body.dataset.origPosition;
+    document.body.style.top = document.body.dataset.origTop;
+    document.body.style.left = document.body.dataset.origLeft;
+    document.body.style.right = document.body.dataset.origRight;
+    document.body.style.width = document.body.dataset.origWidth;
+
+    document.documentElement.classList.remove("photos-modal-lock");
+
+    // Restore scroll position
+    window.scrollTo(0, scrollY);
   }
 
   function initPhotosCanvas() {
-    const viewport = document.getElementById("photos-viewport");
-    const track = document.getElementById("photos-track");
-    const hint = document.getElementById("photos-hint");
-    if (!viewport || !track) return;
-
-    if (viewport.dataset.initialized === "true") return;
-    viewport.dataset.initialized = "true";
-
-    const V = viewport;
-    const T = track;
-    const H = hint;
-
-    // Start x and y will be set later to center the track
-    let x = 0;
-    let y = 0;
-    let parallaxX = 0;
-    let parallaxY = 0;
-    let targetParallaxX = 0;
-    let targetParallaxY = 0;
-    let parallaxFrame = null;
-    let pointerX = 0;
-    let pointerY = 0;
-    let autoPanVX = 0;
-    let autoPanVY = 0;
-    let autoPanFrame = null;
-    let startX = 0;
-    let startY = 0;
-    let originX = 0;
-    let originY = 0;
-    let velocityX = 0;
-    let velocityY = 0;
-    let lastMoveX = 0;
-    let lastMoveY = 0;
-    let lastMoveTime = 0;
-    let isDragging = false;
-    let isClicking = false; // To distinguish between drag and click
-    let clickTarget = null; // Save original target before pointer capture
-    let momentumFrame = null;
-    let hasInteracted = false;
-
-    const FRICTION = 0.94;
-    const BOUNCE_DURATION = 400;
-    const PARALLAX_MAX = 28;
-    const PARALLAX_SMOOTH = 0.14;
-    const EDGE_ZONE = 96;
-    const EDGE_PAN_MAX = 12;
-
-    function getBounds() {
-      const trackRect = T.getBoundingClientRect();
-      const viewportRect = V.getBoundingClientRect();
-      const trackWidth = T.scrollWidth;
-      const trackHeight = T.scrollHeight;
-      const minX = Math.min(0, viewportRect.width - trackWidth);
-      const minY = Math.min(0, viewportRect.height - trackHeight);
-      return { minX, maxX: 0, minY, maxY: 0 };
+    console.log("initPhotosCanvas running!");
+    const V = document.getElementById("photos-viewport");
+    const T = document.getElementById("photos-track");
+    const H = document.getElementById("photos-hint");
+    if (!V || !T) {
+      console.log("initPhotosCanvas aborted: V or T missing");
+      return;
     }
 
-    function setTransform(px, py) {
-      T.style.transform = `translate3d(${px + parallaxX}px, ${py + parallaxY}px, 0)`;
-    }
+    // Prevent duplicate initialization
+    if (V.dataset.initialized === "true") return;
+    V.dataset.initialized = "true";
 
-    function clamp(value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    }
-
-    function dismissHint() {
-      if (hasInteracted || !H) return;
-      hasInteracted = true;
-      H.classList.add("is-hidden");
-    }
-
-    function stopMomentum() {
-      if (momentumFrame !== null) {
-        cancelAnimationFrame(momentumFrame);
-        momentumFrame = null;
-      }
-    }
-
-    function animateParallax() {
-      parallaxX += (targetParallaxX - parallaxX) * PARALLAX_SMOOTH;
-      parallaxY += (targetParallaxY - parallaxY) * PARALLAX_SMOOTH;
-      setTransform(x, y);
-
-      // Update inner image parallax (moves opposite to the track)
-      V.style.setProperty("--inner-px", `${-parallaxX * 0.9}px`);
-      V.style.setProperty("--inner-py", `${-parallaxY * 0.9}px`);
-
-      if (
-        Math.abs(targetParallaxX - parallaxX) > 0.05 ||
-        Math.abs(targetParallaxY - parallaxY) > 0.05
-      ) {
-        parallaxFrame = requestAnimationFrame(animateParallax);
-      } else {
-        parallaxFrame = null;
-      }
-    }
-
-    function animateAutoPan() {
-      x = x + autoPanVX;
-      y = y + autoPanVY;
-      const bounds = getBounds();
-      x = clamp(x, bounds.minX - 60, bounds.maxX + 60);
-      y = clamp(y, bounds.minY - 60, bounds.maxY + 60);
-      setTransform(x, y);
-      if (Math.abs(autoPanVX) > 0.01 || Math.abs(autoPanVY) > 0.01) {
-        autoPanFrame = requestAnimationFrame(animateAutoPan);
-      } else {
-        autoPanFrame = null;
-      }
-    }
-
-    function settleToBounds() {
-      const bounds = getBounds();
-      const targetX = clamp(x, bounds.minX, bounds.maxX);
-      const targetY = clamp(y, bounds.minY, bounds.maxY);
-      if (targetX !== x || targetY !== y) {
-        T.style.transition = `transform ${BOUNCE_DURATION}ms cubic-bezier(0.22, 1, 0.36, 1)`;
-        x = targetX;
-        y = targetY;
-        setTransform(x, y);
-        window.setTimeout(() => {
-          T.style.transition = "none";
-        }, BOUNCE_DURATION);
-      }
-    }
-
-    function runMomentum() {
-      const bounds = getBounds();
-
-      if (x > bounds.maxX) velocityX -= (x - bounds.maxX) * 0.12;
-      if (x < bounds.minX) velocityX -= (x - bounds.minX) * 0.12;
-      if (y > bounds.maxY) velocityY -= (y - bounds.maxY) * 0.12;
-      if (y < bounds.minY) velocityY -= (y - bounds.minY) * 0.12;
-
-      velocityX *= FRICTION;
-      velocityY *= FRICTION;
-      x += velocityX;
-      y += velocityY;
-      setTransform(x, y);
-
-      if (Math.abs(velocityX) > 0.3 || Math.abs(velocityY) > 0.3) {
-        momentumFrame = requestAnimationFrame(runMomentum);
-      } else {
-        momentumFrame = null;
-        settleToBounds();
-      }
-    }
-
-    function onPointerDown(e) {
-      // Don't drag if lightbox is open
-      if (
-        document.getElementById("photos-lightbox").classList.contains("is-open")
-      )
-        return;
-
-      clickTarget = e.target;
-      dismissHint();
-      stopMomentum();
-      T.style.transition = "none";
-      isDragging = true;
-      isClicking = true; // Assume it's a click until they move far enough
-      V.classList.add("is-dragging");
-      startX = e.clientX;
-      startY = e.clientY;
-      originX = x;
-      originY = y;
-      lastMoveX = e.clientX;
-      lastMoveY = e.clientY;
-      lastMoveTime = performance.now();
-      velocityX = 0;
-      velocityY = 0;
-      V.setPointerCapture(e.pointerId);
-    }
-
-    function onPointerMove(e) {
-      if (!isDragging) {
-        if (e.pointerType === "mouse") {
-          const rect = V.getBoundingClientRect();
-          const nx =
-            (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-          const ny =
-            (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
-          targetParallaxX = clamp(
-            -nx * PARALLAX_MAX,
-            -PARALLAX_MAX,
-            PARALLAX_MAX,
-          );
-          targetParallaxY = clamp(
-            -ny * (PARALLAX_MAX * 0.6),
-            -PARALLAX_MAX,
-            PARALLAX_MAX,
-          );
-          pointerX = e.clientX - rect.left;
-          pointerY = e.clientY - rect.top;
-          const zone = EDGE_ZONE;
-          autoPanVX = 0;
-          autoPanVY = 0;
-          if (pointerX < zone) {
-            autoPanVX = ((zone - pointerX) / zone) * EDGE_PAN_MAX;
-          } else if (pointerX > rect.width - zone) {
-            autoPanVX =
-              -((pointerX - (rect.width - zone)) / zone) * EDGE_PAN_MAX;
-          }
-          if (pointerY < zone) {
-            autoPanVY = ((zone - pointerY) / zone) * (EDGE_PAN_MAX * 0.45);
-          } else if (pointerY > rect.height - zone) {
-            autoPanVY =
-              -((pointerY - (rect.height - zone)) / zone) *
-              (EDGE_PAN_MAX * 0.45);
-          }
-          if (parallaxFrame === null)
-            parallaxFrame = requestAnimationFrame(animateParallax);
-          if (
-            (Math.abs(autoPanVX) > 0.01 || Math.abs(autoPanVY) > 0.01) &&
-            autoPanFrame === null
-          ) {
-            autoPanFrame = requestAnimationFrame(animateAutoPan);
-          }
-        }
-        return;
-      }
-
-      // If they move more than 10px, it's a drag, not a click
-      if (
-        Math.abs(e.clientX - startX) > 10 ||
-        Math.abs(e.clientY - startY) > 10
-      ) {
-        isClicking = false;
-      }
-
-      const bounds = getBounds();
-
-      let nextX = originX + (e.clientX - startX);
-      let nextY = originY + (e.clientY - startY);
-
-      if (nextX > bounds.maxX)
-        nextX = bounds.maxX + (nextX - bounds.maxX) * 0.35;
-      if (nextX < bounds.minX)
-        nextX = bounds.minX + (nextX - bounds.minX) * 0.35;
-      if (nextY > bounds.maxY)
-        nextY = bounds.maxY + (nextY - bounds.maxY) * 0.35;
-      if (nextY < bounds.minY)
-        nextY = bounds.minY + (nextY - bounds.minY) * 0.35;
-
-      x = nextX;
-      y = nextY;
-      setTransform(x, y);
-
-      const now = performance.now();
-      const dt = Math.max(now - lastMoveTime, 1);
-      velocityX = ((e.clientX - lastMoveX) / dt) * 16;
-      velocityY = ((e.clientY - lastMoveY) / dt) * 16;
-      lastMoveX = e.clientX;
-      lastMoveY = e.clientY;
-      lastMoveTime = now;
-    }
-
-    function onPointerUp(e) {
-      if (!isDragging) return;
-      isDragging = false;
-      V.classList.remove("is-dragging");
-      V.releasePointerCapture(e.pointerId);
-
-      // Open Lightbox if it was a valid click on a card
-      if (isClicking && clickTarget) {
-        // Because of the inner wrapper, we find the closest photo-card
-        let card = clickTarget;
-        while (card && !card.classList?.contains("photo-card")) {
-          card = card.parentElement;
-        }
-        if (card) {
-          const indexStr = card.getAttribute("data-index");
-          if (indexStr) {
-            openLightbox(parseInt(indexStr, 10));
-          }
-        }
-      }
-
-      clickTarget = null;
-      momentumFrame = requestAnimationFrame(runMomentum);
-      targetParallaxX = 0;
-      targetParallaxY = 0;
-      if (parallaxFrame === null)
-        parallaxFrame = requestAnimationFrame(animateParallax);
-    }
-
-    function onWheel(e) {
-      // Prevent default to stop scrolling the page while inside the canvas
-      e.preventDefault();
-      e.stopPropagation();
-
-      dismissHint();
-      stopMomentum();
-      T.style.transition = "none";
-
-      const bounds = getBounds();
-      x = clamp(x - e.deltaX, bounds.minX - 60, bounds.maxX + 60);
-      y = clamp(y - e.deltaY, bounds.minY - 60, bounds.maxY + 60);
-      setTransform(x, y);
-
-      velocityX = -e.deltaX * 0.5;
-      velocityY = -e.deltaY * 0.5;
-      stopMomentum();
-      momentumFrame = requestAnimationFrame(runMomentum);
-      targetParallaxX = clamp(-e.deltaX * 0.02, -PARALLAX_MAX, PARALLAX_MAX);
-      targetParallaxY = clamp(-e.deltaY * 0.015, -PARALLAX_MAX, PARALLAX_MAX);
-      if (parallaxFrame === null)
-        parallaxFrame = requestAnimationFrame(animateParallax);
-    }
-
-    V.addEventListener("pointerdown", onPointerDown);
-    V.addEventListener("pointermove", onPointerMove);
-    V.addEventListener("pointerup", onPointerUp);
-    V.addEventListener("pointercancel", onPointerUp);
-    V.addEventListener("wheel", onWheel, { passive: false });
-    V.addEventListener("pointerleave", () => {
-      targetParallaxX = 0;
-      targetParallaxY = 0;
-      if (parallaxFrame === null)
-        parallaxFrame = requestAnimationFrame(animateParallax);
-    });
-
-    V.addEventListener("dragstart", (e) => e.preventDefault());
-
-    // Robust Modal Scroll Lock to completely isolate interactions
+    // Setup Modal Lifecycle
     const overlay = V.closest(".stuff-modal-overlay");
     if (overlay) {
-      let isPageLocked = false;
-      let savedScrollY = 0;
-      let originalStyles = {
-        position: "",
-        top: "",
-        left: "",
-        right: "",
-        width: "",
-      };
-
-      function lockPageScroll() {
-        if (isPageLocked) return;
-        isPageLocked = true;
-        savedScrollY = window.scrollY;
-
-        // Save original styles
-        originalStyles.position = document.body.style.position;
-        originalStyles.top = document.body.style.top;
-        originalStyles.left = document.body.style.left;
-        originalStyles.right = document.body.style.right;
-        originalStyles.width = document.body.style.width;
-
-        // Lock the page exactly where it is
-        document.body.style.position = "fixed";
-        document.body.style.top = `-${savedScrollY}px`;
-        document.body.style.left = "0";
-        document.body.style.right = "0";
-        document.body.style.width = "100%";
-        document.documentElement.classList.add("photos-modal-lock");
-      }
-
-      function unlockPageScroll() {
-        if (!isPageLocked) return;
-        isPageLocked = false;
-
-        // Restore previous styles
-        document.body.style.position = originalStyles.position;
-        document.body.style.top = originalStyles.top;
-        document.body.style.left = originalStyles.left;
-        document.body.style.right = originalStyles.right;
-        document.body.style.width = originalStyles.width;
-        document.documentElement.classList.remove("photos-modal-lock");
-
-        // Restore scroll position
-        window.scrollTo(0, savedScrollY);
-      }
-
       const observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
           if (mutation.attributeName === "aria-hidden") {
             if (overlay.getAttribute("aria-hidden") === "false") {
-              lockPageScroll();
+              photoLockPageScroll();
             } else {
-              unlockPageScroll();
+              photoUnlockPageScroll();
             }
           }
         }
       });
       observer.observe(overlay, { attributes: true });
 
-      // Initial check in case it's already open
       if (overlay.getAttribute("aria-hidden") === "false") {
-        lockPageScroll();
+        photoLockPageScroll();
       }
     }
 
-    // Center the canvas on load instead of starting at top-left (0,0)
-    // We delay slightly to ensure DOM dimensions are computed before bounding
-    setTimeout(() => {
-      const bounds = getBounds();
-      x = bounds.minX / 2;
-      y = bounds.minY / 2;
-      setTransform(x, y);
-    }, 10);
+    // Load Data
+    const baseItems = JSON.parse(T.getAttribute("data-items") || "[]");
+    const tileW = parseFloat(V.getAttribute("data-tilesize-w"));
+    const tileH = parseFloat(V.getAttribute("data-tilesize-h"));
 
-    // ==========================================
-    // Lightbox Logic
-    // ==========================================
+    // Infinite Grid State
+    const scroll = {
+      ease: 0.08,
+      current: { x: 0, y: 0 },
+      target: { x: 0, y: 0 },
+      last: { x: 0, y: 0 },
+      delta: { x: { c: 0, t: 0 }, y: { c: 0, t: 0 } },
+    };
+
+    const mouse = {
+      x: { t: 0.5, c: 0.5 },
+      y: { t: 0.5, c: 0.5 },
+    };
+
+    const drag = {
+      isActive: false,
+      startX: 0,
+      startY: 0,
+      scrollX: 0,
+      scrollY: 0,
+    };
+
+    let items = [];
+    let winW = V.clientWidth;
+    let winH = V.clientHeight;
+
+    // Build the 2x2 wrapping DOM
+    // We clone each item 4 times: [0,0], [W,0], [0,H], [W,H]
+    const repsX = [0, tileW];
+    const repsY = [0, tileH];
+
+    baseItems.forEach((base) => {
+      repsX.forEach((offsetX) => {
+        repsY.forEach((offsetY) => {
+          // Construct Card DOM
+          const card = document.createElement("div");
+          card.classList.add("photo-card");
+          card.style.width = `${160 * base.scale}px`; // Apply initial base scale here for CSS
+
+          const wrap = document.createElement("div");
+          wrap.classList.add("photo-card__image-wrap");
+
+          const img = document.createElement("img");
+          img.classList.add("photo-card__image");
+          img.src = base.image;
+          img.alt = `Photograph ${base.id}`;
+          img.loading = "lazy";
+          img.draggable = false;
+
+          wrap.appendChild(img);
+          card.appendChild(wrap);
+
+          const cap = document.createElement("div");
+          cap.classList.add("photo-card__caption");
+          cap.textContent = `Photo ${base.id}`;
+          card.appendChild(cap);
+
+          T.appendChild(card);
+
+          // Store engine data
+          items.push({
+            el: card,
+            img: img,
+            baseX: base.x + offsetX,
+            baseY: base.y + offsetY,
+            extraX: 0,
+            extraY: 0,
+            rotation: base.rotation,
+            ease: base.ease,
+            data: base, // store original data
+          });
+        });
+      });
+    });
+
+    const fullTileW = tileW * 2;
+    const fullTileH = tileH * 2;
+
+    // Start slightly offset to feel natural
+    scroll.target.x = -winW * 0.1;
+    scroll.target.y = -winH * 0.1;
+    scroll.current.x = scroll.target.x;
+    scroll.current.y = scroll.target.y;
+
+    // Initialize GSAP properties on cards
+    items.forEach((item) => {
+      gsap.set(item.el, {
+        xPercent: -50,
+        yPercent: -50,
+        rotation: item.rotation,
+        scale: 1,
+      });
+    });
+
+    function dismissHint() {
+      if (H && !H.classList.contains("is-hidden")) {
+        H.classList.add("is-hidden");
+      }
+    }
+
+    // ----------------------------------------------------
+    // GSAP TICKER RENDER LOOP
+    // ----------------------------------------------------
+    function render() {
+      // 1. Smoothly interpolate scroll
+      scroll.current.x += (scroll.target.x - scroll.current.x) * scroll.ease;
+      scroll.current.y += (scroll.target.y - scroll.current.y) * scroll.ease;
+
+      // 2. Smoothly calculate scroll delta for parallax floating
+      scroll.delta.x.t = scroll.current.x - scroll.last.x;
+      scroll.delta.y.t = scroll.current.y - scroll.last.y;
+      scroll.delta.x.c += (scroll.delta.x.t - scroll.delta.x.c) * 0.05;
+      scroll.delta.y.c += (scroll.delta.y.t - scroll.delta.y.c) * 0.05;
+
+      // 3. Smooth mouse position
+      mouse.x.c += (mouse.x.t - mouse.x.c) * 0.05;
+      mouse.y.c += (mouse.y.t - mouse.y.c) * 0.05;
+
+      const dirX = scroll.current.x > scroll.last.x ? "right" : "left";
+      const dirY = scroll.current.y > scroll.last.y ? "down" : "up";
+
+      // 4. Update each item
+      items.forEach((item) => {
+        // Momentum parallax offsets
+        const parallaxX = 8 * scroll.delta.x.c * item.ease;
+        const parallaxY = 8 * scroll.delta.y.c * item.ease;
+
+        // Mouse parallax offsets
+        const mouseParallaxX = (mouse.x.c - 0.5) * 40 * item.ease;
+        const mouseParallaxY = (mouse.y.c - 0.5) * 40 * item.ease;
+
+        const posX =
+          item.baseX +
+          scroll.current.x +
+          item.extraX +
+          parallaxX +
+          mouseParallaxX;
+        const posY =
+          item.baseY +
+          scroll.current.y +
+          item.extraY +
+          parallaxY +
+          mouseParallaxY;
+
+        // Card dimensions (approximate for wrapping calculations)
+        const cardW = 160 * item.data.scale * 1.5; // include rotation bounds padding
+        const cardH = 160 * item.data.scale * 1.5;
+
+        // 5. Infinite Wrapping Logic
+        if (dirX === "right" && posX > winW + cardW) {
+          item.extraX -= fullTileW;
+        } else if (dirX === "left" && posX < -cardW) {
+          item.extraX += fullTileW;
+        }
+
+        if (dirY === "down" && posY > winH + cardH) {
+          item.extraY -= fullTileH;
+        } else if (dirY === "up" && posY < -cardH) {
+          item.extraY += fullTileH;
+        }
+
+        // Calculate final wrapped position
+        const fx =
+          item.baseX +
+          scroll.current.x +
+          item.extraX +
+          parallaxX +
+          mouseParallaxX;
+        const fy =
+          item.baseY +
+          scroll.current.y +
+          item.extraY +
+          parallaxY +
+          mouseParallaxY;
+
+        // Render positions using GSAP (preserves xPercent, yPercent, rotation, scale)
+        gsap.set(item.el, { x: fx, y: fy });
+
+        // Inner image parallax (opposite direction)
+        gsap.set(item.img, {
+          x: -mouse.x.c * item.ease * 12,
+          y: -mouse.y.c * item.ease * 12,
+        });
+      });
+
+      scroll.last.x = scroll.current.x;
+      scroll.last.y = scroll.current.y;
+    }
+
+    gsap.ticker.add(render);
+
+    // ----------------------------------------------------
+    // INPUT HANDLERS
+    // ----------------------------------------------------
+
+    function onWheel(e) {
+      e.preventDefault();
+      dismissHint();
+      scroll.target.x -= e.deltaX * 0.5;
+      scroll.target.y -= e.deltaY * 0.5;
+    }
+
+    function onPointerDown(e) {
+      // Don't drag if lightbox is open
+      if (
+        document
+          .getElementById("photos-lightbox")
+          ?.classList.contains("is-open")
+      )
+        return;
+
+      e.preventDefault();
+      dismissHint();
+      drag.isActive = true;
+      V.classList.add("is-dragging");
+      drag.startX = e.clientX;
+      drag.startY = e.clientY;
+      drag.scrollX = scroll.target.x;
+      drag.scrollY = scroll.target.y;
+    }
+
+    function onPointerMove(e) {
+      mouse.x.t = e.clientX / window.innerWidth;
+      mouse.y.t = e.clientY / window.innerHeight;
+
+      if (drag.isActive) {
+        const dx = e.clientX - drag.startX;
+        const dy = e.clientY - drag.startY;
+        scroll.target.x = drag.scrollX + dx;
+        scroll.target.y = drag.scrollY + dy;
+      }
+    }
+
+    function onPointerUp(e) {
+      if (drag.isActive) {
+        drag.isActive = false;
+        V.classList.remove("is-dragging");
+      }
+    }
+
+    V.addEventListener("wheel", onWheel, { passive: false });
+    V.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
+
+    // Resize observer
+    window.addEventListener("resize", () => {
+      winW = V.clientWidth;
+      winH = V.clientHeight;
+    });
+
+    // ----------------------------------------------------
+    // LIGHTBOX LOGIC
+    // ----------------------------------------------------
     const lightbox = document.getElementById("photos-lightbox");
     const lbImage = document.getElementById("lightbox-image");
     const btnClose = document.getElementById("lightbox-close");
     const btnPrev = document.getElementById("lightbox-prev");
     const btnNext = document.getElementById("lightbox-next");
-    const imagesDataStr = T.getAttribute("data-images");
-    const urls = imagesDataStr ? JSON.parse(imagesDataStr) : [];
+    const urlsStr = T.getAttribute("data-urls");
+    const urls = urlsStr ? JSON.parse(urlsStr) : [];
 
     let currentIndex = 0;
     let isLightboxOpen = false;
@@ -824,8 +717,6 @@ const photoUrls = photos.map((p) => p.image);
     function updateLightboxImage() {
       if (!lbImage) return;
       lbImage.classList.add("is-loading");
-
-      // Load new image
       const newImg = new Image();
       newImg.src = urls[currentIndex];
       newImg.onload = () => {
@@ -855,8 +746,6 @@ const photoUrls = photos.map((p) => p.image);
       btnClose?.addEventListener("click", closeLightbox);
       btnNext?.addEventListener("click", nextImage);
       btnPrev?.addEventListener("click", prevImage);
-
-      // Close on backdrop click
       lightbox.addEventListener("click", (e) => {
         if (
           e.target === lightbox ||
@@ -867,24 +756,17 @@ const photoUrls = photos.map((p) => p.image);
       });
     }
 
-    // ==========================================
-    // Smooth GSAP Hover Effects
-    // ==========================================
-    const cards = document.querySelectorAll(".photo-card");
-    cards.forEach((card) => {
-      const jitter = parseFloat(card.style.getPropertyValue("--jitter") || "0");
-      const img = card.querySelector(".photo-card__image");
+    // ----------------------------------------------------
+    // GSAP HOVER & LIGHTBOX INTERACTION
+    // ----------------------------------------------------
+    let clickTarget = null;
+    let dragDistance = 0;
 
-      // Initialize GSAP to replace the static CSS transform
-      gsap.set(card, {
-        xPercent: -50,
-        yPercent: -50,
-        rotation: jitter,
-        scale: 1,
-      });
-
-      card.addEventListener("mouseenter", () => {
-        gsap.to(card, {
+    items.forEach((item) => {
+      // Smooth Hover Zoom
+      item.el.addEventListener("mouseenter", () => {
+        if (drag.isActive || isLightboxOpen) return;
+        gsap.to(item.el, {
           scale: 1.06,
           rotation: 0,
           yPercent: -52, // slight lift
@@ -892,35 +774,52 @@ const photoUrls = photos.map((p) => p.image);
           duration: 0.6,
           ease: "power3.out",
         });
-        if (img) {
-          gsap.to(img, {
-            scale: 1.08,
-            duration: 0.6,
-            ease: "power3.out",
-          });
-        }
+        gsap.to(item.img, {
+          scale: 1.08,
+          duration: 0.6,
+          ease: "power3.out",
+        });
       });
 
-      card.addEventListener("mouseleave", () => {
-        gsap.to(card, {
+      item.el.addEventListener("mouseleave", () => {
+        gsap.to(item.el, {
           scale: 1,
-          rotation: jitter,
+          rotation: item.rotation,
           yPercent: -50,
           zIndex: 1,
           duration: 0.8,
           ease: "power3.out",
         });
-        if (img) {
-          gsap.to(img, {
-            scale: 1,
-            duration: 0.8,
-            ease: "power3.out",
-          });
-        }
+        gsap.to(item.img, {
+          scale: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        });
       });
+
+      // Lightbox Support
+      item.el.addEventListener("pointerdown", (e) => {
+        clickTarget = item;
+        dragDistance = 0;
+      });
+
+      item.el.addEventListener("pointerup", (e) => {
+        if (clickTarget === item && dragDistance < 10 && !isLightboxOpen) {
+          // Open lightbox. We map the ID back to zero-indexed array
+          openLightbox(item.data.id - 1);
+        }
+        clickTarget = null;
+      });
+    });
+
+    window.addEventListener("pointermove", (e) => {
+      if (drag.isActive) {
+        dragDistance += Math.abs(e.movementX) + Math.abs(e.movementY);
+      }
     });
   }
 
+  console.log("PhotographsContent top level code running!");
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initPhotosCanvas);
   } else {

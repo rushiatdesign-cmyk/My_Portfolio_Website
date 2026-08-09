@@ -265,11 +265,13 @@
   background: transparent;
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .stuff-modal-overlay.is-active {
   opacity: 1;
   pointer-events: auto;
+  visibility: visible;
 }
 
 /* ======================================================

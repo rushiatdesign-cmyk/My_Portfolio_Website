@@ -1,20 +1,30 @@
 ---
-import StuffLayout from '../layouts/StuffLayout.astro';
-import StuffCard from '../components/stuff/StuffCard.astro';
-import StuffModal from '../components/stuff/StuffModal.astro';
+import StuffLayout from "../layouts/StuffLayout.astro";
+import StuffCard from "../components/stuff/StuffCard.astro";
+import StuffModal from "../components/stuff/StuffModal.astro";
 
-import MoviesContent from '../components/stuff/popups/MoviesContent.astro';
-import DishesContent from '../components/stuff/popups/DishesContent.astro';
-import MusicContent from '../components/stuff/popups/MusicContent.astro';
-import PhotographsContent from '../components/stuff/popups/PhotographsContent.astro';
-import IllustrationsContent from '../components/stuff/popups/IllustrationsContent.astro';
+import MoviesContent from "../components/stuff/popups/MoviesContent.astro";
+import DishesContent from "../components/stuff/popups/DishesContent.astro";
+import MusicContent from "../components/stuff/popups/MusicContent.astro";
+import PhotographsContent from "../components/stuff/popups/PhotographsContent.astro";
+import IllustrationsContent from "../components/stuff/popups/IllustrationsContent.astro";
 
 const cards = [
-  { id: 'stuff-modal-movies',        title: 'Movies',        emoji: '🎬', index: 0 },
-  { id: 'stuff-modal-dishes',        title: 'Dishes',        emoji: '🥘', index: 1 },
-  { id: 'stuff-modal-music',         title: 'Music',         emoji: '🎵', index: 2 },
-  { id: 'stuff-modal-photographs',   title: 'Photographs',   emoji: '📷', index: 3 },
-  { id: 'stuff-modal-illustrations', title: 'Illustrations', emoji: '🎨', index: 4 }
+  { id: "stuff-modal-movies", title: "Movies", emoji: "🎬", index: 0 },
+  { id: "stuff-modal-dishes", title: "Dishes", emoji: "🥘", index: 1 },
+  { id: "stuff-modal-music", title: "Music", emoji: "🎵", index: 2 },
+  {
+    id: "stuff-modal-photographs",
+    title: "Photographs",
+    emoji: "📷",
+    index: 3,
+  },
+  {
+    id: "stuff-modal-illustrations",
+    title: "Illustrations",
+    emoji: "🎨",
+    index: 4,
+  },
 ];
 ---
 
@@ -22,14 +32,16 @@ const cards = [
   <!-- Card carousel -->
   <div class="stuff-carousel-wrap">
     <div id="stuff-track" class="stuff-track">
-      {cards.map(c => (
-        <StuffCard
-          modalId={c.id}
-          title={c.title}
-          emoji={c.emoji}
-          index={c.index}
-        />
-      ))}
+      {
+        cards.map((c) => (
+          <StuffCard
+            modalId={c.id}
+            title={c.title}
+            emoji={c.emoji}
+            index={c.index}
+          />
+        ))
+      }
     </div>
   </div>
 
@@ -43,11 +55,21 @@ const cards = [
       <DishesContent />
     </StuffModal>
 
-    <StuffModal id="stuff-modal-music" borderColor="#F5C842" bgColor="#F5C842" closeIconColor="#0D1855">
+    <StuffModal
+      id="stuff-modal-music"
+      borderColor="#F5C842"
+      bgColor="#F5C842"
+      closeIconColor="#0D1855"
+    >
       <MusicContent />
     </StuffModal>
 
-    <StuffModal id="stuff-modal-photographs" borderColor="#F5C842" bgColor="#F5C842" closeIconColor="#0D1855">
+    <StuffModal
+      id="stuff-modal-photographs"
+      borderColor="#F5C842"
+      bgColor="#F5C842"
+      closeIconColor="#0D1855"
+    >
       <PhotographsContent />
     </StuffModal>
 
@@ -58,27 +80,92 @@ const cards = [
 </StuffLayout>
 
 <script>
-  import gsap from 'gsap';
+  import gsap from "gsap";
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initStuff() {
+    console.log(
+      "initStuff is running! Found cards:",
+      document.querySelectorAll(".stuff-card").length,
+    );
+
+    /* ─── Modal open / close ─── */
+    try {
+      const allModals =
+        document.querySelectorAll<HTMLElement>("[data-stuff-modal]");
+
+      const openModal = (id: string) => {
+        console.log("openModal called for:", id);
+        const modal = document.getElementById(id);
+        console.log("Found modal element:", modal);
+        if (!modal) {
+          alert("ERROR: Modal element not found for id: " + id);
+          return;
+        }
+        modal.classList.add("is-active");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      };
+
+      const closeModal = (modal: HTMLElement) => {
+        modal.classList.remove("is-active");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      };
+
+      document.querySelectorAll<HTMLElement>(".stuff-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          const id = card.dataset.modal;
+          if (id) openModal(id);
+        });
+      });
+
+      document
+        .querySelectorAll<HTMLButtonElement>("[data-stuff-close]")
+        .forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const modal = btn.closest<HTMLElement>("[data-stuff-modal]");
+            if (modal) closeModal(modal);
+          });
+        });
+
+      allModals.forEach((modal) => {
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) closeModal(modal);
+        });
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          allModals.forEach((modal) => {
+            if (modal.classList.contains("is-active")) closeModal(modal);
+          });
+        }
+      });
+    } catch (e) {
+      console.error("Error setting up modals:", e);
+    }
 
     /* ─── Horizontal card carousel ─── */
-    const track = document.getElementById('stuff-track') as HTMLElement;
-    const leftBtn = document.getElementById('stuff-arrow-left') as HTMLButtonElement;
-    const rightBtn = document.getElementById('stuff-arrow-right') as HTMLButtonElement;
+    const track = document.getElementById("stuff-track") as HTMLElement;
+    const leftBtn = document.getElementById(
+      "stuff-arrow-left",
+    ) as HTMLButtonElement;
+    const rightBtn = document.getElementById(
+      "stuff-arrow-right",
+    ) as HTMLButtonElement;
 
     let currentIndex = 0;
     const TOTAL = 5;
 
     // Dynamically calculate visible cards (1 on mobile, 3 on desktop)
-    const getVisibleCount = () => window.innerWidth <= 768 ? 1 : 3;
+    const getVisibleCount = () => (window.innerWidth <= 768 ? 1 : 3);
     let VISIBLE = getVisibleCount();
     let MAX_INDEX = TOTAL - VISIBLE;
 
     const getCardWidth = () => {
-      const card = track.querySelector<HTMLElement>('.stuff-card');
+      const card = track.querySelector<HTMLElement>(".stuff-card");
       if (!card) return 0;
-      const gap = parseFloat(getComputedStyle(track).gap || '0');
+      const gap = parseFloat(getComputedStyle(track).gap || "0");
       return card.offsetWidth + gap;
     };
 
@@ -86,16 +173,16 @@ const cards = [
       gsap.to(track, {
         x: -(currentIndex * getCardWidth()),
         duration: 0.65,
-        ease: 'power2.inOut',
+        ease: "power2.inOut",
       });
     };
 
     const updateArrows = () => {
-      leftBtn.style.opacity = currentIndex === 0 ? '0.35' : '1';
-      rightBtn.style.opacity = currentIndex >= MAX_INDEX ? '0.35' : '1';
+      leftBtn.style.opacity = currentIndex === 0 ? "0.35" : "1";
+      rightBtn.style.opacity = currentIndex >= MAX_INDEX ? "0.35" : "1";
     };
 
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       VISIBLE = getVisibleCount();
       MAX_INDEX = TOTAL - VISIBLE;
       if (currentIndex > MAX_INDEX) currentIndex = MAX_INDEX;
@@ -117,8 +204,8 @@ const cards = [
       updateArrows();
     };
 
-    rightBtn.addEventListener('click', goNext);
-    leftBtn.addEventListener('click', goPrev);
+    rightBtn.addEventListener("click", goNext);
+    leftBtn.addEventListener("click", goPrev);
 
     updateArrows();
 
@@ -127,7 +214,7 @@ const cards = [
     let isDragging = false;
     let dragThreshold = 50;
 
-    track.addEventListener('pointerdown', (e) => {
+    track.addEventListener("pointerdown", (e) => {
       isDragging = true;
       startX = e.clientX;
     });
@@ -135,9 +222,9 @@ const cards = [
     const handlePointerEnd = (e: PointerEvent) => {
       if (!isDragging) return;
       isDragging = false;
-      
+
       const diffX = e.clientX - startX;
-      
+
       // If horizontal swipe distance crosses threshold, switch slides
       if (diffX > dragThreshold) {
         goPrev();
@@ -146,23 +233,24 @@ const cards = [
       }
     };
 
-    window.addEventListener('pointerup', handlePointerEnd);
-    window.addEventListener('pointercancel', handlePointerEnd);
+    window.addEventListener("pointerup", handlePointerEnd);
+    window.addEventListener("pointercancel", handlePointerEnd);
 
     /* ─── Wheel / Trackpad Scroll ─── */
     let lastWheelTime = 0;
 
-    document.addEventListener('wheel', (e) => {
+    document.addEventListener("wheel", (e) => {
       // Disable if a modal is open
-      if (document.body.style.overflow === 'hidden') return;
+      if (document.body.style.overflow === "hidden") return;
 
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      
+      const delta =
+        Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+
       // Ignore tiny resting movements
       if (Math.abs(delta) < 15) return;
 
       const now = Date.now();
-      // Enforce a 350ms cooldown between slides so trackpad swipes don't rapid-fire, 
+      // Enforce a 350ms cooldown between slides so trackpad swipes don't rapid-fire,
       // but the first movement responds instantly
       if (now - lastWheelTime < 350) return;
 
@@ -178,50 +266,15 @@ const cards = [
         lastWheelTime = now;
       }
     });
+  }
 
-    /* ─── Modal open / close ─── */
-    const allModals = document.querySelectorAll<HTMLElement>('[data-stuff-modal]');
-
-    const openModal = (id: string) => {
-      const modal = document.getElementById(id);
-      if (!modal) return;
-      modal.classList.add('is-active');
-      modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    };
-
-    const closeModal = (modal: HTMLElement) => {
-      modal.classList.remove('is-active');
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    };
-
-    document.querySelectorAll<HTMLElement>('.stuff-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const id = card.dataset.modal;
-        if (id) openModal(id);
-      });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOMContentLoaded fired!");
+      initStuff();
     });
-
-    document.querySelectorAll<HTMLButtonElement>('[data-stuff-close]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const modal = btn.closest<HTMLElement>('[data-stuff-modal]');
-        if (modal) closeModal(modal);
-      });
-    });
-
-    allModals.forEach(modal => {
-      modal.addEventListener('click', e => {
-        if (e.target === modal) closeModal(modal);
-      });
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        allModals.forEach(modal => {
-          if (modal.classList.contains('is-active')) closeModal(modal);
-        });
-      }
-    });
-  });
+  } else {
+    console.log("Document already loaded, running initStuff!");
+    initStuff();
+  }
 </script>

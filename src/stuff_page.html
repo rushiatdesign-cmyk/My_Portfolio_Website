@@ -1,0 +1,1681 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><title>Stuff — Portfolio</title><meta name="description" content="A collection of things I love and care about."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Slackey&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Special+Elite&display=swap" rel="stylesheet"><style data-vite-dev-id="/Users/rushikeshhande/Documents/Mdes/Immersive Web Design/Portfolio/My_Portfolio_Website/src/styles/stuff.css">
+
+@import url('https://fonts.googleapis.com/css2?family=Slackey&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+/* ======================================================
+   STUFF PAGE — Full CSS
+   Design: Deep navy blue, gold accents, fixed/non-scrollable
+====================================================== */
+
+/* ── Reset & base ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.stuff-body {
+  background: #0D1855;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  font-family: 'EB Garamond', serif;
+}
+
+/* ======================================================
+   FULL-VIEWPORT FRAME
+====================================================== */
+.stuff-frame-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  pointer-events: none;
+  border-style: solid;
+  border-color: #0D1855;
+  /* Frame is offset by 4vh/4vw, and its borders are 43px 25px 36px 25px */
+  border-top-width: calc(4vh + 43px);
+  border-bottom-width: calc(4vh + 36px);
+  border-left-width: calc(4vw + 25px);
+  border-right-width: calc(4vw + 25px);
+}
+
+.stuff-frame {
+  position: fixed;
+  top: 4vh;
+  left: 4vw;
+  width: 92vw;
+  height: 92vh;
+  pointer-events: none;
+  z-index: 202;
+  user-select: none;
+
+  border-style: solid;
+  border-width: 43px 25px 36px 25px;
+  border-image-source: url('/images/stuff/stuffframe.PNG');
+  border-image-slice: 15% 6% 13% 6%;
+  border-image-repeat: stretch;
+}
+
+/* ======================================================
+   LOGO — TOP CENTER, FIXED
+====================================================== */
+.stuff-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 35;
+  background-color: #0D1855;
+  padding: clamp(16px, 3vh, 40px) 0 clamp(16px, 3vh, 40px);
+  transition: opacity 0.3s ease, filter 0.3s ease, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.stuff-header.is-hidden {
+  transform: translateY(-100%);
+}
+
+.stuff-logo {
+  width: clamp(198px, 31vw, 418px);
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ======================================================
+   BOTTLES — BOTTOM CENTER, FIXED
+====================================================== */
+.stuff-bottles {
+  position: fixed;
+  bottom: 4vh;
+  /* align baseline with stuff-frame */
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(300px, 70vw, 900px);
+  height: auto;
+  z-index: 25;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ======================================================
+   ARROW BUTTONS
+====================================================== */
+.stuff-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 30;
+  padding: 8px;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.stuff-arrow img {
+  width: clamp(24px, 3vw, 44px);
+  height: auto;
+  display: block;
+}
+
+.stuff-arrow--left {
+  left: calc(27vw - min(18vw, 195px));
+  transform: translate(-50%, -50%);
+}
+
+.stuff-arrow--right {
+  right: calc(27vw - min(18vw, 195px));
+  transform: translate(50%, -50%);
+}
+
+.stuff-arrow:hover {
+  /* Retain exact horizontal transform on hover but scale up */
+  transform: translateY(-50%) scale(1.15);
+}
+
+.stuff-arrow--left:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.stuff-arrow--right:hover {
+  transform: translate(50%, -50%) scale(1.15);
+}
+
+/* ======================================================
+   LAYOUT CONTENT (carousel area)
+====================================================== */
+.stuff-layout-content {
+  position: fixed;
+  inset: 0;
+  z-index: auto;
+  /* Removed z-index to allow modals to appear over the frame */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* vertical padding: clear logo (top) and bottles (bottom) */
+  padding: clamp(100px, 25vh, 200px) clamp(60px, 8vw, 120px) clamp(120px, 22vh, 200px);
+}
+
+
+
+/* ======================================================
+   CARD CAROUSEL — narrowed so 3 cards stay small
+====================================================== */
+.stuff-carousel-wrap {
+  width: min(72%, 780px);
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.stuff-track {
+  display: flex;
+  gap: clamp(14px, 2vw, 28px);
+  will-change: transform;
+}
+
+/* ======================================================
+   STUFF CARD — matches screenshot
+====================================================== */
+.stuff-card {
+  /* 3 visible per view */
+  flex: 0 0 calc((100% - 2 * clamp(14px, 2vw, 28px)) / 3);
+  /* Full card uses stuffborder.PNG as the decorative frame */
+  border-style: solid;
+  border-width: 19px;
+  border-image-source: url('/images/stuff/stuffborder.PNG');
+  border-image-slice: 8% 12% 9% 12%;
+  border-image-repeat: stretch;
+  /* stretch prevents bottom-center breaking vs round */
+  background: none;
+  aspect-ratio: 2 / 3;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(8px, 1.2vw, 14px) clamp(8px, 1.2vw, 14px) clamp(10px, 1.5vw, 16px);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .stuff-carousel-wrap {
+    width: min(80%, 400px);
+  }
+
+  .stuff-card {
+    /* show exactly 1 card on mobile */
+    flex: 0 0 100%;
+  }
+}
+
+/* Upper illustration block — stuffcardinside.PNG bg, fill most of card height */
+.stuff-card__illustration {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  background-image: url('/images/stuff/stuffcardinside.PNG');
+  background-size: 100% 100%;
+  /* stretch to fit entirely without cropping */
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 3px;
+}
+
+/* Thin white divider (matches screenshot line) */
+.stuff-card__divider {
+  display: block;
+  width: 85%;
+  height: 1.5px;
+  background: #FACC53;
+  margin: clamp(16px, 1vh, 10px) 0;
+  flex-shrink: 0;
+}
+
+/* Bold white title — Slackey, same as blog */
+.stuff-card__title {
+  font-family: 'Slackey', cursive;
+  font-size: clamp(13px, 1.4vw, 18px);
+  color: #FACC53;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+  flex-shrink: 0;
+  line-height: 1.1;
+}
+
+/* ======================================================
+   MODAL OVERLAY
+====================================================== */
+.stuff-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 202;
+  /* above frame (20), arrows (30), layout (10) */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8vh 8vw;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stuff-modal-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ======================================================
+   MODAL PANEL
+====================================================== */
+.stuff-modal-panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #0D1855;
+  color: #F5C842;
+
+  /* Gold rough-outline border (color overridden per modal via inline style) */
+  border: 3px solid;
+  /* color from inline style */
+  border-radius: 3px 9px 4px 8px / 7px 3px 9px 4px;
+  outline: 2px solid;
+  outline-offset: 6px;
+
+  overflow-y: auto;
+  padding: 0;
+  /* top padding handled by sticky close bar */
+}
+
+/* ======================================================
+   STICKY CLOSE BUTTON
+====================================================== */
+.stuff-modal-close {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 16px 8px;
+  width: 100%;
+  z-index: 10;
+  box-sizing: border-box;
+  border: none;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.stuff-modal-close img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  display: block;
+}
+
+.stuff-modal-close:hover img {
+  opacity: 0.7;
+}
+
+/* ======================================================
+   POPUP CONTENT
+====================================================== */
+.stuff-modal-body {
+  padding: 0 clamp(24px, 5vw, 64px) clamp(40px, 6vh, 80px);
+}
+
+.stuff-popup-content {
+  color: #F5C842;
+}
+
+.stuff-popup-title {
+  font-family: 'Slackey', cursive;
+  font-size: clamp(24px, 4vw, 48px);
+  color: #F5C842;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.04em;
+}
+
+.stuff-popup-placeholder {
+  font-family: 'EB Garamond', serif;
+  font-size: clamp(16px, 1.8vw, 22px);
+  color: rgba(245, 200, 66, 0.5);
+  font-style: italic;
+}</style><style data-vite-dev-id="/Users/rushikeshhande/Documents/Mdes/Immersive Web Design/Portfolio/My_Portfolio_Website/src/components/stuff/popups/MoviesContent.astro?astro&amp;type=style&amp;index=0&amp;lang.css">.movies-canvas[data-astro-cid-y3b7ilw3] {
+  width: 100%;
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 30px;
+  padding: 40px;
+  background: none !important;
+}
+
+.movie-card[data-astro-cid-y3b7ilw3] {
+  position: relative;
+  width: 100%;
+  max-width: 180px;
+  margin: 0 auto;
+  border-style: solid;
+  border-width: clamp(10px, 1.5vw, 16px) clamp(8px, 1.2vw, 12px) clamp(12px, 1.8vw, 20px);
+  border-image-source: url("/images/stuff/stuffborder.PNG");
+  border-image-slice: 8% 12% 9%;
+  border-image-repeat: stretch;
+  background: none;
+  aspect-ratio: 2 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(6px, 1vw, 10px);
+  cursor: grab;
+  user-select: none;
+  transition: z-index, box-shadow .2s;
+}
+
+.movie-card[data-astro-cid-y3b7ilw3]:active {
+  cursor: grabbing;
+  box-shadow: 0 10px 20px #00000026;
+}
+
+.movie-card[data-astro-cid-y3b7ilw3]:before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  bottom: 4px;
+  left: 4px;
+  background: #f5c842;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-mask-box-image-source: url("/images/stuff/stuffcardinside.PNG");
+  -webkit-mask-box-image-slice: 15% 10% 12% fill;
+  -webkit-mask-box-image-width: 12px;
+  -webkit-mask-box-image-repeat: stretch;
+  mask-border-source: url("/images/stuff/stuffcardinside.PNG");
+  mask-border-slice: 15% 10% 12% fill;
+  mask-border-width: 12px;
+  mask-border-repeat: stretch;
+}
+
+.movie-card__illustration[data-astro-cid-y3b7ilw3] {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  -webkit-mask-box-image-source: url("/images/stuff/stuffcardinside.PNG");
+  -webkit-mask-box-image-slice: 15% 10% 12% fill;
+  -webkit-mask-box-image-width: 8px;
+  -webkit-mask-box-image-repeat: stretch;
+  mask-border-source: url("/images/stuff/stuffcardinside.PNG");
+  mask-border-slice: 15% 10% 12% fill;
+  mask-border-width: 8px;
+  mask-border-repeat: stretch;
+  background-color: #f5c842;
+  border-radius: 3px;
+}
+
+.movie-card__poster[data-astro-cid-y3b7ilw3] {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.movie-card__divider[data-astro-cid-y3b7ilw3] {
+  display: block;
+  width: 85%;
+  height: 1.5px;
+  background-image: url("/images/stuff/stuffdivider.PNG");
+  background-size: 100% 100%;
+  margin: 8px 0 6px;
+  flex-shrink: 0;
+}
+
+.movie-card__title[data-astro-cid-y3b7ilw3] {
+  font-family: Slackey, cursive;
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+
+.movie-card__genre[data-astro-cid-y3b7ilw3] {
+  font-size: clamp(11px, 1.2vw, 13px);
+  color: #666;
+  text-align: center;
+  font-family: EB Garamond, serif;
+}
+</style><style data-vite-dev-id="/Users/rushikeshhande/Documents/Mdes/Immersive Web Design/Portfolio/My_Portfolio_Website/src/components/stuff/popups/PhotographsContent.astro?astro&amp;type=style&amp;index=0&amp;lang.css">.stuff-popup-content[data-astro-cid-f6krc7bp].photos-container {
+  padding: 0;
+  margin: 0 calc(-1 * clamp(24px, 5vw, 64px)) calc(-1 * clamp(40px, 6vh, 80px));
+  overflow: hidden;
+  background: none !important;
+}
+
+.photos-viewport[data-astro-cid-f6krc7bp] {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.photos-viewport[data-astro-cid-f6krc7bp].is-dragging {
+  cursor: grabbing;
+}
+
+.photos-track[data-astro-cid-f6krc7bp] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.photo-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  user-select: none;
+  z-index: 1;
+  padding: 16px 16px 42px;
+  cursor: pointer;
+  pointer-events: auto;
+  background-color: #f5c842;
+}
+
+.photo-card:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #0d1855;
+  pointer-events: none;
+  z-index: 2;
+  -webkit-mask-box-image-source: url("/images/frame/blogborder.PNG");
+  -webkit-mask-box-image-slice: 12%;
+  -webkit-mask-box-image-width: 16px;
+  -webkit-mask-box-image-repeat: stretch;
+  mask-border-source: url("/images/frame/blogborder.PNG");
+  mask-border-slice: 12%;
+  mask-border-width: 16px;
+  mask-border-repeat: stretch;
+}
+
+.photo-card__image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 0 18px 30px -14px #000000b3;
+  transition: box-shadow .25s;
+  -webkit-mask-image: url("/images/frame/blogimagemask.PNG");
+  mask-image: url("/images/frame/blogimagemask.PNG");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.photo-card__image {
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.photo-card__caption {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: .8rem;
+  font-family: var(--font-display, "Slackey"), cursive;
+  color: #111010;
+  pointer-events: none;
+  z-index: 3;
+  opacity: .85;
+}
+
+.photos-hint[data-astro-cid-f6krc7bp] {
+  position: absolute;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 16px;
+  border: 1px solid #11101040;
+  border-radius: 999px;
+  font-family: var(--font-display, "Slackey");
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #111010;
+  background: #f5c84299;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity .6s;
+  z-index: 3;
+}
+
+.photos-hint[data-astro-cid-f6krc7bp].is-hidden {
+  opacity: 0;
+}
+
+.photos-lightbox[data-astro-cid-f6krc7bp] {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d1855eb;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+
+.photos-lightbox[data-astro-cid-f6krc7bp].is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.photos-lightbox__content[data-astro-cid-f6krc7bp] {
+  position: relative;
+  max-width: 85vw;
+  max-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photos-lightbox__image[data-astro-cid-f6krc7bp] {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  box-shadow: 0 20px 50px #00000080;
+  transition: opacity .2s, transform .2s;
+}
+
+.photos-lightbox__image[data-astro-cid-f6krc7bp].is-loading {
+  opacity: 0;
+  transform: scale(.98);
+}
+
+.photos-lightbox__btn[data-astro-cid-f6krc7bp] {
+  position: absolute;
+  background: none;
+  border: none;
+  color: #f5c842;
+  font-size: 3.5rem;
+  font-family: var(--font-display, "Slackey");
+  cursor: pointer;
+  padding: 20px;
+  transition: transform .2s, color .2s;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photos-lightbox__btn[data-astro-cid-f6krc7bp]:hover {
+  transform: scale(1.15);
+  color: #fff;
+}
+
+.photos-lightbox__btn[data-astro-cid-f6krc7bp]:active {
+  transform: scale(.95);
+}
+
+.photos-lightbox__btn--close[data-astro-cid-f6krc7bp] {
+  top: 20px;
+  right: 20px;
+  position: fixed;
+  font-size: 3rem;
+}
+
+.photos-lightbox__btn--prev[data-astro-cid-f6krc7bp] {
+  left: 2vw;
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.photos-lightbox__btn--prev[data-astro-cid-f6krc7bp]:hover {
+  transform: translateY(-50%) scale(1.15);
+}
+
+.photos-lightbox__btn--next[data-astro-cid-f6krc7bp] {
+  right: 2vw;
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.photos-lightbox__btn--next[data-astro-cid-f6krc7bp]:hover {
+  transform: translateY(-50%) scale(1.15);
+}
+</style><style data-vite-dev-id="/Users/rushikeshhande/Documents/Mdes/Immersive Web Design/Portfolio/My_Portfolio_Website/src/components/stuff/popups/IllustrationsContent.astro?astro&amp;type=style&amp;index=0&amp;lang.css">.illustrations-container[data-astro-cid-jq276nfn] {
+  padding: 0;
+  margin: 0 calc(-1 * clamp(24px, 5vw, 64px)) calc(-1 * clamp(40px, 6vh, 80px));
+  overflow: hidden;
+  background-color: #f5c842 !important;
+}
+
+.ill-viewport[data-astro-cid-jq276nfn] {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.ill-viewport[data-astro-cid-jq276nfn].is-dragging {
+  cursor: grabbing;
+}
+
+.ill-track[data-astro-cid-jq276nfn] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ill-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 10px 38px;
+  background-color: #0d1855;
+  box-shadow: 0 12px 24px -10px #0009;
+  user-select: none;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.ill-card__image-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 0 18px 30px -14px #000000b3;
+}
+
+.ill-card__image {
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.ill-card__caption {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: .7rem;
+  font-family: var(--font-body, "Outfit"), sans-serif;
+  color: #f5c842;
+  pointer-events: none;
+  z-index: 3;
+  opacity: .9;
+}
+
+.ill-hint[data-astro-cid-jq276nfn] {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0d1855cc;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #f5c842;
+  padding: 12px 24px;
+  border-radius: 100px;
+  font-family: var(--font-body, "Outfit"), sans-serif;
+  font-size: .9rem;
+  font-weight: 500;
+  letter-spacing: .05em;
+  pointer-events: none;
+  z-index: 100;
+  transition: opacity .5s;
+  border: 1px solid #f5c8424d;
+}
+
+.ill-hint[data-astro-cid-jq276nfn].is-hidden {
+  opacity: 0;
+}
+
+.ill-hint__icon[data-astro-cid-jq276nfn] {
+  width: 20px;
+  height: 20px;
+  animation: 2s ease-in-out infinite pan-hint;
+}
+
+@keyframes pan-hint {
+  0%, 100% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+}
+</style><script type="module" src="/@vite/client"></script><script type="module" src="/@id/astro/runtime/client/dev-toolbar/entrypoint.js"></script><script>window.__astro_dev_toolbar__ = {"root":"/Users/rushikeshhande/Documents/Mdes/Immersive Web Design/Portfolio/My_Portfolio_Website/","version":"7.1.6","debugInfo":"Astro                    v7.1.6\nNode                     v24.11.1\nSystem                   macOS (arm64)\nPackage Manager          pnpm\nOutput                   static\nAdapter                  none\nIntegrations             none"}</script><script type="module" src="/src/styles/stuff.css"></script><script type="module" src="/src/components/stuff/popups/MoviesContent.astro?astro&type=style&index=0&lang.css"></script><script type="module" src="/src/components/stuff/popups/PhotographsContent.astro?astro&type=style&index=0&lang.css"></script><script type="module" src="/src/components/stuff/popups/IllustrationsContent.astro?astro&type=style&index=0&lang.css"></script></head><body class="stuff-body"><!-- Full-viewport frame border --><div class="stuff-frame-bg" aria-hidden="true"></div><div class="stuff-frame" aria-hidden="true"></div><!-- Sticky logo at top-center --><header class="stuff-header"><img src="/images/stuff/stufflogo.PNG" class="stuff-logo" alt="Stuff"></header><!-- Bottles decoration at bottom --><img src="/images/stuff/bottles.PNG" class="stuff-bottles" alt="" aria-hidden="true"><!-- Page content slot --><main class="stuff-layout-content"><!-- Arrow navigation buttons --><button id="stuff-arrow-left" class="stuff-arrow stuff-arrow--left" aria-label="Scroll left"><img src="/images/stuff/arrowleft.PNG" alt="←"></button><button id="stuff-arrow-right" class="stuff-arrow stuff-arrow--right" aria-label="Scroll right"><img src="/images/stuff/arrowright.PNG" alt="→"></button><div class="stuff-carousel-wrap"><div id="stuff-track" class="stuff-track"><button class="stuff-card" type="button" aria-label="Open Movies" data-modal="stuff-modal-movies"><!-- Upper: illustration area (stuffcardinside.PNG) — add your image inside later --><div class="stuff-card__illustration"></div><!-- Thin divider line --><span class="stuff-card__divider" aria-hidden="true"></span><!-- Single-word title --><span class="stuff-card__title">Movies</span></button><button class="stuff-card" type="button" aria-label="Open Dishes" data-modal="stuff-modal-dishes"><!-- Upper: illustration area (stuffcardinside.PNG) — add your image inside later --><div class="stuff-card__illustration"></div><!-- Thin divider line --><span class="stuff-card__divider" aria-hidden="true"></span><!-- Single-word title --><span class="stuff-card__title">Dishes</span></button><button class="stuff-card" type="button" aria-label="Open Music" data-modal="stuff-modal-music"><!-- Upper: illustration area (stuffcardinside.PNG) — add your image inside later --><div class="stuff-card__illustration"></div><!-- Thin divider line --><span class="stuff-card__divider" aria-hidden="true"></span><!-- Single-word title --><span class="stuff-card__title">Music</span></button><button class="stuff-card" type="button" aria-label="Open Photographs" data-modal="stuff-modal-photographs"><!-- Upper: illustration area (stuffcardinside.PNG) — add your image inside later --><div class="stuff-card__illustration"></div><!-- Thin divider line --><span class="stuff-card__divider" aria-hidden="true"></span><!-- Single-word title --><span class="stuff-card__title">Photographs</span></button><button class="stuff-card" type="button" aria-label="Open Illustrations" data-modal="stuff-modal-illustrations"><!-- Upper: illustration area (stuffcardinside.PNG) — add your image inside later --><div class="stuff-card__illustration"></div><!-- Thin divider line --><span class="stuff-card__divider" aria-hidden="true"></span><!-- Single-word title --><span class="stuff-card__title">Illustrations</span></button></div></div></main><!-- Slot for popups so they sit on top of everything without z-index trapping --><div id="stuff-modal-movies" class="stuff-modal-overlay" aria-hidden="true" data-stuff-modal><div class="stuff-modal-panel" role="dialog" aria-modal="true" style="border-color: #F5C842; outline-color: #F5C842; background-color: #0D1855;"><!-- Sticky close bar --><button class="stuff-modal-close" aria-label="Close" data-stuff-close style="background-color: transparent;"><div style="
+        width: 32px;
+        height: 32px;
+        background-color: #F5C842;
+        mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+        -webkit-mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+      "></div></button><!-- Popup body content (injected per-card via slot) --><div class="stuff-modal-body"><section class="stuff-popup-content movies-canvas" id="moviesCanvas" data-astro-cid-y3b7ilw3><div class="movie-card draggable" style="transform: translate(19.736616771411633px, 18.435311583460802px) rotate(-3.8158621311778553deg); z-index: inception;" data-rotation="-3.8158621311778553" data-tx="19.736616771411633" data-ty="18.435311583460802" data-astro-cid-y3b7ilw3><div class="movie-card__illustration" data-astro-cid-y3b7ilw3><div class="movie-card__poster" style="background-image: url('https://picsum.photos/seed/Inception/300/450');" data-astro-cid-y3b7ilw3></div></div><span class="movie-card__divider" aria-hidden="true" data-astro-cid-y3b7ilw3></span><span class="movie-card__title" data-astro-cid-y3b7ilw3>Inception</span><span class="movie-card__genre" data-astro-cid-y3b7ilw3>Sci-Fi / Thriller</span></div><div class="movie-card draggable" style="transform: translate(-8.724931652110381px, 8.720013883359524px) rotate(0.3584799797498528deg); z-index: interstellar;" data-rotation="0.3584799797498528" data-tx="-8.724931652110381" data-ty="8.720013883359524" data-astro-cid-y3b7ilw3><div class="movie-card__illustration" data-astro-cid-y3b7ilw3><div class="movie-card__poster" style="background-image: url('https://picsum.photos/seed/Interstellar/300/450');" data-astro-cid-y3b7ilw3></div></div><span class="movie-card__divider" aria-hidden="true" data-astro-cid-y3b7ilw3></span><span class="movie-card__title" data-astro-cid-y3b7ilw3>Interstellar</span><span class="movie-card__genre" data-astro-cid-y3b7ilw3>Adventure / Sci-Fi</span></div><div class="movie-card draggable" style="transform: translate(17.679184166896505px, -14.112500123057256px) rotate(3.0740758095839382deg); z-index: parasite;" data-rotation="3.0740758095839382" data-tx="17.679184166896505" data-ty="-14.112500123057256" data-astro-cid-y3b7ilw3><div class="movie-card__illustration" data-astro-cid-y3b7ilw3><div class="movie-card__poster" style="background-image: url('https://picsum.photos/seed/Parasite/300/450');" data-astro-cid-y3b7ilw3></div></div><span class="movie-card__divider" aria-hidden="true" data-astro-cid-y3b7ilw3></span><span class="movie-card__title" data-astro-cid-y3b7ilw3>Parasite</span><span class="movie-card__genre" data-astro-cid-y3b7ilw3>Drama / Thriller</span></div><div class="movie-card draggable" style="transform: translate(4.101182977670369px, -17.135279784627965px) rotate(2.722394956598772deg); z-index: spirited-away;" data-rotation="2.722394956598772" data-tx="4.101182977670369" data-ty="-17.135279784627965" data-astro-cid-y3b7ilw3><div class="movie-card__illustration" data-astro-cid-y3b7ilw3><div class="movie-card__poster" style="background-image: url('https://picsum.photos/seed/SpiritedAway/300/450');" data-astro-cid-y3b7ilw3></div></div><span class="movie-card__divider" aria-hidden="true" data-astro-cid-y3b7ilw3></span><span class="movie-card__title" data-astro-cid-y3b7ilw3>Spirited Away</span><span class="movie-card__genre" data-astro-cid-y3b7ilw3>Animation / Adventure</span></div><div class="movie-card draggable" style="transform: translate(-7.289932721313029px, 10.600145396660139px) rotate(-3.5571856265722026deg); z-index: the-dark-knight;" data-rotation="-3.5571856265722026" data-tx="-7.289932721313029" data-ty="10.600145396660139" data-astro-cid-y3b7ilw3><div class="movie-card__illustration" data-astro-cid-y3b7ilw3><div class="movie-card__poster" style="background-image: url('https://picsum.photos/seed/TheDarkKnight/300/450');" data-astro-cid-y3b7ilw3></div></div><span class="movie-card__divider" aria-hidden="true" data-astro-cid-y3b7ilw3></span><span class="movie-card__title" data-astro-cid-y3b7ilw3>The Dark Knight</span><span class="movie-card__genre" data-astro-cid-y3b7ilw3>Action / Crime</span></div><div class="movie-card draggable" style="transform: translate(-16.745229450122437px, -6.607073299128867px) rotate(-3.613880519461082deg); z-index: the-matrix;" data-rotation="-3.613880519461082" data-tx="-16.745229450122437" data-ty="-6.607073299128867" data-astro-cid-y3b7ilw3><div class="movie-card__illustration" data-astro-cid-y3b7ilw3><div class="movie-card__poster" style="background-image: url('https://picsum.photos/seed/TheMatrix/300/450');" data-astro-cid-y3b7ilw3></div></div><span class="movie-card__divider" aria-hidden="true" data-astro-cid-y3b7ilw3></span><span class="movie-card__title" data-astro-cid-y3b7ilw3>The Matrix</span><span class="movie-card__genre" data-astro-cid-y3b7ilw3>Action / Sci-Fi</span></div></section><script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('moviesCanvas');
+    if (!canvas) return;
+
+    const cards = canvas.querySelectorAll('.draggable');
+    let zIndexCounter = 100;
+    let isDragging = false;
+    let currentCard = null;
+    let startX, startY, initialTx, initialTy;
+
+    cards.forEach(card => {
+      const downHandler = (e) => {
+        if (e.type === 'mousedown' && e.button !== 0) return;
+        
+        isDragging = true;
+        currentCard = card;
+        
+        zIndexCounter++;
+        card.style.zIndex = zIndexCounter;
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        startX = clientX;
+        startY = clientY;
+        
+        // Retrieve current translation values from dataset
+        initialTx = parseFloat(card.dataset.tx) || 0;
+        initialTy = parseFloat(card.dataset.ty) || 0;
+
+        card.style.transform = `translate(${initialTx}px, ${initialTy}px) rotate(${card.dataset.rotation}deg) scale(1.05)`;
+
+        e.preventDefault(); 
+      };
+
+      card.addEventListener('mousedown', downHandler);
+      card.addEventListener('touchstart', downHandler, { passive: false });
+    });
+
+    const moveHandler = (e) => {
+      if (!isDragging || !currentCard) return;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+
+      const newTx = initialTx + dx;
+      const newTy = initialTy + dy;
+      
+      currentCard.style.transform = `translate(${newTx}px, ${newTy}px) rotate(${currentCard.dataset.rotation}deg) scale(1.05)`;
+      currentCard.dataset.currentTx = newTx;
+      currentCard.dataset.currentTy = newTy;
+    };
+
+    const upHandler = () => {
+      if (currentCard) {
+        const finalTx = currentCard.dataset.currentTx || currentCard.dataset.tx;
+        const finalTy = currentCard.dataset.currentTy || currentCard.dataset.ty;
+        
+        currentCard.style.transform = `translate(${finalTx}px, ${finalTy}px) rotate(${currentCard.dataset.rotation}deg) scale(1)`;
+        
+        // Update dataset with new values so next drag starts from here
+        currentCard.dataset.tx = finalTx;
+        currentCard.dataset.ty = finalTy;
+      }
+      isDragging = false;
+      currentCard = null;
+    };
+
+    document.addEventListener('mousemove', moveHandler);
+    document.addEventListener('touchmove', moveHandler, { passive: false });
+    document.addEventListener('mouseup', upHandler);
+    document.addEventListener('touchend', upHandler);
+  });
+</script></div></div></div><div id="stuff-modal-dishes" class="stuff-modal-overlay" aria-hidden="true" data-stuff-modal><div class="stuff-modal-panel" role="dialog" aria-modal="true" style="border-color: #F5C842; outline-color: #F5C842; background-color: #0D1855;"><!-- Sticky close bar --><button class="stuff-modal-close" aria-label="Close" data-stuff-close style="background-color: transparent;"><div style="
+        width: 32px;
+        height: 32px;
+        background-color: #F5C842;
+        mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+        -webkit-mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+      "></div></button><!-- Popup body content (injected per-card via slot) --><div class="stuff-modal-body"><section class="stuff-popup-content"><h2 class="stuff-popup-title">Dishes</h2><p class="stuff-popup-placeholder">Content coming soon…</p></section></div></div></div><div id="stuff-modal-music" class="stuff-modal-overlay" aria-hidden="true" data-stuff-modal><div class="stuff-modal-panel" role="dialog" aria-modal="true" style="border-color: #F5C842; outline-color: #F5C842; background-color: #F5C842;"><!-- Sticky close bar --><button class="stuff-modal-close" aria-label="Close" data-stuff-close style="background-color: transparent;"><div style="
+        width: 32px;
+        height: 32px;
+        background-color: #0D1855;
+        mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+        -webkit-mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+      "></div></button><!-- Popup body content (injected per-card via slot) --><div class="stuff-modal-body"><style>
+  :root {
+    --bg-page: transparent;
+    --card-red: #8a2417;
+    --ink: #111010;
+    --cream: #f6e8bd;
+    --label-yellow: #f0cf6b;
+    --arm-grey: #75746f;
+    --arm-grey-dark: #4a4946;
+    --accent: #e8b23d;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .vinyl-widget {
+    width: 100%;
+    max-width: 880px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .player-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(16px, 2vw, 28px);
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .art-wrap {
+    flex: 1 1 280px;
+    min-width: 250px;
+    max-width: 380px;
+  }
+
+  @media (max-width: 720px) {
+    .player-layout {
+      flex-direction: column;
+      align-items: center;
+    }
+    .art-wrap {
+      width: 100%;
+      max-width: 380px;
+    }
+    .controls {
+      margin-top: 20px;
+      padding: 18px 18px 16px;
+      width: 100%;
+      max-width: 420px;
+    }
+  }
+
+  /* ================= SVG ARTWORK ================= */
+  .art {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    overflow: visible;
+  }
+
+  #diskGroup {
+    transform-box: view-box;
+    transform-origin: 515px 460px;
+    animation: spin 1.8s linear infinite;
+    animation-play-state: paused;
+  }
+  .art.spinning #diskGroup {
+    animation-play-state: running;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  #tonearmGroup {
+    transform-box: view-box;
+    transform-origin: 955px 288px;
+    transform: rotate(-16deg);
+    transition: transform 0.7s cubic-bezier(0.34, 1.25, 0.4, 1);
+  }
+  .art.spinning #tonearmGroup {
+    transform: rotate(0deg);
+  }
+
+  #labelCover {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  #labelCover.loaded {
+    opacity: 1;
+  }
+
+  #labelTitleText {
+    fill: #fff;
+    font-size: 26px;
+    font-weight: 700;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+
+  #playGlyph {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+  .disk-wrap-hover:hover #playGlyph {
+    opacity: 1;
+  }
+
+  /* ================= CONTROLS ================= */
+  .controls {
+    flex: 1 1 270px;
+    min-width: 0;
+    max-width: 320px;
+    background: transparent;
+    border-radius: 0;
+    padding: 18px 20px 16px;
+    position: relative;
+    z-index: 1;
+    margin: 38px 32px 42px 32px; /* Make space for the negative absolute positioning */
+  }
+
+  .controls::before {
+    content: "";
+    position: absolute;
+    /* Inner cream card, slightly larger than the content */
+    top: -10px;
+    right: -10px;
+    bottom: -10px;
+    left: -10px;
+    pointer-events: none;
+    background-color: #0d1855;
+    z-index: -1;
+
+    -webkit-mask-image: url("/images/stuff/stuffcardinside.PNG");
+    -webkit-mask-size: 100% 100%;
+
+    mask-image: url("/images/stuff/stuffcardinside.PNG");
+    mask-size: 100% 100%;
+  }
+
+  .controls::after {
+    content: "";
+    position: absolute;
+    /* Outer blue border, positioned outside the inner card with an 8px gap */
+    top: -30px;
+    right: -25px;
+    bottom: -36px;
+    left: -25px;
+    pointer-events: none;
+    background-color: #0d1855;
+
+    -webkit-mask-box-image-source: url("/images/stuff/stuffborder.PNG");
+    -webkit-mask-box-image-slice: 8% 12% 9% 12%;
+    -webkit-mask-box-image-width: 20px 14px 24px 14px;
+    -webkit-mask-box-image-repeat: stretch;
+
+    mask-border-source: url("/images/stuff/stuffborder.PNG");
+    mask-border-slice: 8% 12% 9% 12%;
+    mask-border-width: 20px 14px 24px 14px;
+    mask-border-repeat: stretch;
+  }
+
+  .top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .now-playing .t {
+    font-weight: 800;
+    font-size: 15px;
+    color: #f5c842;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    transition: opacity 0.25s ease;
+  }
+  .now-playing .a {
+    font-size: 11px;
+    color: rgba(245, 200, 66, 0.7);
+    margin-top: 2px;
+  }
+  .now-playing .t.fading {
+    opacity: 0;
+  }
+  .time-display {
+    font-size: 12px;
+    color: rgba(245, 200, 66, 0.7);
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+
+  .buffering-line {
+    text-align: left;
+    font-size: 9px;
+    color: #f5c842;
+    opacity: 0.65;
+    min-height: 11px;
+    margin-bottom: 2px;
+  }
+  .buffering-line.show::after {
+    content: "Buffering…";
+    animation: pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .progress-bar {
+    height: 11px;
+    border-radius: 0;
+    border: 2px solid #f5c842;
+    background: #0d1855;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0%;
+    background: #f5c842;
+  }
+
+  .buttons-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    flex: none;
+  }
+  .btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #f5c842;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+
+  .btn.circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #f0cf6b;
+    color: #0d1855;
+    border: 0.5px solid #0d1855;
+    flex: none;
+  }
+  .btn.circle:hover {
+    filter: brightness(1.2);
+  }
+  .btn.circle:active {
+    transform: translateY(1px);
+  }
+
+  .btn.play-pause {
+    width: 48px;
+    height: 48px;
+    background: #0d1855;
+    color: #f5c842;
+    border: 0.5px solid #f5c842;
+    box-shadow: 0 0 0 2px #f5c842;
+  }
+  .btn.play-pause svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .volume {
+    display: flex;
+    align-items: center;
+    flex: 1 1 70px;
+    min-width: 50px;
+    max-width: 120px;
+  }
+  .volume input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 0;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(
+      to right,
+      #f5c842 0%,
+      #f5c842 var(--vol, 100%),
+      rgba(245, 200, 66, 0.3) var(--vol, 100%),
+      rgba(245, 200, 66, 0.3) 100%
+    );
+  }
+  .volume input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 0;
+    background: #0d1855;
+    border: 2px solid #f5c842;
+    cursor: pointer;
+  }
+  .volume input[type="range"]::-moz-range-track {
+    height: 3px;
+    border-radius: 0;
+    background: rgba(245, 200, 66, 0.3);
+  }
+  .volume input[type="range"]::-moz-range-progress {
+    height: 3px;
+    border-radius: 0;
+    background: #f5c842;
+  }
+  .volume input[type="range"]::-moz-range-thumb {
+    width: 13px;
+    height: 13px;
+    border-radius: 0;
+    background: #0d1855;
+    border: 2px solid #f5c842;
+    cursor: pointer;
+  }
+
+  .status-line {
+    text-align: center;
+    color: #f5c842;
+    opacity: 0.7;
+    font-size: 9px;
+    margin-top: 10px;
+    min-height: 11px;
+  }
+
+  /* ================= UPCOMING TRACKS ================= */
+  .upcoming {
+    margin-top: 13px;
+    padding-top: 11px;
+    border-top: 2px solid #f5c842;
+  }
+  .upcoming-heading {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: rgba(245, 200, 66, 0.7);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .upcoming-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-top: 1px solid rgba(245, 200, 66, 0.2);
+  }
+  .upcoming-row:first-of-type {
+    border-top: none;
+  }
+  .upcoming-row .num {
+    font-size: 10px;
+    color: rgba(245, 200, 66, 0.7);
+    width: 14px;
+    flex: none;
+  }
+  .upcoming-row .info {
+    flex: 1;
+    min-width: 0;
+  }
+  .upcoming-row .info .name {
+    font-weight: 700;
+    font-size: 11px;
+    color: #f5c842;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .upcoming-row .info .artist {
+    font-size: 10px;
+    color: rgba(245, 200, 66, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style><section class="stuff-popup-content" style="width: 100%; min-height: calc(84vh - 100px); display: flex; align-items: center; justify-content: center; padding: 0; margin-top: -20px;"><div class="vinyl-widget"><div class="player-layout"><div class="art-wrap"><svg class="art disk-wrap-hover" id="art" viewBox="0 0 1205 949" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><clipPath id="labelClip"><circle cx="500" cy="455" r="138"></circle></clipPath><path id="diskTitlePath" d="M335,460 A180,180 0 1,1 695,460 A180,180 0 1,1 335,460" fill="none"></path></defs><!-- red card --><path d="M76,62 L1098,46 L1108,864 L86,880 Z" fill="var(--card-red)" stroke="var(--ink)" stroke-width="10" stroke-linejoin="round"></path><!-- static decorative shaft (behind disk) --><line x1="1063" y1="92" x2="1000" y2="850" stroke="var(--ink)" stroke-width="9" stroke-linecap="round"></line><line x1="1057" y1="98" x2="994" y2="846" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"></line><circle cx="1063" cy="92" r="8" fill="var(--ink)"></circle><!-- static rotated control bar --><g transform="rotate(-15 850 815)"><rect x="700" y="775" width="300" height="82" rx="14" fill="var(--ink)"></rect><rect x="700" y="775" width="300" height="10" rx="5" fill="var(--accent)"></rect></g><!-- ===== rotating vinyl disk ===== --><g id="diskGroup"><circle cx="515" cy="460" r="425" fill="#0d0c0b"></circle><circle cx="515" cy="460" r="404" fill="none" stroke="#ffdc85" stroke-width="6"></circle><circle cx="515" cy="460" r="335" fill="none" stroke="#ffdc85" opacity="0.6" stroke-width="3"></circle><!-- a few subtle glint marks, drawn as true arcs along the ring curvature so they read as light catching the grooves, not stray marks --><path d="M135,322 A404,404 0 0,1 224,179" stroke="#8a8a8a" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.6"></path><path d="M377,80 A404,404 0 0,1 487,57" stroke="#ffdc85" stroke-width="3" stroke-linecap="round" fill="none" opacity="1"></path><path d="M172,599 A370,370 0 0,1 146,486" stroke="#ffdc85" stroke-width="3" stroke-linecap="round" fill="none" opacity="1"></path><path d="M833,709 A404,404 0 0,1 729,803" stroke="#ffdc85" stroke-width="3" stroke-linecap="round" fill="none" opacity="1"></path><path d="M476,828 A370,370 0 0,1 370,801" stroke="#ffdc85" stroke-width="3" stroke-linecap="round" fill="none" opacity="1"></path><!-- track name, curved around the label, spins together with the disk --><text id="diskRingText" fill="var(--cream)" font-size="19" font-weight="700" opacity="0.6" letter-spacing="6" style="text-transform:uppercase;"><textPath id="diskRingTextPath" href="#diskTitlePath" xlink:href="#diskTitlePath" startOffset="0%">—</textPath></text></g><!-- ===== static label (does not rotate, stays readable) ===== --><g id="labelGroup"><circle cx="500" cy="455" r="140" fill="var(--label-yellow)"></circle><image id="labelCover" href="" x="362" y="317" width="276" height="276" clip-path="url(#labelClip)" preserveAspectRatio="xMidYMid slice"></image><circle cx="500" cy="455" r="140" fill="none" stroke="var(--cream)" stroke-width="4"></circle><!-- title plate --><rect x="365" y="560" width="270" height="46" rx="8" fill="rgba(17,16,16,0.72)" clip-path="url(#labelClip)"></rect><text id="labelTitleText" x="500" y="592" text-anchor="middle" font-size="20">Loading…</text><!-- play/pause glyph shown on hover --><g id="playGlyph" transform="translate(500 455)"><circle r="34" fill="rgba(17,16,16,0.55)"></circle><path id="playGlyphPath" d="M-8,-14 L-8,14 L16,0 Z" fill="#fff"></path></g></g><!-- ===== tonearm (rotates around pivot near headshell) ===== --><g id="tonearmGroup"><path d="M430,548 C415,552 405,540 412,525" stroke="var(--cream)" stroke-width="14" stroke-linecap="round" fill="none"></path><line x1="425" y1="535" x2="930" y2="300" stroke="var(--cream)" stroke-width="11" stroke-linecap="round"></line><rect x="905" y="255" width="55" height="95" rx="10" fill="var(--cream)" transform="rotate(28 932 302)"></rect></g></svg></div><div class="controls"><div class="top-row"><div class="now-playing"><div class="t" id="trackTitle">—</div><div class="a" id="trackArtist">—</div></div><div class="time-display"><span id="curTime">0:00</span> / <span id="durTime">0:00</span></div></div><div class="buffering-line" id="bufferingLine"></div><div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div><div class="buttons-row"><div class="transport"><button class="btn circle" id="prevBtn" title="Previous"><svg viewBox="0 0 24 24"><path d="M17 6l-8 6 8 6V6zm-9 0h2v12H8V6z"></path></svg></button><button class="btn circle play-pause" id="playBtn" title="Play/Pause"><svg viewBox="0 0 24 24"><path id="playIcon" d="M8 5v14l11-7z"></path></svg></button><button class="btn circle" id="nextBtn" title="Next"><svg viewBox="0 0 24 24"><path d="M7 6l8 6-8 6V6zm9 0h2v12h-2V6z"></path></svg></button></div><div class="volume"><input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" title="Volume"></div></div><div class="status-line" id="statusLine"></div><div class="upcoming" id="upcoming"><div class="upcoming-heading">Up Next</div><div id="upcomingList"></div></div></div></div><audio id="audio" preload="metadata"></audio></div></section><script>
+  /* =========================================================================
+   VINYL PLAYER WIDGET
+   - Loads a playlist from the Jamendo API (free, Creative-Commons catalogue)
+   - Swap JAMENDO_CLIENT_ID for your own (https://devportal.jamendo.com)
+   ========================================================================= */
+
+  const JAMENDO_CLIENT_ID = "8e1f4e47"; // your Jamendo client_id
+  const PLAYLIST_MODE = "tags"; // "tags" | "ids" | "demo"
+  const PLAYLIST_TAGS = "chillout";
+  const PLAYLIST_TRACK_IDS = [];
+  const PLAYLIST_LIMIT = 10;
+
+  // A ready-to-play public playlist (all Creative-Commons tracks from Jamendo's
+  // open catalogue) — used instantly on load, and as the fallback if the live
+  // API call is blocked (offline, ad-blocker, CORS, sandboxed preview, etc.)
+  const DEMO_PLAYLIST = [
+    {
+      name: "mañana será tarde",
+      artist_name: "fankel",
+      image:
+        "https://usercontent.jamendo.com?type=album&id=368084&width=300&trackid=1848357",
+      audio:
+        "https://prod-1.storage.jamendo.com/?trackid=1848357&format=mp31&from=app-devsite",
+    },
+    {
+      name: "Scene 5",
+      artist_name: "WE ARE FM",
+      image:
+        "https://usercontent.jamendo.com?type=album&id=104336&width=300&trackid=887209",
+      audio:
+        "https://prod-1.storage.jamendo.com/?trackid=887209&format=mp31&from=app-devsite",
+    },
+    {
+      name: "Press Record",
+      artist_name: "WE ARE FM",
+      image:
+        "https://usercontent.jamendo.com?type=album&id=104336&width=300&trackid=887202",
+      audio:
+        "https://prod-1.storage.jamendo.com/?trackid=887202&format=mp31&from=app-devsite",
+    },
+    {
+      name: "Balrog Boogie",
+      artist_name: "Diablo Swing Orchestra",
+      image:
+        "https://usercontent.jamendo.com?type=album&id=49216&width=300&trackid=391002",
+      audio:
+        "https://prod-1.storage.jamendo.com/?trackid=391002&format=mp31&from=app-devsite",
+    },
+  ];
+
+  // ---- DOM refs ----
+  const art = document.getElementById("art");
+  const labelCover = document.getElementById("labelCover");
+  const labelTitleText = document.getElementById("labelTitleText");
+  const diskRingTextPath = document.getElementById("diskRingTextPath");
+  const playGlyphPath = document.getElementById("playGlyphPath");
+  const playIcon = document.getElementById("playIcon");
+  const playBtn = document.getElementById("playBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const trackTitleEl = document.getElementById("trackTitle");
+  const trackArtistEl = document.getElementById("trackArtist");
+  const progressBar = document.getElementById("progressBar");
+  const progressFill = document.getElementById("progressFill");
+  const curTimeEl = document.getElementById("curTime");
+  const durTimeEl = document.getElementById("durTime");
+  const statusLine = document.getElementById("statusLine");
+  const bufferingLine = document.getElementById("bufferingLine");
+  const audio = document.getElementById("audio");
+  const volumeSlider = document.getElementById("volumeSlider");
+  const upcomingList = document.getElementById("upcomingList");
+
+  let playlist = [];
+  let currentIndex = 0;
+  let isPlaying = false;
+
+  // --- Guards against the "buffering glitch": these three flags stop the
+  // title/label from flickering or skipping tracks on transient stall events.
+  let isTransitioningTrack = false; // true while we're deliberately loading a new track
+  let loadToken = 0; // increments each loadTrack() call; stale async callbacks are ignored
+  let errorRetryCount = 0; // retries once before actually skipping a track
+
+  const ICON_PLAY = "M8 5v14l11-7z";
+  const ICON_PAUSE = "M6 5h4v14H6zm8 0h4v14h-4z";
+  const GLYPH_PLAY = "M-8,-14 L-8,14 L16,0 Z";
+  const GLYPH_PAUSE =
+    "M-14,-14 L-4,-14 L-4,14 L-14,14 Z M4,-14 L14,-14 L14,14 L4,14 Z";
+
+  function fmtTime(sec) {
+    if (!isFinite(sec) || sec < 0) sec = 0;
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${m}:${s}`;
+  }
+
+  function setIcons(playing) {
+    playIcon.setAttribute("d", playing ? ICON_PAUSE : ICON_PLAY);
+    playGlyphPath.setAttribute("d", playing ? GLYPH_PAUSE : GLYPH_PLAY);
+  }
+
+  // Truncates long titles so the SVG label text never overflows the disc.
+  function fitTitle(name) {
+    if (!name) return "Untitled";
+    return name.length > 22 ? name.slice(0, 21) + "…" : name;
+  }
+
+  function setCoverImage(url) {
+    labelCover.classList.remove("loaded");
+    if (!url) return;
+    // Set both href and xlink:href — some browsers (older Safari, some
+    // embedded webviews) only recognise the namespaced xlink:href on SVG
+    // <image>, which is why cover art could silently fail to appear before.
+    labelCover.setAttribute("href", url);
+    labelCover.setAttributeNS("http://www.w3.org/1999/xlink", "href", url);
+  }
+
+  function setTitleText(track) {
+    // Update all title/artist copies ATOMICALLY, in one go, so the UI never
+    // shows a half-updated / stale-then-fresh flicker while buffering.
+    labelTitleText.textContent = fitTitle(track.name);
+    trackTitleEl.textContent = track.name || "Untitled";
+    trackArtistEl.textContent = track.artist_name || "Unknown artist";
+    setCoverImage(track.image);
+    setDiskRingText(track.name);
+  }
+
+  // Repeats "NAME • " enough times to wrap fully around the guide circle
+  // (circumference ≈ 2·π·180 ≈ 1131px), so the loop reads seamlessly.
+  function setDiskRingText(name) {
+    const label = (name || "Untitled").toUpperCase() + " \u2022 ";
+    const approxCharWidth = 14; // rough average glyph width at this font-size/letter-spacing
+    const circumference = 2 * Math.PI * 180;
+    let repeated = "";
+    while (repeated.length * approxCharWidth < circumference) {
+      repeated += label;
+    }
+    diskRingTextPath.textContent = repeated;
+  }
+
+  labelCover.addEventListener("load", () => labelCover.classList.add("loaded"));
+  labelCover.addEventListener("error", () =>
+    labelCover.classList.remove("loaded"),
+  );
+
+  function renderUpcoming() {
+    if (!playlist.length) {
+      upcomingList.innerHTML = "";
+      return;
+    }
+    const count = Math.min(3, playlist.length - 1); // never show the currently-playing track
+    let html = "";
+    for (let i = 1; i <= count; i++) {
+      const t = playlist[(currentIndex + i) % playlist.length];
+      html += `<div class="upcoming-row">
+      <span class="num">${i}</span>
+      <div class="info">
+        <div class="name">${t.name || "Untitled"}</div>
+        <div class="artist">${t.artist_name || "Unknown artist"}</div>
+      </div>
+    </div>`;
+    }
+    upcomingList.innerHTML = html;
+  }
+
+  function loadTrack(index, autoplay) {
+    if (!playlist.length) return;
+
+    currentIndex = (index + playlist.length) % playlist.length;
+    const t = playlist[currentIndex];
+    renderUpcoming();
+    const myToken = ++loadToken; // this load "owns" this token
+    isTransitioningTrack = true;
+    errorRetryCount = 0;
+
+    // Fade the text out briefly, THEN swap it in one atomic update — this is
+    // what removes the "glitchy" mid-buffer flicker of the previous fix.
+    trackTitleEl.classList.add("fading");
+    bufferingLine.classList.add("show");
+
+    setTimeout(() => {
+      if (myToken !== loadToken) return; // a newer track load has since started — ignore this stale one
+      setTitleText(t);
+      trackTitleEl.classList.remove("fading");
+      audio.src = t.audio;
+      progressFill.style.width = "0%";
+      curTimeEl.textContent = "0:00";
+      durTimeEl.textContent = "0:00";
+      if (autoplay) play();
+    }, 140);
+  }
+
+  function play() {
+    audio
+      .play()
+      .then(() => {
+        isPlaying = true;
+        art.classList.add("spinning");
+        setIcons(true);
+      })
+      .catch((err) => {
+        // Surface the real browser error instead of a generic message — this
+        // tells us whether it's an autoplay block, a network/CORS failure, or
+        // an unsupported source, which are three very different fixes.
+        const reason =
+          (audio.error && audio.error.message) ||
+          err.message ||
+          err.name ||
+          "unknown error";
+        statusLine.textContent = `Couldn't start playback (${reason}). Try clicking again.`;
+        console.error("Playback failed:", err, audio.error);
+      });
+  }
+
+  function pause() {
+    audio.pause();
+    isPlaying = false;
+    art.classList.remove("spinning");
+    setIcons(false);
+  }
+
+  function togglePlay() {
+    if (!playlist.length) return;
+    isPlaying ? pause() : play();
+  }
+
+  function next() {
+    loadTrack(currentIndex + 1, isPlaying);
+  }
+  function prev() {
+    loadTrack(currentIndex - 1, isPlaying);
+  }
+
+  // ---- Events ----
+  art.addEventListener("click", togglePlay);
+  playBtn.addEventListener("click", togglePlay);
+  nextBtn.addEventListener("click", next);
+  prevBtn.addEventListener("click", prev);
+
+  audio.addEventListener("waiting", () => {
+    bufferingLine.classList.add("show");
+  });
+  audio.addEventListener("playing", () => {
+    bufferingLine.classList.remove("show");
+    isTransitioningTrack = false;
+  });
+  audio.addEventListener("canplay", () => {
+    bufferingLine.classList.remove("show");
+  });
+
+  audio.addEventListener("timeupdate", () => {
+    if (audio.duration) {
+      progressFill.style.width =
+        (audio.currentTime / audio.duration) * 100 + "%";
+      curTimeEl.textContent = fmtTime(audio.currentTime);
+    }
+  });
+  audio.addEventListener("loadedmetadata", () => {
+    durTimeEl.textContent = fmtTime(audio.duration);
+  });
+  audio.addEventListener("ended", next);
+
+  // Only skip on a REAL fatal error (not transient stalls while buffering),
+  // and retry once before giving up — this was the source of tracks/titles
+  // rapidly cycling ("glitching") while a track was still buffering.
+  audio.addEventListener("error", () => {
+    if (isTransitioningTrack) return; // ignore errors from a load we already abandoned
+    const codeNames = {
+      1: "aborted",
+      2: "network error",
+      3: "decode error",
+      4: "source not supported",
+    };
+    const code = audio.error ? audio.error.code : null;
+    console.error(
+      "Audio element error:",
+      code,
+      codeNames[code] || "",
+      audio.currentSrc,
+    );
+    if (errorRetryCount < 1) {
+      errorRetryCount++;
+      audio.load();
+      return;
+    }
+    statusLine.textContent = `This track failed to load (${codeNames[code] || "error"}) — skipping to the next one.`;
+    next();
+  });
+
+  function setVolumeUI(v) {
+    volumeSlider.style.setProperty("--vol", v * 100 + "%");
+  }
+  volumeSlider.addEventListener("input", () => {
+    const v = parseFloat(volumeSlider.value);
+    audio.volume = v;
+    setVolumeUI(v);
+  });
+  setVolumeUI(parseFloat(volumeSlider.value));
+
+  progressBar.addEventListener("click", (e) => {
+    if (!audio.duration) return;
+    const rect = progressBar.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = ratio * audio.duration;
+  });
+
+  // ---- Playlist loading (Jamendo API, with an instant offline-safe demo playlist) ----
+  function startWithDemoPlaylist() {
+    playlist = DEMO_PLAYLIST;
+    loadTrack(0, false);
+  }
+
+  async function tryLiveJamendoFetch() {
+    if (PLAYLIST_MODE === "demo") return; // demo mode: skip the network call entirely
+
+    try {
+      let url;
+      if (PLAYLIST_MODE === "ids" && PLAYLIST_TRACK_IDS.length) {
+        url = `https://api.jamendo.com/v3.0/tracks/?client_id=${JAMENDO_CLIENT_ID}&format=json&id=${PLAYLIST_TRACK_IDS.join(",")}`;
+      } else {
+        url = `https://api.jamendo.com/v3.0/tracks/?client_id=${JAMENDO_CLIENT_ID}&format=json&limit=${PLAYLIST_LIMIT}&tags=${encodeURIComponent(PLAYLIST_TAGS)}&include=musicinfo&audioformat=mp32`;
+      }
+
+      const res = await fetch(url);
+      if (!res.ok) return; // stay on the demo playlist, no visible error
+      const data = await res.json();
+      if (!data.results || !data.results.length) return;
+
+      const liveTracks = data.results
+        .filter((t) => t.audio)
+        .map((t) => ({
+          name: t.name,
+          artist_name: t.artist_name,
+          image: t.album_image || t.image,
+          audio: t.audio,
+        }));
+
+      if (!liveTracks.length) return;
+
+      // Swap in the live playlist quietly. If nothing has played yet, load
+      // its first track; otherwise leave the current track playing and just
+      // extend the queue.
+      playlist = liveTracks;
+      if (!isPlaying && audio.currentTime === 0) {
+        loadTrack(0, false);
+      }
+      renderUpcoming();
+      statusLine.textContent = "";
+    } catch (err) {
+      // Network blocked / CORS / offline — this is expected in some sandboxed
+      // environments. Silently keep using the demo playlist, no user-facing error.
+      console.info("Live Jamendo fetch unavailable, using demo playlist.", err);
+    }
+  }
+
+  startWithDemoPlaylist();
+  tryLiveJamendoFetch();
+</script></div></div></div><div id="stuff-modal-photographs" class="stuff-modal-overlay" aria-hidden="true" data-stuff-modal><div class="stuff-modal-panel" role="dialog" aria-modal="true" style="border-color: #F5C842; outline-color: #F5C842; background-color: #F5C842;"><!-- Sticky close bar --><button class="stuff-modal-close" aria-label="Close" data-stuff-close style="background-color: transparent;"><div style="
+        width: 32px;
+        height: 32px;
+        background-color: #0D1855;
+        mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+        -webkit-mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+      "></div></button><!-- Popup body content (injected per-card via slot) --><div class="stuff-modal-body"><section class="stuff-popup-content photos-container" data-astro-cid-f6krc7bp><div class="photos-viewport" id="photos-viewport" data-tilesize-w="2000" data-tilesize-h="1400" data-astro-cid-f6krc7bp><div class="photos-track" id="photos-track" data-items="[{&quot;id&quot;:1,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph0/1200/800&quot;,&quot;rotation&quot;:-17,&quot;x&quot;:27.77777777777777,&quot;y&quot;:29.16666666666667,&quot;scale&quot;:0.6,&quot;ease&quot;:0.6},{&quot;id&quot;:2,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph1/1200/800&quot;,&quot;rotation&quot;:0,&quot;x&quot;:311.6666666666667,&quot;y&quot;:48.41666666666667,&quot;scale&quot;:0.944,&quot;ease&quot;:0.988},{&quot;id&quot;:3,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph2/1200/800&quot;,&quot;rotation&quot;:17,&quot;x&quot;:595.5555555555555,&quot;y&quot;:67.66666666666666,&quot;scale&quot;:1.288,&quot;ease&quot;:0.976},{&quot;id&quot;:4,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph3/1200/800&quot;,&quot;rotation&quot;:-1,&quot;x&quot;:712.7777777777778,&quot;y&quot;:86.91666666666667,&quot;scale&quot;:0.832,&quot;ease&quot;:0.964},{&quot;id&quot;:5,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph4/1200/800&quot;,&quot;rotation&quot;:16,&quot;x&quot;:996.6666666666666,&quot;y&quot;:106.16666666666667,&quot;scale&quot;:1.176,&quot;ease&quot;:0.952},{&quot;id&quot;:6,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph5/1200/800&quot;,&quot;rotation&quot;:-2,&quot;x&quot;:1280.5555555555554,&quot;y&quot;:125.41666666666669,&quot;scale&quot;:0.72,&quot;ease&quot;:0.94},{&quot;id&quot;:7,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph6/1200/800&quot;,&quot;rotation&quot;:15,&quot;x&quot;:1397.7777777777778,&quot;y&quot;:144.66666666666669,&quot;scale&quot;:1.064,&quot;ease&quot;:0.9279999999999999},{&quot;id&quot;:8,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph7/1200/800&quot;,&quot;rotation&quot;:-3,&quot;x&quot;:1681.6666666666667,&quot;y&quot;:163.91666666666669,&quot;scale&quot;:0.608,&quot;ease&quot;:0.916},{&quot;id&quot;:9,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph8/1200/800&quot;,&quot;rotation&quot;:14,&quot;x&quot;:1965.5555555555557,&quot;y&quot;:183.16666666666669,&quot;scale&quot;:0.952,&quot;ease&quot;:0.904},{&quot;id&quot;:10,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph9/1200/800&quot;,&quot;rotation&quot;:-4,&quot;x&quot;:82.77777777777777,&quot;y&quot;:435.75,&quot;scale&quot;:1.296,&quot;ease&quot;:0.8919999999999999},{&quot;id&quot;:11,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph10/1200/800&quot;,&quot;rotation&quot;:13,&quot;x&quot;:366.6666666666667,&quot;y&quot;:280,&quot;scale&quot;:0.84,&quot;ease&quot;:0.8799999999999999},{&quot;id&quot;:12,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph11/1200/800&quot;,&quot;rotation&quot;:-5,&quot;x&quot;:483.88888888888886,&quot;y&quot;:299.25,&quot;scale&quot;:1.184,&quot;ease&quot;:0.868},{&quot;id&quot;:13,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph12/1200/800&quot;,&quot;rotation&quot;:12,&quot;x&quot;:767.7777777777778,&quot;y&quot;:318.5,&quot;scale&quot;:0.728,&quot;ease&quot;:0.856},{&quot;id&quot;:14,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph13/1200/800&quot;,&quot;rotation&quot;:-6,&quot;x&quot;:1051.6666666666667,&quot;y&quot;:337.75,&quot;scale&quot;:1.072,&quot;ease&quot;:0.844},{&quot;id&quot;:15,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph14/1200/800&quot;,&quot;rotation&quot;:11,&quot;x&quot;:1168.888888888889,&quot;y&quot;:357,&quot;scale&quot;:0.616,&quot;ease&quot;:0.832},{&quot;id&quot;:16,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph15/1200/800&quot;,&quot;rotation&quot;:-7,&quot;x&quot;:1452.7777777777778,&quot;y&quot;:376.25,&quot;scale&quot;:0.96,&quot;ease&quot;:0.8200000000000001},{&quot;id&quot;:17,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph16/1200/800&quot;,&quot;rotation&quot;:10,&quot;x&quot;:1736.6666666666667,&quot;y&quot;:395.5,&quot;scale&quot;:1.304,&quot;ease&quot;:0.808},{&quot;id&quot;:18,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph17/1200/800&quot;,&quot;rotation&quot;:-8,&quot;x&quot;:1853.888888888889,&quot;y&quot;:414.75,&quot;scale&quot;:0.848,&quot;ease&quot;:0.796},{&quot;id&quot;:19,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph18/1200/800&quot;,&quot;rotation&quot;:9,&quot;x&quot;:137.7777777777778,&quot;y&quot;:667.3333333333334,&quot;scale&quot;:1.192,&quot;ease&quot;:0.784},{&quot;id&quot;:20,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph19/1200/800&quot;,&quot;rotation&quot;:-9,&quot;x&quot;:255.00000000000003,&quot;y&quot;:511.58333333333337,&quot;scale&quot;:0.736,&quot;ease&quot;:0.772},{&quot;id&quot;:21,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph20/1200/800&quot;,&quot;rotation&quot;:8,&quot;x&quot;:538.8888888888889,&quot;y&quot;:530.8333333333334,&quot;scale&quot;:1.08,&quot;ease&quot;:0.76},{&quot;id&quot;:22,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph21/1200/800&quot;,&quot;rotation&quot;:-10,&quot;x&quot;:822.7777777777778,&quot;y&quot;:550.0833333333334,&quot;scale&quot;:0.624,&quot;ease&quot;:0.748},{&quot;id&quot;:23,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph22/1200/800&quot;,&quot;rotation&quot;:7,&quot;x&quot;:940,&quot;y&quot;:569.3333333333334,&quot;scale&quot;:0.968,&quot;ease&quot;:0.736},{&quot;id&quot;:24,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph23/1200/800&quot;,&quot;rotation&quot;:-11,&quot;x&quot;:1223.888888888889,&quot;y&quot;:588.5833333333334,&quot;scale&quot;:1.312,&quot;ease&quot;:0.724},{&quot;id&quot;:25,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph24/1200/800&quot;,&quot;rotation&quot;:6,&quot;x&quot;:1507.7777777777778,&quot;y&quot;:607.8333333333334,&quot;scale&quot;:0.856,&quot;ease&quot;:0.712},{&quot;id&quot;:26,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph25/1200/800&quot;,&quot;rotation&quot;:-12,&quot;x&quot;:1625,&quot;y&quot;:627.0833333333334,&quot;scale&quot;:1.2000000000000002,&quot;ease&quot;:0.7},{&quot;id&quot;:27,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph26/1200/800&quot;,&quot;rotation&quot;:5,&quot;x&quot;:1908.888888888889,&quot;y&quot;:646.3333333333334,&quot;scale&quot;:0.744,&quot;ease&quot;:0.688},{&quot;id&quot;:28,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph27/1200/800&quot;,&quot;rotation&quot;:-13,&quot;x&quot;:192.77777777777777,&quot;y&quot;:898.9166666666666,&quot;scale&quot;:1.088,&quot;ease&quot;:0.6759999999999999},{&quot;id&quot;:29,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph28/1200/800&quot;,&quot;rotation&quot;:4,&quot;x&quot;:310.00000000000006,&quot;y&quot;:743.1666666666666,&quot;scale&quot;:0.632,&quot;ease&quot;:0.6639999999999999},{&quot;id&quot;:30,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph29/1200/800&quot;,&quot;rotation&quot;:-14,&quot;x&quot;:593.8888888888889,&quot;y&quot;:762.4166666666666,&quot;scale&quot;:0.976,&quot;ease&quot;:0.652},{&quot;id&quot;:31,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph30/1200/800&quot;,&quot;rotation&quot;:3,&quot;x&quot;:711.1111111111112,&quot;y&quot;:781.6666666666666,&quot;scale&quot;:1.32,&quot;ease&quot;:0.64},{&quot;id&quot;:32,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph31/1200/800&quot;,&quot;rotation&quot;:-15,&quot;x&quot;:995,&quot;y&quot;:800.9166666666666,&quot;scale&quot;:0.864,&quot;ease&quot;:0.628},{&quot;id&quot;:33,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph32/1200/800&quot;,&quot;rotation&quot;:2,&quot;x&quot;:1278.888888888889,&quot;y&quot;:820.1666666666666,&quot;scale&quot;:1.2080000000000002,&quot;ease&quot;:0.616},{&quot;id&quot;:34,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph33/1200/800&quot;,&quot;rotation&quot;:-16,&quot;x&quot;:1396.1111111111113,&quot;y&quot;:839.4166666666666,&quot;scale&quot;:0.752,&quot;ease&quot;:0.604},{&quot;id&quot;:35,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph34/1200/800&quot;,&quot;rotation&quot;:1,&quot;x&quot;:1680,&quot;y&quot;:858.6666666666666,&quot;scale&quot;:1.096,&quot;ease&quot;:0.992},{&quot;id&quot;:36,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph35/1200/800&quot;,&quot;rotation&quot;:-17,&quot;x&quot;:1963.888888888889,&quot;y&quot;:877.9166666666666,&quot;scale&quot;:0.64,&quot;ease&quot;:0.98},{&quot;id&quot;:37,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph36/1200/800&quot;,&quot;rotation&quot;:0,&quot;x&quot;:81.11111111111111,&quot;y&quot;:1130.5,&quot;scale&quot;:0.984,&quot;ease&quot;:0.968},{&quot;id&quot;:38,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph37/1200/800&quot;,&quot;rotation&quot;:17,&quot;x&quot;:365.00000000000006,&quot;y&quot;:974.75,&quot;scale&quot;:1.328,&quot;ease&quot;:0.956},{&quot;id&quot;:39,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph38/1200/800&quot;,&quot;rotation&quot;:-1,&quot;x&quot;:482.2222222222222,&quot;y&quot;:994,&quot;scale&quot;:0.872,&quot;ease&quot;:0.944},{&quot;id&quot;:40,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph39/1200/800&quot;,&quot;rotation&quot;:16,&quot;x&quot;:766.1111111111112,&quot;y&quot;:1013.25,&quot;scale&quot;:1.2160000000000002,&quot;ease&quot;:0.9319999999999999},{&quot;id&quot;:41,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph40/1200/800&quot;,&quot;rotation&quot;:-2,&quot;x&quot;:1050,&quot;y&quot;:1032.5,&quot;scale&quot;:0.76,&quot;ease&quot;:0.92},{&quot;id&quot;:42,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph41/1200/800&quot;,&quot;rotation&quot;:15,&quot;x&quot;:1167.2222222222222,&quot;y&quot;:1051.75,&quot;scale&quot;:1.104,&quot;ease&quot;:0.908},{&quot;id&quot;:43,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph42/1200/800&quot;,&quot;rotation&quot;:-3,&quot;x&quot;:1451.1111111111113,&quot;y&quot;:1071,&quot;scale&quot;:0.648,&quot;ease&quot;:0.8959999999999999},{&quot;id&quot;:44,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph43/1200/800&quot;,&quot;rotation&quot;:14,&quot;x&quot;:1735,&quot;y&quot;:1090.25,&quot;scale&quot;:0.992,&quot;ease&quot;:0.8839999999999999},{&quot;id&quot;:45,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph44/1200/800&quot;,&quot;rotation&quot;:-4,&quot;x&quot;:1852.2222222222222,&quot;y&quot;:1109.5,&quot;scale&quot;:1.336,&quot;ease&quot;:0.872},{&quot;id&quot;:46,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph45/1200/800&quot;,&quot;rotation&quot;:13,&quot;x&quot;:136.11111111111111,&quot;y&quot;:1362.0833333333335,&quot;scale&quot;:0.8799999999999999,&quot;ease&quot;:0.86},{&quot;id&quot;:47,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph46/1200/800&quot;,&quot;rotation&quot;:-5,&quot;x&quot;:253.33333333333337,&quot;y&quot;:1206.3333333333335,&quot;scale&quot;:1.2240000000000002,&quot;ease&quot;:0.848},{&quot;id&quot;:48,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph47/1200/800&quot;,&quot;rotation&quot;:12,&quot;x&quot;:537.2222222222222,&quot;y&quot;:1225.5833333333335,&quot;scale&quot;:0.768,&quot;ease&quot;:0.836},{&quot;id&quot;:49,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph48/1200/800&quot;,&quot;rotation&quot;:-6,&quot;x&quot;:821.1111111111112,&quot;y&quot;:1244.8333333333335,&quot;scale&quot;:1.112,&quot;ease&quot;:0.8240000000000001},{&quot;id&quot;:50,&quot;image&quot;:&quot;https://picsum.photos/seed/photograph49/1200/800&quot;,&quot;rotation&quot;:11,&quot;x&quot;:938.3333333333334,&quot;y&quot;:1264.0833333333335,&quot;scale&quot;:0.656,&quot;ease&quot;:0.812}]" data-urls="[&quot;https://picsum.photos/seed/photograph0/1200/800&quot;,&quot;https://picsum.photos/seed/photograph1/1200/800&quot;,&quot;https://picsum.photos/seed/photograph2/1200/800&quot;,&quot;https://picsum.photos/seed/photograph3/1200/800&quot;,&quot;https://picsum.photos/seed/photograph4/1200/800&quot;,&quot;https://picsum.photos/seed/photograph5/1200/800&quot;,&quot;https://picsum.photos/seed/photograph6/1200/800&quot;,&quot;https://picsum.photos/seed/photograph7/1200/800&quot;,&quot;https://picsum.photos/seed/photograph8/1200/800&quot;,&quot;https://picsum.photos/seed/photograph9/1200/800&quot;,&quot;https://picsum.photos/seed/photograph10/1200/800&quot;,&quot;https://picsum.photos/seed/photograph11/1200/800&quot;,&quot;https://picsum.photos/seed/photograph12/1200/800&quot;,&quot;https://picsum.photos/seed/photograph13/1200/800&quot;,&quot;https://picsum.photos/seed/photograph14/1200/800&quot;,&quot;https://picsum.photos/seed/photograph15/1200/800&quot;,&quot;https://picsum.photos/seed/photograph16/1200/800&quot;,&quot;https://picsum.photos/seed/photograph17/1200/800&quot;,&quot;https://picsum.photos/seed/photograph18/1200/800&quot;,&quot;https://picsum.photos/seed/photograph19/1200/800&quot;,&quot;https://picsum.photos/seed/photograph20/1200/800&quot;,&quot;https://picsum.photos/seed/photograph21/1200/800&quot;,&quot;https://picsum.photos/seed/photograph22/1200/800&quot;,&quot;https://picsum.photos/seed/photograph23/1200/800&quot;,&quot;https://picsum.photos/seed/photograph24/1200/800&quot;,&quot;https://picsum.photos/seed/photograph25/1200/800&quot;,&quot;https://picsum.photos/seed/photograph26/1200/800&quot;,&quot;https://picsum.photos/seed/photograph27/1200/800&quot;,&quot;https://picsum.photos/seed/photograph28/1200/800&quot;,&quot;https://picsum.photos/seed/photograph29/1200/800&quot;,&quot;https://picsum.photos/seed/photograph30/1200/800&quot;,&quot;https://picsum.photos/seed/photograph31/1200/800&quot;,&quot;https://picsum.photos/seed/photograph32/1200/800&quot;,&quot;https://picsum.photos/seed/photograph33/1200/800&quot;,&quot;https://picsum.photos/seed/photograph34/1200/800&quot;,&quot;https://picsum.photos/seed/photograph35/1200/800&quot;,&quot;https://picsum.photos/seed/photograph36/1200/800&quot;,&quot;https://picsum.photos/seed/photograph37/1200/800&quot;,&quot;https://picsum.photos/seed/photograph38/1200/800&quot;,&quot;https://picsum.photos/seed/photograph39/1200/800&quot;,&quot;https://picsum.photos/seed/photograph40/1200/800&quot;,&quot;https://picsum.photos/seed/photograph41/1200/800&quot;,&quot;https://picsum.photos/seed/photograph42/1200/800&quot;,&quot;https://picsum.photos/seed/photograph43/1200/800&quot;,&quot;https://picsum.photos/seed/photograph44/1200/800&quot;,&quot;https://picsum.photos/seed/photograph45/1200/800&quot;,&quot;https://picsum.photos/seed/photograph46/1200/800&quot;,&quot;https://picsum.photos/seed/photograph47/1200/800&quot;,&quot;https://picsum.photos/seed/photograph48/1200/800&quot;,&quot;https://picsum.photos/seed/photograph49/1200/800&quot;]" data-astro-cid-f6krc7bp><!-- The JS engine will construct the 2x2 wrapping grid here --></div><p class="photos-hint" id="photos-hint" aria-hidden="true" data-astro-cid-f6krc7bp>scroll / drag to move</p></div></section><!-- Lightbox DOM --><div class="photos-lightbox" id="photos-lightbox" aria-hidden="true" role="dialog" data-astro-cid-f6krc7bp><button class="photos-lightbox__btn photos-lightbox__btn--close" id="lightbox-close" aria-label="Close Lightbox" data-astro-cid-f6krc7bp>×</button><button class="photos-lightbox__btn photos-lightbox__btn--prev" id="lightbox-prev" aria-label="Previous Photo" data-astro-cid-f6krc7bp>‹</button><div class="photos-lightbox__content" id="lightbox-backdrop" data-astro-cid-f6krc7bp><img class="photos-lightbox__image" id="lightbox-image" src="" alt="Full size photograph" data-astro-cid-f6krc7bp></div><button class="photos-lightbox__btn photos-lightbox__btn--next" id="lightbox-next" aria-label="Next Photo" data-astro-cid-f6krc7bp>›</button></div><script type="module" src="/src/components/stuff/popups/PhotographsContent.astro?astro&type=script&index=0&lang.ts"></script></div></div></div><div id="stuff-modal-illustrations" class="stuff-modal-overlay" aria-hidden="true" data-stuff-modal><div class="stuff-modal-panel" role="dialog" aria-modal="true" style="border-color: #F5C842; outline-color: #F5C842; background-color: #0D1855;"><!-- Sticky close bar --><button class="stuff-modal-close" aria-label="Close" data-stuff-close style="background-color: transparent;"><div style="
+        width: 32px;
+        height: 32px;
+        background-color: #F5C842;
+        mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+        -webkit-mask: url('/images/frame/closeo.PNG') no-repeat center / contain;
+      "></div></button><!-- Popup body content (injected per-card via slot) --><div class="stuff-modal-body"><section class="stuff-popup-content illustrations-container" data-astro-cid-jq276nfn><div id="ill-viewport" class="ill-viewport" data-orig-w="1522" data-orig-h="1238" data-astro-cid-jq276nfn><div id="ill-track" class="ill-track" data-items="[{&quot;id&quot;:1,&quot;image&quot;:&quot;/images/illustrations/image-1.jpg&quot;,&quot;caption&quot;:&quot;30 knots <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2021&quot;,&quot;x&quot;:71,&quot;y&quot;:58,&quot;w&quot;:400,&quot;h&quot;:270,&quot;ease&quot;:0.8574292026875483},{&quot;id&quot;:2,&quot;image&quot;:&quot;/images/illustrations/image-2.jpg&quot;,&quot;caption&quot;:&quot;Sad Mis-Step <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2024&quot;,&quot;x&quot;:211,&quot;y&quot;:255,&quot;w&quot;:540,&quot;h&quot;:360,&quot;ease&quot;:0.587035675651217},{&quot;id&quot;:3,&quot;image&quot;:&quot;/images/illustrations/image-3.jpg&quot;,&quot;caption&quot;:&quot;Mini Orange <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2014&quot;,&quot;x&quot;:631,&quot;y&quot;:158,&quot;w&quot;:400,&quot;h&quot;:270,&quot;ease&quot;:0.6690857291952708},{&quot;id&quot;:4,&quot;image&quot;:&quot;/images/illustrations/image-4.jpg&quot;,&quot;caption&quot;:&quot;After Storm <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2022&quot;,&quot;x&quot;:1191,&quot;y&quot;:245,&quot;w&quot;:260,&quot;h&quot;:195,&quot;ease&quot;:0.8433464071337777},{&quot;id&quot;:5,&quot;image&quot;:&quot;/images/illustrations/image-5.jpg&quot;,&quot;caption&quot;:&quot;Untitled <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2016&quot;,&quot;x&quot;:351,&quot;y&quot;:687,&quot;w&quot;:260,&quot;h&quot;:290,&quot;ease&quot;:0.8320698932184956},{&quot;id&quot;:6,&quot;image&quot;:&quot;/images/illustrations/image-6.jpg&quot;,&quot;caption&quot;:&quot;Toilet Paper <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2022&quot;,&quot;x&quot;:751,&quot;y&quot;:824,&quot;w&quot;:205,&quot;h&quot;:154,&quot;ease&quot;:0.6016652699940566},{&quot;id&quot;:7,&quot;image&quot;:&quot;/images/illustrations/image-7.jpg&quot;,&quot;caption&quot;:&quot;Cocoa Eggplant Tomato <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2025&quot;,&quot;x&quot;:911,&quot;y&quot;:540,&quot;w&quot;:260,&quot;h&quot;:350,&quot;ease&quot;:0.8170002243186818},{&quot;id&quot;:8,&quot;image&quot;:&quot;/images/illustrations/image-8.jpg&quot;,&quot;caption&quot;:&quot;Toilet Paper <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2022&quot;,&quot;x&quot;:1051,&quot;y&quot;:803,&quot;w&quot;:400,&quot;h&quot;:300,&quot;ease&quot;:0.9037482945649971},{&quot;id&quot;:9,&quot;image&quot;:&quot;/images/illustrations/image-9.jpg&quot;,&quot;caption&quot;:&quot;Production Fun Fact (Eggs) <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2024&quot;,&quot;x&quot;:71,&quot;y&quot;:922,&quot;w&quot;:350,&quot;h&quot;:260,&quot;ease&quot;:0.830881939644936}]" data-astro-cid-jq276nfn><!-- The JS engine will construct the 2x2 wrapping grid here --></div><!-- User hint --><div id="ill-hint" class="ill-hint" data-astro-cid-jq276nfn><div class="ill-hint__icon" data-astro-cid-jq276nfn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-astro-cid-jq276nfn><path d="M5 12h14M12 5l7 7-7 7" data-astro-cid-jq276nfn></path></svg></div><span data-astro-cid-jq276nfn>Pan around infinitely</span></div></div></section><script type="module" src="/src/components/stuff/popups/IllustrationsContent.astro?astro&type=script&index=0&lang.ts"></script></div></div></div></body></html><script type="module" src="/src/pages/stuff.astro?astro&type=script&index=0&lang.ts"></script>

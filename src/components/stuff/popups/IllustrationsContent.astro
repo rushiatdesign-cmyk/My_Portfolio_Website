@@ -1,8 +1,594 @@
 ---
-// Illustrations popup content
+// Illustrations popup content - Infinite Grid Implementation
+
+const originalSize = { w: 1522, h: 1238 };
+
+const referenceData = [
+  {x: 71, y: 58, w: 400, h: 270},
+  {x: 211, y: 255, w: 540, h: 360},
+  {x: 631, y: 158, w: 400, h: 270},
+  {x: 1191, y: 245, w: 260, h: 195},
+  {x: 351, y: 687, w: 260, h: 290},
+  {x: 751, y: 824, w: 205, h: 154},
+  {x: 911, y: 540, w: 260, h: 350},
+  {x: 1051, y: 803, w: 400, h: 300},
+  {x: 71, y: 922, w: 350, h: 260},
+];
+
+const sources = [
+  {src: 'image-1.jpg', caption: '30 knots <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2021'},
+  {src: 'image-2.jpg', caption: 'Sad Mis-Step <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2024'},
+  {src: 'image-3.jpg', caption: 'Mini Orange <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2014'},
+  {src: 'image-4.jpg', caption: 'After Storm <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2022'},
+  {src: 'image-5.jpg', caption: 'Untitled <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2016'},
+  {src: 'image-6.jpg', caption: 'Toilet Paper <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2022'},
+  {src: 'image-7.jpg', caption: 'Cocoa Eggplant Tomato <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2025'},
+  {src: 'image-8.jpg', caption: 'Toilet Paper <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2022'},
+  {src: 'image-9.jpg', caption: 'Production Fun Fact (Eggs) <br>12 x 16 inch C type hand print <br>Edition of 1 Plus an additional artist Proof <br>2024'},
+];
+
+const illustrations = referenceData.map((d, i) => {
+  return {
+    id: i + 1,
+    image: `/images/illustrations/${sources[i].src}`,
+    caption: sources[i].caption,
+    x: d.x,
+    y: d.y,
+    w: d.w,
+    h: d.h,
+    ease: Math.random() * 0.5 + 0.5,
+  };
+});
 ---
 
-<section class="stuff-popup-content">
-  <h2 class="stuff-popup-title">Illustrations</h2>
-  <p class="stuff-popup-placeholder">Content coming soon…</p>
+<section class="stuff-popup-content illustrations-container">
+  <div id="ill-viewport" class="ill-viewport" data-orig-w={originalSize.w} data-orig-h={originalSize.h}>
+    <div id="ill-track" class="ill-track" data-items={JSON.stringify(illustrations)}>
+      <!-- The JS engine will construct the 2x2 wrapping grid here -->
+    </div>
+
+    <!-- User hint -->
+    <div id="ill-hint" class="ill-hint">
+      <div class="ill-hint__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </div>
+      <span>Pan around infinitely</span>
+    </div>
+  </div>
 </section>
+
+<style>
+  .illustrations-container {
+    padding: 0;
+    margin: 0 calc(-1 * clamp(24px, 5vw, 64px))
+      calc(-1 * clamp(40px, 6vh, 80px)); /* Pull to edges */
+    overflow: hidden;
+    background-color: #f5c842 !important; /* Set popup background to yellow */
+  }
+
+  .ill-viewport {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none; /* Required for native touch drag prevention */
+  }
+
+  .ill-viewport.is-dragging {
+    cursor: grabbing;
+  }
+
+  .ill-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let the viewport catch drag events */
+  }
+
+  /* We use :global because the DOM elements are created in JS */
+  :global(.ill-card) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 10px 38px 10px; /* Polaroid style */
+    
+    background-color: #0d1855; /* User requested blue cards */
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
+    
+    user-select: none;
+    pointer-events: auto; /* Enable hover/click on the cards themselves */
+    cursor: pointer;
+    z-index: 1;
+
+    /* No CSS transitions on transform, GSAP handles all movement */
+  }
+
+  :global(.ill-card__image-wrap) {
+    position: relative;
+    width: 100%;
+    height: 100%; /* Fill the allocated space */
+    overflow: hidden;
+    z-index: 1;
+    box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.7);
+  }
+
+  :global(.ill-card__image) {
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none; /* Let card handle events */
+  }
+
+  :global(.ill-card__caption) {
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.7rem;
+    font-family: var(--font-body, "Outfit"), sans-serif;
+    color: #f5c842; /* Yellow text on blue card */
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.9;
+  }
+
+  /* Hint styling */
+  .ill-hint {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(13, 24, 85, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #f5c842;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-family: var(--font-body, "Outfit"), sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    z-index: 100;
+    transition: opacity 0.5s ease;
+    border: 1px solid rgba(245, 200, 66, 0.3);
+  }
+
+  .ill-hint.is-hidden {
+    opacity: 0;
+  }
+
+  .ill-hint__icon {
+    width: 20px;
+    height: 20px;
+    animation: pan-hint 2s infinite ease-in-out;
+  }
+
+  @keyframes pan-hint {
+    0%, 100% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  import gsap from "gsap";
+
+  // Robust Modal Scroll Lock to completely isolate interactions
+  function illLockPageScroll() {
+    if (document.documentElement.classList.contains("ill-modal-lock")) return;
+    
+    const scrollY = window.scrollY;
+    document.body.dataset.illScrollY = scrollY.toString();
+    
+    // Save original styles
+    document.body.dataset.origPosition = document.body.style.position || "";
+    document.body.dataset.origTop = document.body.style.top || "";
+    document.body.dataset.origLeft = document.body.style.left || "";
+    document.body.dataset.origRight = document.body.style.right || "";
+    document.body.dataset.origWidth = document.body.style.width || "";
+
+    // Lock the page exactly where it is
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    
+    document.documentElement.classList.add("ill-modal-lock");
+  }
+
+  function illUnlockPageScroll() {
+    if (!document.documentElement.classList.contains("ill-modal-lock")) return;
+    
+    const scrollY = parseFloat(document.body.dataset.illScrollY || "0");
+    
+    // Restore previous styles
+    document.body.style.position = document.body.dataset.origPosition;
+    document.body.style.top = document.body.dataset.origTop;
+    document.body.style.left = document.body.dataset.origLeft;
+    document.body.style.right = document.body.dataset.origRight;
+    document.body.style.width = document.body.dataset.origWidth;
+    
+    document.documentElement.classList.remove("ill-modal-lock");
+    
+    // Restore scroll position
+    window.scrollTo(0, scrollY);
+  }
+
+  function initIllCanvas() {
+    console.log("initIllCanvas running!");
+    const V = document.getElementById("ill-viewport");
+    const T = document.getElementById("ill-track");
+    const H = document.getElementById("ill-hint");
+    if (!V || !T) {
+      console.log("initIllCanvas aborted: V or T missing");
+      return;
+    }
+
+    // Prevent duplicate initialization
+    if (V.dataset.initialized === "true") return;
+    V.dataset.initialized = "true";
+
+    // Setup Modal Lifecycle
+    const overlay = V.closest(".stuff-modal-overlay");
+    if (overlay) {
+      const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.attributeName === "aria-hidden") {
+            if (overlay.getAttribute("aria-hidden") === "false") {
+              illLockPageScroll();
+            } else {
+              illUnlockPageScroll();
+            }
+          }
+        }
+      });
+      observer.observe(overlay, { attributes: true });
+
+      if (overlay.getAttribute("aria-hidden") === "false") {
+        illLockPageScroll();
+      }
+    }
+
+    // Load Data
+    const baseItems = JSON.parse(T.getAttribute("data-items") || "[]");
+    const origW = parseFloat(V.getAttribute("data-orig-w"));
+    const origH = parseFloat(V.getAttribute("data-orig-h"));
+
+    let winW = V.clientWidth;
+    let winH = V.clientHeight;
+
+    // Calculate tile size matching reference exact logic
+    let tileW = winW;
+    let tileH = winW * (origH / origW);
+
+    const scaleX = tileW / origW;
+    const scaleY = tileH / origH;
+
+    // Infinite Grid State
+    const scroll = {
+      ease: 0.08,
+      current: { x: 0, y: 0 },
+      target: { x: 0, y: 0 },
+      last: { x: 0, y: 0 },
+      delta: { x: { c: 0, t: 0 }, y: { c: 0, t: 0 } }
+    };
+
+    const mouse = {
+      x: { t: 0.5, c: 0.5 },
+      y: { t: 0.5, c: 0.5 }
+    };
+
+    const drag = {
+      isActive: false,
+      startX: 0,
+      startY: 0,
+      scrollX: 0,
+      scrollY: 0
+    };
+
+    let items = [];
+
+    // Build the 2x2 wrapping DOM
+    const repsX = [0, tileW];
+    const repsY = [0, tileH];
+
+    baseItems.forEach((base) => {
+      // Scale base positions to responsive tile
+      const sx = base.x * scaleX;
+      const sy = base.y * scaleY;
+      const sw = base.w * scaleX;
+      const sh = base.h * scaleY;
+
+      repsX.forEach((offsetX) => {
+        repsY.forEach((offsetY) => {
+          // Construct Card DOM
+          const card = document.createElement("div");
+          card.classList.add("ill-card");
+          card.style.width = `${sw}px`;
+          card.style.height = `${sh + 48}px`; // Extra height for caption
+
+          const wrap = document.createElement("div");
+          wrap.classList.add("ill-card__image-wrap");
+
+          const img = document.createElement("img");
+          img.classList.add("ill-card__image");
+          img.src = base.image;
+          img.alt = `Illustration ${base.id}`;
+          img.loading = "lazy";
+          img.draggable = false;
+
+          wrap.appendChild(img);
+          card.appendChild(wrap);
+
+          const cap = document.createElement("div");
+          cap.classList.add("ill-card__caption");
+          cap.innerHTML = base.caption;
+          card.appendChild(cap);
+
+          T.appendChild(card);
+
+          // Store engine data
+          items.push({
+            el: card,
+            img: img,
+            baseX: sx + offsetX,
+            baseY: sy + offsetY,
+            w: sw,
+            h: sh + 48,
+            extraX: 0,
+            extraY: 0,
+            ease: base.ease,
+            data: base
+          });
+        });
+      });
+    });
+
+    const fullTileW = tileW * 2;
+    const fullTileH = tileH * 2;
+
+    // Start slightly offset to feel natural
+    scroll.target.x = -winW * 0.1;
+    scroll.target.y = -winH * 0.1;
+    scroll.current.x = scroll.target.x;
+    scroll.current.y = scroll.target.y;
+
+    // Initialize GSAP properties on cards without rotation
+    items.forEach(item => {
+      gsap.set(item.el, { 
+        xPercent: 0, // Reference does not translate -50% from center
+        yPercent: 0, 
+        rotation: 0,
+        scale: 1 
+      });
+    });
+
+    function dismissHint() {
+      if (H && !H.classList.contains("is-hidden")) {
+        H.classList.add("is-hidden");
+      }
+    }
+
+    // ----------------------------------------------------
+    // GSAP TICKER RENDER LOOP
+    // ----------------------------------------------------
+    function render() {
+      // 1. Smoothly interpolate scroll
+      scroll.current.x += (scroll.target.x - scroll.current.x) * scroll.ease;
+      scroll.current.y += (scroll.target.y - scroll.current.y) * scroll.ease;
+
+      // 2. Smoothly calculate scroll delta for parallax floating
+      scroll.delta.x.t = scroll.current.x - scroll.last.x;
+      scroll.delta.y.t = scroll.current.y - scroll.last.y;
+      scroll.delta.x.c += (scroll.delta.x.t - scroll.delta.x.c) * 0.05;
+      scroll.delta.y.c += (scroll.delta.y.t - scroll.delta.y.c) * 0.05;
+
+      // 3. Smooth mouse position
+      mouse.x.c += (mouse.x.t - mouse.x.c) * 0.05;
+      mouse.y.c += (mouse.y.t - mouse.y.c) * 0.05;
+
+      const dirX = scroll.current.x > scroll.last.x ? "right" : "left";
+      const dirY = scroll.current.y > scroll.last.y ? "down" : "up";
+
+      // 4. Update each item
+      items.forEach(item => {
+        // Momentum parallax offsets
+        const parallaxX = 8 * scroll.delta.x.c * item.ease;
+        const parallaxY = 8 * scroll.delta.y.c * item.ease;
+        
+        // Mouse parallax offsets
+        const mouseParallaxX = (mouse.x.c - 0.5) * 40 * item.ease;
+        const mouseParallaxY = (mouse.y.c - 0.5) * 40 * item.ease;
+
+        const posX = item.baseX + scroll.current.x + item.extraX + parallaxX + mouseParallaxX;
+        const posY = item.baseY + scroll.current.y + item.extraY + parallaxY + mouseParallaxY;
+
+        // 5. Infinite Wrapping Logic
+        if (dirX === "right" && posX > winW) {
+          item.extraX -= fullTileW;
+        } else if (dirX === "left" && posX + item.w < 0) {
+          item.extraX += fullTileW;
+        }
+
+        if (dirY === "down" && posY > winH) {
+          item.extraY -= fullTileH;
+        } else if (dirY === "up" && posY + item.h < 0) {
+          item.extraY += fullTileH;
+        }
+
+        // Calculate final wrapped position
+        const fx = item.baseX + scroll.current.x + item.extraX + parallaxX + mouseParallaxX;
+        const fy = item.baseY + scroll.current.y + item.extraY + parallaxY + mouseParallaxY;
+
+        // Render positions using GSAP
+        gsap.set(item.el, { x: fx, y: fy });
+        
+        // Inner image parallax (opposite direction)
+        gsap.set(item.img, { 
+          x: -mouse.x.c * item.ease * 12, 
+          y: -mouse.y.c * item.ease * 12 
+        });
+      });
+
+      scroll.last.x = scroll.current.x;
+      scroll.last.y = scroll.current.y;
+    }
+
+    gsap.ticker.add(render);
+
+    // ----------------------------------------------------
+    // INPUT HANDLERS
+    // ----------------------------------------------------
+    
+    function onWheel(e) {
+      e.preventDefault();
+      dismissHint();
+      // Trackpad / Wheel directly manipulates the virtual target
+      // Adjust factor for desired scroll speed (0.5 is comfortable)
+      scroll.target.x -= e.deltaX * 0.5;
+      scroll.target.y -= e.deltaY * 0.5;
+    }
+
+    function onPointerDown(e) {
+      e.preventDefault();
+      dismissHint();
+      drag.isActive = true;
+      V.classList.add("is-dragging");
+      drag.startX = e.clientX;
+      drag.startY = e.clientY;
+      drag.scrollX = scroll.target.x;
+      drag.scrollY = scroll.target.y;
+    }
+
+    function onPointerMove(e) {
+      // Normalize mouse coordinates for subtle parallax
+      mouse.x.t = e.clientX / window.innerWidth;
+      mouse.y.t = e.clientY / window.innerHeight;
+
+      if (drag.isActive) {
+        const dx = e.clientX - drag.startX;
+        const dy = e.clientY - drag.startY;
+        scroll.target.x = drag.scrollX + dx;
+        scroll.target.y = drag.scrollY + dy;
+      }
+    }
+
+    function onPointerUp(e) {
+      if (drag.isActive) {
+        drag.isActive = false;
+        V.classList.remove("is-dragging");
+      }
+    }
+
+    // Bind listeners directly to viewport.
+    // Because the document body is strictly locked when modal is open, 
+    // we don't need excessive propagation stoppers here.
+    V.addEventListener("wheel", onWheel, { passive: false });
+    V.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
+
+    // Resize observer
+    window.addEventListener("resize", () => {
+      winW = V.clientWidth;
+      winH = V.clientHeight;
+    });
+
+    // ----------------------------------------------------
+    // GSAP HOVER & LIGHTBOX INTERACTION
+    // ----------------------------------------------------
+    let clickTarget = null;
+    let dragDistance = 0;
+    
+    items.forEach((item) => {
+      // Smooth Hover Zoom without rotation
+      item.el.addEventListener("mouseenter", () => {
+        if (drag.isActive) return;
+        gsap.to(item.el, {
+          scale: 1.06,
+          zIndex: 10,
+          duration: 0.6,
+          ease: "power3.out",
+        });
+        gsap.to(item.img, {
+          scale: 1.08,
+          duration: 0.6,
+          ease: "power3.out",
+        });
+      });
+
+      item.el.addEventListener("mouseleave", () => {
+        gsap.to(item.el, {
+          scale: 1,
+          zIndex: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        });
+        gsap.to(item.img, {
+          scale: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        });
+      });
+
+      // Lightbox Support
+      item.el.addEventListener("pointerdown", (e) => {
+        clickTarget = item;
+        dragDistance = 0;
+      });
+
+      item.el.addEventListener("pointerup", (e) => {
+        if (clickTarget === item && dragDistance < 10) {
+          // It's a clean click, open the lightbox!
+          const imgRect = item.img.getBoundingClientRect();
+          document.dispatchEvent(
+            new CustomEvent("openLightbox", {
+              detail: {
+                id: item.data.id,
+                src: item.data.image,
+                rect: imgRect, // Origin rect for GSAP Flip in lightbox
+              },
+            })
+          );
+        }
+        clickTarget = null;
+      });
+    });
+
+    // Track drag distance to differentiate drag vs click
+    window.addEventListener("pointermove", (e) => {
+      if (drag.isActive) {
+        dragDistance += Math.abs(e.movementX) + Math.abs(e.movementY);
+      }
+    });
+
+  }
+
+  console.log("IllustrationsContent top level code running!");
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initIllCanvas);
+  } else {
+    initIllCanvas();
+  }
+</script>
