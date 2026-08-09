@@ -14,7 +14,6 @@
   padding: 0;
 }
 
-/* ── Body: fixed, no scroll ── */
 .stuff-body {
   background: #0D1855;
   width: 100vw;
@@ -28,29 +27,61 @@
 /* ======================================================
    FULL-VIEWPORT FRAME
 ====================================================== */
+.stuff-frame-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  pointer-events: none;
+  border-style: solid;
+  border-color: #0D1855;
+  /* Frame is offset by 4vh/4vw, and its borders are 43px 25px 36px 25px */
+  border-top-width: calc(4vh + 43px);
+  border-bottom-width: calc(4vh + 36px);
+  border-left-width: calc(4vw + 25px);
+  border-right-width: calc(4vw + 25px);
+}
+
 .stuff-frame {
   position: fixed;
   top: 4vh;
   left: 4vw;
   width: 92vw;
   height: 92vh;
-  object-fit: fill;
   pointer-events: none;
-  z-index: 20;
+  z-index: 202;
   user-select: none;
+
+  border-style: solid;
+  border-width: 43px 25px 36px 25px;
+  border-image-source: url('/images/stuff/stuffframe.PNG');
+  border-image-slice: 15% 6% 13% 6%;
+  border-image-repeat: stretch;
 }
 
 /* ======================================================
    LOGO — TOP CENTER, FIXED
 ====================================================== */
-.stuff-logo {
+.stuff-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
   position: fixed;
-  top: clamp(16px, 3vh, 40px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: clamp(180px, 28vw, 380px);
+  top: 0;
+  left: 0;
+  z-index: 35;
+  background-color: #0D1855;
+  padding: clamp(16px, 3vh, 40px) 0 clamp(16px, 3vh, 40px);
+  transition: opacity 0.3s ease, filter 0.3s ease, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.stuff-header.is-hidden {
+  transform: translateY(-100%);
+}
+
+.stuff-logo {
+  width: clamp(198px, 31vw, 418px);
   height: auto;
-  z-index: 30;
+  display: block;
   pointer-events: none;
   user-select: none;
 }
@@ -75,7 +106,7 @@
    ARROW BUTTONS
 ====================================================== */
 .stuff-arrow {
-  position: fixed;
+  position: absolute;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -93,15 +124,26 @@
 }
 
 .stuff-arrow--left {
-  left: calc(4vw + clamp(112px, 2vw, 32px));
+  left: calc(27vw - min(18vw, 195px));
+  transform: translate(-50%, -50%);
 }
 
 .stuff-arrow--right {
-  right: calc(4vw + clamp(112px, 2vw, 32px));
+  right: calc(27vw - min(18vw, 195px));
+  transform: translate(50%, -50%);
 }
 
 .stuff-arrow:hover {
+  /* Retain exact horizontal transform on hover but scale up */
   transform: translateY(-50%) scale(1.15);
+}
+
+.stuff-arrow--left:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.stuff-arrow--right:hover {
+  transform: translate(50%, -50%) scale(1.15);
 }
 
 /* ======================================================
@@ -110,13 +152,14 @@
 .stuff-layout-content {
   position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: auto;
+  /* Removed z-index to allow modals to appear over the frame */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   /* vertical padding: clear logo (top) and bottles (bottom) */
-  padding: clamp(100px, 18vh, 200px) clamp(60px, 8vw, 120px) clamp(120px, 22vh, 200px);
+  padding: clamp(100px, 25vh, 200px) clamp(60px, 8vw, 120px) clamp(120px, 22vh, 200px);
 }
 
 
@@ -147,7 +190,8 @@
   border-width: 19px;
   border-image-source: url('/images/stuff/stuffborder.PNG');
   border-image-slice: 8% 12% 9% 12%;
-  border-image-repeat: round;
+  border-image-repeat: stretch;
+  /* stretch prevents bottom-center breaking vs round */
   background: none;
   aspect-ratio: 2 / 3;
 
@@ -160,13 +204,25 @@
   transition: transform 0.2s ease;
 }
 
+@media (max-width: 768px) {
+  .stuff-carousel-wrap {
+    width: min(80%, 400px);
+  }
+
+  .stuff-card {
+    /* show exactly 1 card on mobile */
+    flex: 0 0 100%;
+  }
+}
+
 /* Upper illustration block — stuffcardinside.PNG bg, fill most of card height */
 .stuff-card__illustration {
   width: 100%;
   flex: 1;
   min-height: 0;
   background-image: url('/images/stuff/stuffcardinside.PNG');
-  background-size: cover;
+  background-size: 100% 100%;
+  /* stretch to fit entirely without cropping */
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 3px;
@@ -177,8 +233,8 @@
   display: block;
   width: 85%;
   height: 1.5px;
-  background: #ffffff;
-  margin: clamp(6px, 1vh, 10px) 0;
+  background: #FACC53;
+  margin: clamp(16px, 1vh, 10px) 0;
   flex-shrink: 0;
 }
 
@@ -186,7 +242,7 @@
 .stuff-card__title {
   font-family: 'Slackey', cursive;
   font-size: clamp(13px, 1.4vw, 18px);
-  color: #ffffff;
+  color: #FACC53;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-align: center;
@@ -200,7 +256,7 @@
 .stuff-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 202;
   /* above frame (20), arrows (30), layout (10) */
   display: flex;
   justify-content: center;

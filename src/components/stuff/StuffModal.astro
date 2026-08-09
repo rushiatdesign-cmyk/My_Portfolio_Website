@@ -4,6 +4,10 @@ export interface Props {
   id: string;
   /** Border and outline color. Defaults to gold. */
   borderColor?: string;
+  /** Background color of the modal. Defaults to dark blue. */
+  bgColor?: string;
+  /** Background color of the close button. Defaults to dark blue. */
+  closeBtnBg?: string;
   /** Path to the close icon image */
   closeIcon?: string;
 }
@@ -11,6 +15,8 @@ export interface Props {
 const {
   id,
   borderColor = "#F5C842",
+  bgColor = "#0D1855",
+  closeBtnBg = "#0D1855",
   closeIcon = "/images/frame/closeo.PNG",
 } = Astro.props;
 ---
@@ -25,14 +31,14 @@ const {
     class="stuff-modal-panel"
     role="dialog"
     aria-modal="true"
-    style={`border-color: ${borderColor}; outline-color: ${borderColor};`}
+    style={`border-color: ${borderColor}; outline-color: ${borderColor}; background-color: ${bgColor};`}
   >
     <!-- Sticky close bar -->
     <button
       class="stuff-modal-close"
       aria-label="Close"
       data-stuff-close
-      style={`background: #0D1855;`}
+      style={`background-color: ${closeBtnBg};`}
     >
       <img src={closeIcon} alt="Close" />
     </button>

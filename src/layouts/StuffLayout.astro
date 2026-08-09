@@ -30,27 +30,17 @@ const {
 
   <body class="stuff-body">
     <!-- Full-viewport frame border -->
-    <img
-      src="/images/stuff/stuffframe.PNG"
-      class="stuff-frame"
-      alt=""
-      aria-hidden="true"
-    />
+    <div class="stuff-frame-bg" aria-hidden="true"></div>
+    <div class="stuff-frame" aria-hidden="true"></div>
 
     <!-- Sticky logo at top-center -->
-    <img
-      src="/images/stuff/stufflogo.PNG"
-      class="stuff-logo"
-      alt="Stuff"
-    />
-
-    <!-- Arrow navigation buttons -->
-    <button id="stuff-arrow-left" class="stuff-arrow stuff-arrow--left" aria-label="Scroll left">
-      <img src="/images/stuff/arrowleft.PNG" alt="←" />
-    </button>
-    <button id="stuff-arrow-right" class="stuff-arrow stuff-arrow--right" aria-label="Scroll right">
-      <img src="/images/stuff/arrowright.PNG" alt="→" />
-    </button>
+    <header class="stuff-header">
+      <img
+        src="/images/stuff/stufflogo.PNG"
+        class="stuff-logo"
+        alt="Stuff"
+      />
+    </header>
 
     <!-- Bottles decoration at bottom -->
     <img
@@ -62,7 +52,18 @@ const {
 
     <!-- Page content slot -->
     <main class="stuff-layout-content">
+      <!-- Arrow navigation buttons -->
+      <button id="stuff-arrow-left" class="stuff-arrow stuff-arrow--left" aria-label="Scroll left">
+        <img src="/images/stuff/arrowleft.PNG" alt="←" />
+      </button>
+      <button id="stuff-arrow-right" class="stuff-arrow stuff-arrow--right" aria-label="Scroll right">
+        <img src="/images/stuff/arrowright.PNG" alt="→" />
+      </button>
+
       <slot />
     </main>
+
+    <!-- Slot for popups so they sit on top of everything without z-index trapping -->
+    <slot name="modals" />
   </body>
 </html>
