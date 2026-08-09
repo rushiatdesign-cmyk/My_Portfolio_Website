@@ -121,34 +121,35 @@
 
   /* ================= CONTROLS ================= */
   .controls {
-    flex: 1 1 340px;
+    flex: 1 1 270px;
     min-width: 0;
+    max-width: 320px;
     background: var(--cream);
-    border: 4px solid var(--ink);
+    border: 3px solid var(--ink);
     border-radius: 0;
-    padding: 22px 26px 20px;
-    box-shadow: 7px 7px 0 var(--ink);
+    padding: 18px 20px 16px;
+    box-shadow: 5px 5px 0 var(--ink);
   }
 
   .top-row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 14px;
+    gap: 10px;
+    margin-bottom: 11px;
   }
   .now-playing .t {
     font-weight: 800;
-    font-size: 19px;
+    font-size: 15px;
     color: var(--ink);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 260px;
+    max-width: 200px;
     transition: opacity 0.25s ease;
   }
   .now-playing .a {
-    font-size: 13px;
+    font-size: 11px;
     color: #8a8880;
     margin-top: 2px;
   }
@@ -156,7 +157,7 @@
     opacity: 0;
   }
   .time-display {
-    font-size: 15px;
+    font-size: 12px;
     color: #8a8880;
     white-space: nowrap;
     padding-top: 2px;
@@ -164,10 +165,10 @@
 
   .buffering-line {
     text-align: left;
-    font-size: 11px;
+    font-size: 9px;
     color: var(--card-red);
     opacity: 0.65;
-    min-height: 14px;
+    min-height: 11px;
     margin-bottom: 2px;
   }
   .buffering-line.show::after {
@@ -185,14 +186,14 @@
   }
 
   .progress-bar {
-    height: 14px;
+    height: 11px;
     border-radius: 0;
-    border: 3px solid var(--ink);
+    border: 2px solid var(--ink);
     background: var(--cream);
     position: relative;
     cursor: pointer;
     overflow: hidden;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
   }
   .progress-fill {
     position: absolute;
@@ -207,14 +208,14 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
   }
 
   .transport {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 11px;
     flex: none;
   }
   .btn {
@@ -228,17 +229,17 @@
     justify-content: center;
   }
   .btn svg {
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
     fill: currentColor;
   }
 
   .btn.circle {
-    width: 48px;
-    height: 48px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background: var(--accent);
-    border: 3px solid var(--ink);
+    border: 2px solid var(--ink);
     flex: none;
   }
   .btn.circle:hover {
@@ -249,30 +250,30 @@
   }
 
   .btn.play-pause {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
     background: var(--ink);
     color: #fff;
-    border: 4px solid var(--cream);
-    box-shadow: 0 0 0 3px #3f7fe0;
+    border: 3px solid var(--cream);
+    box-shadow: 0 0 0 2px #3f7fe0;
   }
   .btn.play-pause svg {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
   }
 
   .volume {
     display: flex;
     align-items: center;
-    flex: 1 1 90px;
-    min-width: 70px;
-    max-width: 150px;
+    flex: 1 1 70px;
+    min-width: 50px;
+    max-width: 120px;
   }
   .volume input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 4px;
+    height: 3px;
     border-radius: 0;
     outline: none;
     cursor: pointer;
@@ -286,26 +287,26 @@
   }
   .volume input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 13px;
+    height: 13px;
     border-radius: 0;
     background: var(--card-red);
     border: 2px solid var(--ink);
     cursor: pointer;
   }
   .volume input[type="range"]::-moz-range-track {
-    height: 4px;
+    height: 3px;
     border-radius: 0;
     background: #ded7c0;
   }
   .volume input[type="range"]::-moz-range-progress {
-    height: 4px;
+    height: 3px;
     border-radius: 0;
     background: var(--card-red);
   }
   .volume input[type="range"]::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+    width: 13px;
+    height: 13px;
     border-radius: 0;
     background: var(--card-red);
     border: 2px solid var(--ink);
@@ -316,39 +317,39 @@
     text-align: center;
     color: var(--card-red);
     opacity: 0.7;
-    font-size: 11px;
-    margin-top: 12px;
-    min-height: 14px;
+    font-size: 9px;
+    margin-top: 10px;
+    min-height: 11px;
   }
 
   /* ================= UPCOMING TRACKS ================= */
   .upcoming {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 3px solid var(--ink);
+    margin-top: 13px;
+    padding-top: 11px;
+    border-top: 2px solid var(--ink);
   }
   .upcoming-heading {
-    font-size: 11px;
+    font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.08em;
     color: #8a8880;
     text-transform: uppercase;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .upcoming-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 9px 0;
+    gap: 10px;
+    padding: 7px 0;
     border-top: 1px solid rgba(17, 16, 16, 0.15);
   }
   .upcoming-row:first-of-type {
     border-top: none;
   }
   .upcoming-row .num {
-    font-size: 12px;
+    font-size: 10px;
     color: #8a8880;
-    width: 18px;
+    width: 14px;
     flex: none;
   }
   .upcoming-row .info {
@@ -357,14 +358,14 @@
   }
   .upcoming-row .info .name {
     font-weight: 700;
-    font-size: 14px;
+    font-size: 11px;
     color: var(--ink);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .upcoming-row .info .artist {
-    font-size: 12px;
+    font-size: 10px;
     color: #8a8880;
     white-space: nowrap;
     overflow: hidden;
@@ -374,7 +375,7 @@
 
 <section
   class="stuff-popup-content"
-  style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 0; margin-top: -20px;"
+  style="width: 100%; min-height: calc(84vh - 100px); display: flex; align-items: center; justify-content: center; padding: 0; margin-top: -20px;"
 >
   <div class="vinyl-widget">
     <div class="player-layout">
@@ -449,60 +450,62 @@
               cy="460"
               r="404"
               fill="none"
-              stroke="var(--cream)"
+              stroke="#ffdc85"
               stroke-width="6"></circle>
             <circle
               cx="515"
               cy="460"
               r="335"
               fill="none"
-              stroke="var(--cream)"
-              stroke-width="9"></circle>
+              stroke="#ffdc85"
+              opacity="0.6"
+              stroke-width="3"></circle>
 
             <!-- a few subtle glint marks, drawn as true arcs along the ring curvature so they read as light catching the grooves, not stray marks -->
             <path
               d="M135,322 A404,404 0 0,1 224,179"
-              stroke="var(--cream)"
-              stroke-width="9"
+              stroke="#8a8a8a"
+              stroke-width="3"
               stroke-linecap="round"
               fill="none"
-              opacity="0.9"></path>
+              opacity="0.6"></path>
             <path
               d="M377,80 A404,404 0 0,1 487,57"
-              stroke="var(--cream)"
-              stroke-width="9"
+              stroke="#ffdc85"
+              stroke-width="3"
               stroke-linecap="round"
               fill="none"
-              opacity="0.9"></path>
+              opacity="1"></path>
             <path
               d="M172,599 A370,370 0 0,1 146,486"
-              stroke="var(--cream)"
-              stroke-width="9"
+              stroke="#ffdc85"
+              stroke-width="3"
               stroke-linecap="round"
               fill="none"
-              opacity="0.9"></path>
+              opacity="1"></path>
             <path
               d="M833,709 A404,404 0 0,1 729,803"
-              stroke="var(--cream)"
-              stroke-width="9"
+              stroke="#ffdc85"
+              stroke-width="3"
               stroke-linecap="round"
               fill="none"
-              opacity="0.9"></path>
+              opacity="1"></path>
             <path
               d="M476,828 A370,370 0 0,1 370,801"
-              stroke="var(--cream)"
-              stroke-width="9"
+              stroke="#ffdc85"
+              stroke-width="3"
               stroke-linecap="round"
               fill="none"
-              opacity="0.9"></path>
+              opacity="1"></path>
 
             <!-- track name, curved around the label, spins together with the disk -->
             <text
               id="diskRingText"
               fill="var(--cream)"
-              font-size="17"
+              font-size="19"
               font-weight="700"
-              letter-spacing="3"
+              opacity="0.6"
+              letter-spacing="6"
               style="text-transform:uppercase;"
             >
               <textPath
@@ -788,7 +791,7 @@
   // (circumference ≈ 2·π·180 ≈ 1131px), so the loop reads seamlessly.
   function setDiskRingText(name) {
     const label = (name || "Untitled").toUpperCase() + " \u2022 ";
-    const approxCharWidth = 12.5; // rough average glyph width at this font-size/letter-spacing
+    const approxCharWidth = 14; // rough average glyph width at this font-size/letter-spacing
     const circumference = 2 * Math.PI * 180;
     let repeated = "";
     while (repeated.length * approxCharWidth < circumference) {
