@@ -1,16 +1,44 @@
 ---
 // Photographs popup content
-const photos = Array.from({ length: 50 }).map((_, i) => {
-  const rx = (i * 137) % 90;
-  const ry = (i * 211) % 90;
-  const scale = 0.6 + (((i * 43) % 100) / 100) * 0.8; // random scale 0.6 to 1.4
+// Configuration for the robust Cell-Jitter algorithm
+const numPhotos = 50;
+const canvasWidth = 1800;
+const canvasHeight = 1300;
+
+// Calculate grid dimensions
+const cols = Math.ceil(Math.sqrt(numPhotos * (canvasWidth / canvasHeight)));
+const rows = Math.ceil(numPhotos / cols);
+
+const cellWidth = canvasWidth / cols;
+const cellHeight = canvasHeight / rows;
+
+const photos = Array.from({ length: numPhotos }).map((_, i) => {
+  // 1. Assign to a cell
+  const col = i % cols;
+  const row = Math.floor(i / cols);
+
+  // 2. Find the center of that cell
+  const baseLeft = col * cellWidth + cellWidth / 2;
+  const baseTop = row * cellHeight + cellHeight / 2;
+
+  // 3. Apply a controlled random jitter (up to 35% of the cell size away from center)
+  // This guarantees they look scattered but can never clump or leave massive voids
+  const jitterX = (((i * 137) % 100) / 100 - 0.5) * (cellWidth * 0.7);
+  const jitterY = (((i * 211) % 100) / 100 - 0.5) * (cellHeight * 0.7);
+
+  // 4. Calculate final position
+  const finalLeft = baseLeft + jitterX;
+  const finalTop = baseTop + jitterY;
+
+  const scale = 0.6 + (((i * 43) % 100) / 100) * 0.8; // Random scale 0.6 to 1.4
+  const rotation = ((i * 17) % 35) - 17; // Random rotation -17 to 17 deg
+
   return {
     id: i + 1,
-    // Using a larger size for better lightbox quality
     image: `https://picsum.photos/seed/photograph${i}/1200/800`,
-    jitter: ((i * 17) % 35) - 17, // random rotation -17 to 17 deg
-    x: rx + 5,
-    y: ry + 5,
+    jitter: rotation,
+    x: finalLeft.toFixed(2), // Absolute X pixel coordinate
+    y: finalTop.toFixed(2), // Absolute Y pixel coordinate
     scale: scale.toFixed(2),
   };
 });
@@ -44,33 +72,30 @@ const photoUrls = photos.map((p) => p.image);
     position: absolute;
     top: 0;
     left: 0;
-    width: 700px;
-    height: 800px;
-
-    will-change: transform;
+    width: var(--track-width);
+    height: var(--track-height);
 
     will-change: transform;
   }
 
   .photo-card {
     position: absolute;
-    left: calc(var(--x) * 1.2%);
-    top: calc(var(--y) * 1.2%);
-    width: calc(120px * var(--scale));
-    aspect-ratio: 4 / 3;
+    /* Use exact pixel coordinates from the algorithm, centered on the coordinate */
+    left: calc(var(--x) * 1px);
+    top: calc(var(--y) * 1px);
+    /* The transform handles both the centering offset and the rotation */
+    transform: translate(-50%, -50%) rotate(calc(var(--jitter) * 1deg));
+
+    width: calc(160px * var(--scale));
+    /* Removed aspect-ratio to let the card adopt a Polaroid shape (taller than wide) */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 
-    transform: rotate(calc(var(--jitter) * 1deg));
-    transition:
-      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-      z-index 0s;
     user-select: none;
     z-index: 1;
-    padding: 8px; /* Tighter padding to bring frame closer */
+    padding: 16px 16px 42px 16px; /* Increased padding to support the thicker border */
     cursor: pointer; /* Affordance for lightbox */
 
     /* Solid yellow background so cards block the ones behind them when overlapping */
@@ -87,30 +112,22 @@ const photoUrls = photos.map((p) => p.image);
     z-index: 2;
 
     -webkit-mask-box-image-source: url("/images/frame/blogborder.PNG");
-    -webkit-mask-box-image-slice: 3% 6% 6% 6%; /* No fill, center is transparent so yellow canvas shows through */
-    -webkit-mask-box-image-width: 8px; /* Thinner frame width */
-    -webkit-mask-box-image-repeat: round;
+    -webkit-mask-box-image-slice: 12%;
+    -webkit-mask-box-image-width: 16px; /* Significantly thicker frame */
+    -webkit-mask-box-image-repeat: stretch;
 
     mask-border-source: url("/images/frame/blogborder.PNG");
-    mask-border-slice: 3% 6% 6% 6%;
-    mask-border-width: 8px; /* Thinner frame width */
-    mask-border-repeat: round;
+    mask-border-slice: 12%;
+    mask-border-width: 16px; /* Significantly thicker frame */
+    mask-border-repeat: stretch;
   }
 
-  /* Hover effect matching WorkCanvas */
-  .photo-card:hover {
-    transform: rotate(0deg) scale(1.045) translateY(-4px);
-    z-index: 10;
-  }
-
-  .photo-card:hover .photo-card__image-wrap {
-    box-shadow: 0 28px 48px -16px rgba(0, 0, 0, 0.85);
-  }
+  /* Hover effect now handled smoothly by GSAP in the script! */
 
   .photo-card__image-wrap {
     position: relative;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 4 / 3; /* Force the image area to remain landscape */
     overflow: hidden;
     z-index: 1;
     box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.7);
@@ -128,15 +145,32 @@ const photoUrls = photos.map((p) => p.image);
   }
 
   .photo-card__image {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
     object-fit: cover;
     display: block;
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    /* Apply the inner parallax variables set by JS */
+    transform: translate3d(var(--inner-px, 0px), var(--inner-py, 0px), 0)
+      scale(1);
+    /* Transition removed so GSAP can take over smoothly on hover, 
+       but we keep it for the inner parallax if we want, but better to let GSAP handle scale */
   }
 
-  .photo-card:hover .photo-card__image {
-    transform: scale(1.05);
+  .photo-card__caption {
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    font-family: var(--font-display, "Slackey"), cursive;
+    color: #111010;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.85;
   }
 
   /* Hint styling */
@@ -278,6 +312,7 @@ const photoUrls = photos.map((p) => p.image);
       class="photos-track"
       id="photos-track"
       data-images={JSON.stringify(photoUrls)}
+      style={`--track-width: ${canvasWidth}px; --track-height: ${canvasHeight}px;`}
     >
       {
         photos.map((photo, index) => (
@@ -295,6 +330,7 @@ const photoUrls = photos.map((p) => p.image);
                 draggable="false"
               />
             </div>
+            <div class="photo-card__caption">Photo {photo.id}</div>
           </div>
         ))
       }
@@ -338,13 +374,29 @@ const photoUrls = photos.map((p) => p.image);
 </div>
 
 <script>
+  // @ts-nocheck
+  import gsap from "gsap";
   // Vanilla drag + momentum + edge bounce-back for the photographs canvas.
+
+  function lockPageScroll() {
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+  }
+
+  function unlockPageScroll() {
+    document.body.style.overflow = "";
+    document.body.style.touchAction = "";
+  }
 
   function initPhotosCanvas() {
     const viewport = document.getElementById("photos-viewport");
     const track = document.getElementById("photos-track");
     const hint = document.getElementById("photos-hint");
     if (!viewport || !track) return;
+
+    if (viewport.dataset.initialized === "true") return;
+    viewport.dataset.initialized = "true";
+
     const V = viewport;
     const T = track;
     const H = hint;
@@ -419,6 +471,11 @@ const photoUrls = photos.map((p) => p.image);
       parallaxX += (targetParallaxX - parallaxX) * PARALLAX_SMOOTH;
       parallaxY += (targetParallaxY - parallaxY) * PARALLAX_SMOOTH;
       setTransform(x, y);
+
+      // Update inner image parallax (moves opposite to the track)
+      V.style.setProperty("--inner-px", `${-parallaxX * 0.9}px`);
+      V.style.setProperty("--inner-py", `${-parallaxY * 0.9}px`);
+
       if (
         Math.abs(targetParallaxX - parallaxX) > 0.05 ||
         Math.abs(targetParallaxY - parallaxY) > 0.05
@@ -621,6 +678,8 @@ const photoUrls = photos.map((p) => p.image);
     function onWheel(e) {
       // Prevent default to stop scrolling the page while inside the canvas
       e.preventDefault();
+      e.stopPropagation();
+
       dismissHint();
       stopMomentum();
       T.style.transition = "none";
@@ -653,6 +712,75 @@ const photoUrls = photos.map((p) => p.image);
     });
 
     V.addEventListener("dragstart", (e) => e.preventDefault());
+
+    // Robust Modal Scroll Lock to completely isolate interactions
+    const overlay = V.closest(".stuff-modal-overlay");
+    if (overlay) {
+      let isPageLocked = false;
+      let savedScrollY = 0;
+      let originalStyles = {
+        position: "",
+        top: "",
+        left: "",
+        right: "",
+        width: "",
+      };
+
+      function lockPageScroll() {
+        if (isPageLocked) return;
+        isPageLocked = true;
+        savedScrollY = window.scrollY;
+
+        // Save original styles
+        originalStyles.position = document.body.style.position;
+        originalStyles.top = document.body.style.top;
+        originalStyles.left = document.body.style.left;
+        originalStyles.right = document.body.style.right;
+        originalStyles.width = document.body.style.width;
+
+        // Lock the page exactly where it is
+        document.body.style.position = "fixed";
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.style.left = "0";
+        document.body.style.right = "0";
+        document.body.style.width = "100%";
+        document.documentElement.classList.add("photos-modal-lock");
+      }
+
+      function unlockPageScroll() {
+        if (!isPageLocked) return;
+        isPageLocked = false;
+
+        // Restore previous styles
+        document.body.style.position = originalStyles.position;
+        document.body.style.top = originalStyles.top;
+        document.body.style.left = originalStyles.left;
+        document.body.style.right = originalStyles.right;
+        document.body.style.width = originalStyles.width;
+        document.documentElement.classList.remove("photos-modal-lock");
+
+        // Restore scroll position
+        window.scrollTo(0, savedScrollY);
+      }
+
+      const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.attributeName === "aria-hidden") {
+            if (overlay.getAttribute("aria-hidden") === "false") {
+              lockPageScroll();
+            } else {
+              unlockPageScroll();
+            }
+          }
+        }
+      });
+      observer.observe(overlay, { attributes: true });
+
+      // Initial check in case it's already open
+      if (overlay.getAttribute("aria-hidden") === "false") {
+        lockPageScroll();
+      }
+    }
 
     // Center the canvas on load instead of starting at top-left (0,0)
     // We delay slightly to ensure DOM dimensions are computed before bounding
@@ -738,6 +866,59 @@ const photoUrls = photos.map((p) => p.image);
         }
       });
     }
+
+    // ==========================================
+    // Smooth GSAP Hover Effects
+    // ==========================================
+    const cards = document.querySelectorAll(".photo-card");
+    cards.forEach((card) => {
+      const jitter = parseFloat(card.style.getPropertyValue("--jitter") || "0");
+      const img = card.querySelector(".photo-card__image");
+
+      // Initialize GSAP to replace the static CSS transform
+      gsap.set(card, {
+        xPercent: -50,
+        yPercent: -50,
+        rotation: jitter,
+        scale: 1,
+      });
+
+      card.addEventListener("mouseenter", () => {
+        gsap.to(card, {
+          scale: 1.06,
+          rotation: 0,
+          yPercent: -52, // slight lift
+          zIndex: 10,
+          duration: 0.6,
+          ease: "power3.out",
+        });
+        if (img) {
+          gsap.to(img, {
+            scale: 1.08,
+            duration: 0.6,
+            ease: "power3.out",
+          });
+        }
+      });
+
+      card.addEventListener("mouseleave", () => {
+        gsap.to(card, {
+          scale: 1,
+          rotation: jitter,
+          yPercent: -50,
+          zIndex: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        });
+        if (img) {
+          gsap.to(img, {
+            scale: 1,
+            duration: 0.8,
+            ease: "power3.out",
+          });
+        }
+      });
+    });
   }
 
   if (document.readyState === "loading") {
