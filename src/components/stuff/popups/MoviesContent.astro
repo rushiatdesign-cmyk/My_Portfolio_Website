@@ -1,9 +1,235 @@
 ---
+import { getCollection } from 'astro:content';
+
 // Movies popup content
-// Add your movie list, reviews, ratings etc. here
+const rawMovies = await getCollection('movies');
+const movies = rawMovies.map((movie, index) => {
+  // Random rotation between -4 and 4 degrees
+  const rotation = Math.random() * 8 - 4;
+  // Random translation for a scattered look
+  const tx = Math.random() * 40 - 20;
+  const ty = Math.random() * 40 - 20;
+  return { 
+    id: movie.id, 
+    title: movie.data.title,
+    genre: movie.data.genre,
+    image: movie.data.image || `https://picsum.photos/seed/${movie.data.title.replace(/\s+/g, '')}/300/450`,
+    rotation, 
+    tx, 
+    ty 
+  };
+});
 ---
 
-<section class="stuff-popup-content">
-  <h2 class="stuff-popup-title">Movies</h2>
-  <p class="stuff-popup-placeholder">Content coming soon…</p>
+<style>
+  .movies-canvas {
+    width: 100%;
+    min-height: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 30px;
+    padding: 40px;
+    background: transparent !important; /* Override white background from .stuff-popup-content */
+  }
+
+  .movie-card {
+    position: relative;
+    width: 100%;
+    max-width: 180px;
+    margin: 0 auto;
+    /* Reuse stuff card outer styles */
+    border-style: solid;
+    border-width: clamp(10px, 1.5vw, 16px) clamp(8px, 1.2vw, 12px) clamp(12px, 1.8vw, 20px) clamp(8px, 1.2vw, 12px);
+    border-image-source: url('/images/stuff/stuffborder.PNG');
+    border-image-slice: 8% 12% 9% 12%;
+    border-image-repeat: stretch;
+    background: none;
+    aspect-ratio: 2 / 3;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(6px, 1vw, 10px);
+    cursor: grab;
+    user-select: none;
+    /* A small transition on rotation to make it feel organic, but NOT on left/top to avoid drag lag */
+    transition: z-index 0s, box-shadow 0.2s;
+  }
+
+  .movie-card:active {
+    cursor: grabbing;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15); /* Lift effect when dragging */
+  }
+
+  .movie-card::before {
+    content: '';
+    position: absolute;
+    top: 4px; right: 4px; bottom: 4px; left: 4px;
+    background: #F5C842; /* Solid yellow background */
+    z-index: -1;
+    pointer-events: none;
+
+    /* Mask the yellow background perfectly to the wavy inner shape */
+    -webkit-mask-box-image-source: url('/images/stuff/stuffcardinside.PNG');
+    -webkit-mask-box-image-slice: 15% 10% 12% 10% fill;
+    -webkit-mask-box-image-width: 12px;
+    -webkit-mask-box-image-repeat: stretch;
+
+    mask-border-source: url('/images/stuff/stuffcardinside.PNG');
+    mask-border-slice: 15% 10% 12% 10% fill;
+    mask-border-width: 12px;
+    mask-border-repeat: stretch;
+  }
+
+  .movie-card__illustration {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    /* Mask the poster to the inside border shape */
+    -webkit-mask-box-image-source: url('/images/stuff/stuffcardinside.PNG');
+    -webkit-mask-box-image-slice: 15% 10% 12% 10% fill;
+    -webkit-mask-box-image-width: 8px;
+    -webkit-mask-box-image-repeat: stretch;
+
+    mask-border-source: url('/images/stuff/stuffcardinside.PNG');
+    mask-border-slice: 15% 10% 12% 10% fill;
+    mask-border-width: 8px;
+    mask-border-repeat: stretch;
+    background-color: #F5C842; /* fallback */
+    border-radius: 3px;
+  }
+
+  .movie-card__poster {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .movie-card__divider {
+    display: block;
+    width: 85%;
+    height: 1.5px;
+    background-image: url('/images/stuff/stuffdivider.PNG');
+    background-size: 100% 100%;
+    margin: 8px 0 6px;
+    flex-shrink: 0;
+  }
+
+  .movie-card__title {
+    font-family: 'Slackey', cursive;
+    font-size: clamp(13px, 1.5vw, 16px);
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.1;
+    margin-bottom: 2px;
+  }
+  
+  .movie-card__genre {
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: #666;
+    text-align: center;
+    font-family: 'EB Garamond', serif;
+  }
+</style>
+
+<section class="stuff-popup-content movies-canvas" id="moviesCanvas">
+  {movies.map((movie) => (
+    <div
+      class="movie-card draggable"
+      style={`transform: translate(${movie.tx}px, ${movie.ty}px) rotate(${movie.rotation}deg); z-index: ${movie.id};`}
+      data-rotation={movie.rotation}
+      data-tx={movie.tx}
+      data-ty={movie.ty}
+    >
+      <div class="movie-card__illustration">
+        <div
+          class="movie-card__poster"
+          style={`background-image: url('${movie.image}');`}
+        ></div>
+      </div>
+      <span class="movie-card__divider" aria-hidden="true"></span>
+      <span class="movie-card__title">{movie.title}</span>
+      <span class="movie-card__genre">{movie.genre}</span>
+    </div>
+  ))}
 </section>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('moviesCanvas');
+    if (!canvas) return;
+
+    const cards = canvas.querySelectorAll('.draggable');
+    let zIndexCounter = 100;
+    let isDragging = false;
+    let currentCard = null;
+    let startX, startY, initialTx, initialTy;
+
+    cards.forEach(card => {
+      const downHandler = (e) => {
+        if (e.type === 'mousedown' && e.button !== 0) return;
+        
+        isDragging = true;
+        currentCard = card;
+        
+        zIndexCounter++;
+        card.style.zIndex = zIndexCounter;
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        startX = clientX;
+        startY = clientY;
+        
+        // Retrieve current translation values from dataset
+        initialTx = parseFloat(card.dataset.tx) || 0;
+        initialTy = parseFloat(card.dataset.ty) || 0;
+
+        card.style.transform = `translate(${initialTx}px, ${initialTy}px) rotate(${card.dataset.rotation}deg) scale(1.05)`;
+
+        e.preventDefault(); 
+      };
+
+      card.addEventListener('mousedown', downHandler);
+      card.addEventListener('touchstart', downHandler, { passive: false });
+    });
+
+    const moveHandler = (e) => {
+      if (!isDragging || !currentCard) return;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+
+      const newTx = initialTx + dx;
+      const newTy = initialTy + dy;
+      
+      currentCard.style.transform = `translate(${newTx}px, ${newTy}px) rotate(${currentCard.dataset.rotation}deg) scale(1.05)`;
+      currentCard.dataset.currentTx = newTx;
+      currentCard.dataset.currentTy = newTy;
+    };
+
+    const upHandler = () => {
+      if (currentCard) {
+        const finalTx = currentCard.dataset.currentTx || currentCard.dataset.tx;
+        const finalTy = currentCard.dataset.currentTy || currentCard.dataset.ty;
+        
+        currentCard.style.transform = `translate(${finalTx}px, ${finalTy}px) rotate(${currentCard.dataset.rotation}deg) scale(1)`;
+        
+        // Update dataset with new values so next drag starts from here
+        currentCard.dataset.tx = finalTx;
+        currentCard.dataset.ty = finalTy;
+      }
+      isDragging = false;
+      currentCard = null;
+    };
+
+    document.addEventListener('mousemove', moveHandler);
+    document.addEventListener('touchmove', moveHandler, { passive: false });
+    document.addEventListener('mouseup', upHandler);
+    document.addEventListener('touchend', upHandler);
+  });
+</script>

@@ -56,10 +56,20 @@ const stuff = defineCollection({
   }),
 });
 
+const movies = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/movies" }),
+  schema: z.object({
+    title: z.string(),
+    genre: z.string(),
+    image: z.string().optional(),
+  }),
+});
+
 export const collections = {
   "daily-dose": dailyDose,
   blog,
   work,
   gallery,
   stuff,
+  movies,
 };

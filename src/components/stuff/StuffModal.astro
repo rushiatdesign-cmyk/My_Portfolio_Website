@@ -24,12 +24,7 @@ const {
 } = Astro.props;
 ---
 
-<div
-  id={id}
-  class="stuff-modal-overlay"
-  aria-hidden="true"
-  data-stuff-modal
->
+<div id={id} class="stuff-modal-overlay" aria-hidden="true" data-stuff-modal>
   <div
     class="stuff-modal-panel"
     role="dialog"
@@ -43,13 +38,16 @@ const {
       data-stuff-close
       style={`background-color: ${closeBtnBg};`}
     >
-      <div style={`
+      <div
+        style={`
         width: 32px;
         height: 32px;
         background-color: ${closeIconColor};
         mask: url('${closeIcon}') no-repeat center / contain;
         -webkit-mask: url('${closeIcon}') no-repeat center / contain;
-      `}></div>
+      `}
+      >
+      </div>
     </button>
 
     <!-- Popup body content (injected per-card via slot) -->

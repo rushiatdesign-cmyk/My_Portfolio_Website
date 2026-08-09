@@ -1,8 +1,748 @@
 ---
 // Photographs popup content
+const photos = Array.from({ length: 50 }).map((_, i) => {
+  const rx = (i * 137) % 90;
+  const ry = (i * 211) % 90;
+  const scale = 0.6 + (((i * 43) % 100) / 100) * 0.8; // random scale 0.6 to 1.4
+  return {
+    id: i + 1,
+    // Using a larger size for better lightbox quality
+    image: `https://picsum.photos/seed/photograph${i}/1200/800`,
+    jitter: ((i * 17) % 35) - 17, // random rotation -17 to 17 deg
+    x: rx + 5,
+    y: ry + 5,
+    scale: scale.toFixed(2),
+  };
+});
+const photoUrls = photos.map((p) => p.image);
 ---
 
-<section class="stuff-popup-content">
-  <h2 class="stuff-popup-title">Photographs</h2>
-  <p class="stuff-popup-placeholder">Content coming soon…</p>
+<style>
+  /* The popup content area should now act as the container */
+  .stuff-popup-content.photos-container {
+    padding: 0;
+    margin: 0 calc(-1 * clamp(24px, 5vw, 64px))
+      calc(-1 * clamp(40px, 6vh, 80px)); /* Pull to edges */
+    overflow: hidden; /* Hide scrollbars, JS takes over */
+    background: transparent !important; /* Inherits yellow from modal */
+  }
+
+  .photos-viewport {
+    position: relative;
+    width: 100%;
+    height: 80vh; /* Fixed height for the parallax viewport to work */
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .photos-viewport.is-dragging {
+    cursor: grabbing;
+  }
+
+  .photos-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 700px;
+    height: 800px;
+
+    will-change: transform;
+
+    will-change: transform;
+  }
+
+  .photo-card {
+    position: absolute;
+    left: calc(var(--x) * 1.2%);
+    top: calc(var(--y) * 1.2%);
+    width: calc(120px * var(--scale));
+    aspect-ratio: 4 / 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    transform: rotate(calc(var(--jitter) * 1deg));
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      z-index 0s;
+    user-select: none;
+    z-index: 1;
+    padding: 8px; /* Tighter padding to bring frame closer */
+    cursor: pointer; /* Affordance for lightbox */
+
+    /* Solid yellow background so cards block the ones behind them when overlapping */
+    background-color: #f5c842;
+  }
+
+  /* Ink frame mask using blogborder */
+  .photo-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #0d1855; /* Blue color */
+    pointer-events: none;
+    z-index: 2;
+
+    -webkit-mask-box-image-source: url("/images/frame/blogborder.PNG");
+    -webkit-mask-box-image-slice: 3% 6% 6% 6%; /* No fill, center is transparent so yellow canvas shows through */
+    -webkit-mask-box-image-width: 8px; /* Thinner frame width */
+    -webkit-mask-box-image-repeat: round;
+
+    mask-border-source: url("/images/frame/blogborder.PNG");
+    mask-border-slice: 3% 6% 6% 6%;
+    mask-border-width: 8px; /* Thinner frame width */
+    mask-border-repeat: round;
+  }
+
+  /* Hover effect matching WorkCanvas */
+  .photo-card:hover {
+    transform: rotate(0deg) scale(1.045) translateY(-4px);
+    z-index: 10;
+  }
+
+  .photo-card:hover .photo-card__image-wrap {
+    box-shadow: 0 28px 48px -16px rgba(0, 0, 0, 0.85);
+  }
+
+  .photo-card__image-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.7);
+    transition: box-shadow 0.25s ease;
+
+    /* Using the blog image mask so the photo fits nicely */
+    -webkit-mask-image: url("/images/frame/blogimagemask.PNG");
+    mask-image: url("/images/frame/blogimagemask.PNG");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
+
+  .photo-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .photo-card:hover .photo-card__image {
+    transform: scale(1.05);
+  }
+
+  /* Hint styling */
+  .photos-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 8px 16px;
+    border: 1px solid rgba(17, 16, 16, 0.25);
+    border-radius: 999px;
+    font-family: var(--font-display, "Slackey");
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #111010;
+    background: rgba(245, 200, 66, 0.6);
+    backdrop-filter: blur(6px);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.6s ease;
+    z-index: 3;
+  }
+
+  .photos-hint.is-hidden {
+    opacity: 0;
+  }
+
+  /* Lightbox Styles */
+  .photos-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13, 24, 85, 0.92); /* Dark blue overlay */
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .photos-lightbox.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .photos-lightbox__content {
+    position: relative;
+    max-width: 85vw;
+    max-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .photos-lightbox__image {
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .photos-lightbox__image.is-loading {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  .photos-lightbox__btn {
+    position: absolute;
+    background: none;
+    border: none;
+    color: #f5c842;
+    font-size: 3.5rem;
+    font-family: var(--font-display, "Slackey");
+    cursor: pointer;
+    padding: 20px;
+    transition:
+      transform 0.2s ease,
+      color 0.2s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .photos-lightbox__btn:hover {
+    transform: scale(1.15);
+    color: #fff;
+  }
+
+  .photos-lightbox__btn:active {
+    transform: scale(0.95);
+  }
+
+  .photos-lightbox__btn--close {
+    top: 20px;
+    right: 20px;
+    position: fixed;
+    font-size: 3rem;
+  }
+
+  .photos-lightbox__btn--prev {
+    left: 2vw;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .photos-lightbox__btn--prev:hover {
+    transform: translateY(-50%) scale(1.15);
+  }
+
+  .photos-lightbox__btn--next {
+    right: 2vw;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .photos-lightbox__btn--next:hover {
+    transform: translateY(-50%) scale(1.15);
+  }
+
+  /* Responsive Track - keep canvas large for dragging, but make cards slightly smaller on mobile */
+  @media (max-width: 720px) {
+    .photo-card {
+      width: clamp(180px, 30vw, 260px);
+    }
+  }
+</style>
+
+<section class="stuff-popup-content photos-container">
+  <div class="photos-viewport" id="photos-viewport">
+    <div
+      class="photos-track"
+      id="photos-track"
+      data-images={JSON.stringify(photoUrls)}
+    >
+      {
+        photos.map((photo, index) => (
+          <div
+            class="photo-card"
+            data-index={index}
+            style={`--jitter: ${photo.jitter}; --x: ${photo.x}; --y: ${photo.y}; --scale: ${photo.scale};`}
+          >
+            <div class="photo-card__image-wrap">
+              <img
+                class="photo-card__image"
+                src={photo.image}
+                alt={`Photograph ${photo.id}`}
+                loading="lazy"
+                draggable="false"
+              />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <p class="photos-hint" id="photos-hint" aria-hidden="true">
+      scroll / drag to move
+    </p>
+  </div>
 </section>
+
+<!-- Lightbox DOM -->
+<div
+  class="photos-lightbox"
+  id="photos-lightbox"
+  aria-hidden="true"
+  role="dialog"
+>
+  <button
+    class="photos-lightbox__btn photos-lightbox__btn--close"
+    id="lightbox-close"
+    aria-label="Close Lightbox">×</button
+  >
+  <button
+    class="photos-lightbox__btn photos-lightbox__btn--prev"
+    id="lightbox-prev"
+    aria-label="Previous Photo">‹</button
+  >
+  <div class="photos-lightbox__content" id="lightbox-backdrop">
+    <img
+      class="photos-lightbox__image"
+      id="lightbox-image"
+      src=""
+      alt="Full size photograph"
+    />
+  </div>
+  <button
+    class="photos-lightbox__btn photos-lightbox__btn--next"
+    id="lightbox-next"
+    aria-label="Next Photo">›</button
+  >
+</div>
+
+<script>
+  // Vanilla drag + momentum + edge bounce-back for the photographs canvas.
+
+  function initPhotosCanvas() {
+    const viewport = document.getElementById("photos-viewport");
+    const track = document.getElementById("photos-track");
+    const hint = document.getElementById("photos-hint");
+    if (!viewport || !track) return;
+    const V = viewport;
+    const T = track;
+    const H = hint;
+
+    // Start x and y will be set later to center the track
+    let x = 0;
+    let y = 0;
+    let parallaxX = 0;
+    let parallaxY = 0;
+    let targetParallaxX = 0;
+    let targetParallaxY = 0;
+    let parallaxFrame = null;
+    let pointerX = 0;
+    let pointerY = 0;
+    let autoPanVX = 0;
+    let autoPanVY = 0;
+    let autoPanFrame = null;
+    let startX = 0;
+    let startY = 0;
+    let originX = 0;
+    let originY = 0;
+    let velocityX = 0;
+    let velocityY = 0;
+    let lastMoveX = 0;
+    let lastMoveY = 0;
+    let lastMoveTime = 0;
+    let isDragging = false;
+    let isClicking = false; // To distinguish between drag and click
+    let clickTarget = null; // Save original target before pointer capture
+    let momentumFrame = null;
+    let hasInteracted = false;
+
+    const FRICTION = 0.94;
+    const BOUNCE_DURATION = 400;
+    const PARALLAX_MAX = 28;
+    const PARALLAX_SMOOTH = 0.14;
+    const EDGE_ZONE = 96;
+    const EDGE_PAN_MAX = 12;
+
+    function getBounds() {
+      const trackRect = T.getBoundingClientRect();
+      const viewportRect = V.getBoundingClientRect();
+      const trackWidth = T.scrollWidth;
+      const trackHeight = T.scrollHeight;
+      const minX = Math.min(0, viewportRect.width - trackWidth);
+      const minY = Math.min(0, viewportRect.height - trackHeight);
+      return { minX, maxX: 0, minY, maxY: 0 };
+    }
+
+    function setTransform(px, py) {
+      T.style.transform = `translate3d(${px + parallaxX}px, ${py + parallaxY}px, 0)`;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function dismissHint() {
+      if (hasInteracted || !H) return;
+      hasInteracted = true;
+      H.classList.add("is-hidden");
+    }
+
+    function stopMomentum() {
+      if (momentumFrame !== null) {
+        cancelAnimationFrame(momentumFrame);
+        momentumFrame = null;
+      }
+    }
+
+    function animateParallax() {
+      parallaxX += (targetParallaxX - parallaxX) * PARALLAX_SMOOTH;
+      parallaxY += (targetParallaxY - parallaxY) * PARALLAX_SMOOTH;
+      setTransform(x, y);
+      if (
+        Math.abs(targetParallaxX - parallaxX) > 0.05 ||
+        Math.abs(targetParallaxY - parallaxY) > 0.05
+      ) {
+        parallaxFrame = requestAnimationFrame(animateParallax);
+      } else {
+        parallaxFrame = null;
+      }
+    }
+
+    function animateAutoPan() {
+      x = x + autoPanVX;
+      y = y + autoPanVY;
+      const bounds = getBounds();
+      x = clamp(x, bounds.minX - 60, bounds.maxX + 60);
+      y = clamp(y, bounds.minY - 60, bounds.maxY + 60);
+      setTransform(x, y);
+      if (Math.abs(autoPanVX) > 0.01 || Math.abs(autoPanVY) > 0.01) {
+        autoPanFrame = requestAnimationFrame(animateAutoPan);
+      } else {
+        autoPanFrame = null;
+      }
+    }
+
+    function settleToBounds() {
+      const bounds = getBounds();
+      const targetX = clamp(x, bounds.minX, bounds.maxX);
+      const targetY = clamp(y, bounds.minY, bounds.maxY);
+      if (targetX !== x || targetY !== y) {
+        T.style.transition = `transform ${BOUNCE_DURATION}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+        x = targetX;
+        y = targetY;
+        setTransform(x, y);
+        window.setTimeout(() => {
+          T.style.transition = "none";
+        }, BOUNCE_DURATION);
+      }
+    }
+
+    function runMomentum() {
+      const bounds = getBounds();
+
+      if (x > bounds.maxX) velocityX -= (x - bounds.maxX) * 0.12;
+      if (x < bounds.minX) velocityX -= (x - bounds.minX) * 0.12;
+      if (y > bounds.maxY) velocityY -= (y - bounds.maxY) * 0.12;
+      if (y < bounds.minY) velocityY -= (y - bounds.minY) * 0.12;
+
+      velocityX *= FRICTION;
+      velocityY *= FRICTION;
+      x += velocityX;
+      y += velocityY;
+      setTransform(x, y);
+
+      if (Math.abs(velocityX) > 0.3 || Math.abs(velocityY) > 0.3) {
+        momentumFrame = requestAnimationFrame(runMomentum);
+      } else {
+        momentumFrame = null;
+        settleToBounds();
+      }
+    }
+
+    function onPointerDown(e) {
+      // Don't drag if lightbox is open
+      if (
+        document.getElementById("photos-lightbox").classList.contains("is-open")
+      )
+        return;
+
+      clickTarget = e.target;
+      dismissHint();
+      stopMomentum();
+      T.style.transition = "none";
+      isDragging = true;
+      isClicking = true; // Assume it's a click until they move far enough
+      V.classList.add("is-dragging");
+      startX = e.clientX;
+      startY = e.clientY;
+      originX = x;
+      originY = y;
+      lastMoveX = e.clientX;
+      lastMoveY = e.clientY;
+      lastMoveTime = performance.now();
+      velocityX = 0;
+      velocityY = 0;
+      V.setPointerCapture(e.pointerId);
+    }
+
+    function onPointerMove(e) {
+      if (!isDragging) {
+        if (e.pointerType === "mouse") {
+          const rect = V.getBoundingClientRect();
+          const nx =
+            (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+          const ny =
+            (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+          targetParallaxX = clamp(
+            -nx * PARALLAX_MAX,
+            -PARALLAX_MAX,
+            PARALLAX_MAX,
+          );
+          targetParallaxY = clamp(
+            -ny * (PARALLAX_MAX * 0.6),
+            -PARALLAX_MAX,
+            PARALLAX_MAX,
+          );
+          pointerX = e.clientX - rect.left;
+          pointerY = e.clientY - rect.top;
+          const zone = EDGE_ZONE;
+          autoPanVX = 0;
+          autoPanVY = 0;
+          if (pointerX < zone) {
+            autoPanVX = ((zone - pointerX) / zone) * EDGE_PAN_MAX;
+          } else if (pointerX > rect.width - zone) {
+            autoPanVX =
+              -((pointerX - (rect.width - zone)) / zone) * EDGE_PAN_MAX;
+          }
+          if (pointerY < zone) {
+            autoPanVY = ((zone - pointerY) / zone) * (EDGE_PAN_MAX * 0.45);
+          } else if (pointerY > rect.height - zone) {
+            autoPanVY =
+              -((pointerY - (rect.height - zone)) / zone) *
+              (EDGE_PAN_MAX * 0.45);
+          }
+          if (parallaxFrame === null)
+            parallaxFrame = requestAnimationFrame(animateParallax);
+          if (
+            (Math.abs(autoPanVX) > 0.01 || Math.abs(autoPanVY) > 0.01) &&
+            autoPanFrame === null
+          ) {
+            autoPanFrame = requestAnimationFrame(animateAutoPan);
+          }
+        }
+        return;
+      }
+
+      // If they move more than 10px, it's a drag, not a click
+      if (
+        Math.abs(e.clientX - startX) > 10 ||
+        Math.abs(e.clientY - startY) > 10
+      ) {
+        isClicking = false;
+      }
+
+      const bounds = getBounds();
+
+      let nextX = originX + (e.clientX - startX);
+      let nextY = originY + (e.clientY - startY);
+
+      if (nextX > bounds.maxX)
+        nextX = bounds.maxX + (nextX - bounds.maxX) * 0.35;
+      if (nextX < bounds.minX)
+        nextX = bounds.minX + (nextX - bounds.minX) * 0.35;
+      if (nextY > bounds.maxY)
+        nextY = bounds.maxY + (nextY - bounds.maxY) * 0.35;
+      if (nextY < bounds.minY)
+        nextY = bounds.minY + (nextY - bounds.minY) * 0.35;
+
+      x = nextX;
+      y = nextY;
+      setTransform(x, y);
+
+      const now = performance.now();
+      const dt = Math.max(now - lastMoveTime, 1);
+      velocityX = ((e.clientX - lastMoveX) / dt) * 16;
+      velocityY = ((e.clientY - lastMoveY) / dt) * 16;
+      lastMoveX = e.clientX;
+      lastMoveY = e.clientY;
+      lastMoveTime = now;
+    }
+
+    function onPointerUp(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      V.classList.remove("is-dragging");
+      V.releasePointerCapture(e.pointerId);
+
+      // Open Lightbox if it was a valid click on a card
+      if (isClicking && clickTarget) {
+        // Because of the inner wrapper, we find the closest photo-card
+        let card = clickTarget;
+        while (card && !card.classList?.contains("photo-card")) {
+          card = card.parentElement;
+        }
+        if (card) {
+          const indexStr = card.getAttribute("data-index");
+          if (indexStr) {
+            openLightbox(parseInt(indexStr, 10));
+          }
+        }
+      }
+
+      clickTarget = null;
+      momentumFrame = requestAnimationFrame(runMomentum);
+      targetParallaxX = 0;
+      targetParallaxY = 0;
+      if (parallaxFrame === null)
+        parallaxFrame = requestAnimationFrame(animateParallax);
+    }
+
+    function onWheel(e) {
+      // Prevent default to stop scrolling the page while inside the canvas
+      e.preventDefault();
+      dismissHint();
+      stopMomentum();
+      T.style.transition = "none";
+
+      const bounds = getBounds();
+      x = clamp(x - e.deltaX, bounds.minX - 60, bounds.maxX + 60);
+      y = clamp(y - e.deltaY, bounds.minY - 60, bounds.maxY + 60);
+      setTransform(x, y);
+
+      velocityX = -e.deltaX * 0.5;
+      velocityY = -e.deltaY * 0.5;
+      stopMomentum();
+      momentumFrame = requestAnimationFrame(runMomentum);
+      targetParallaxX = clamp(-e.deltaX * 0.02, -PARALLAX_MAX, PARALLAX_MAX);
+      targetParallaxY = clamp(-e.deltaY * 0.015, -PARALLAX_MAX, PARALLAX_MAX);
+      if (parallaxFrame === null)
+        parallaxFrame = requestAnimationFrame(animateParallax);
+    }
+
+    V.addEventListener("pointerdown", onPointerDown);
+    V.addEventListener("pointermove", onPointerMove);
+    V.addEventListener("pointerup", onPointerUp);
+    V.addEventListener("pointercancel", onPointerUp);
+    V.addEventListener("wheel", onWheel, { passive: false });
+    V.addEventListener("pointerleave", () => {
+      targetParallaxX = 0;
+      targetParallaxY = 0;
+      if (parallaxFrame === null)
+        parallaxFrame = requestAnimationFrame(animateParallax);
+    });
+
+    V.addEventListener("dragstart", (e) => e.preventDefault());
+
+    // Center the canvas on load instead of starting at top-left (0,0)
+    // We delay slightly to ensure DOM dimensions are computed before bounding
+    setTimeout(() => {
+      const bounds = getBounds();
+      x = bounds.minX / 2;
+      y = bounds.minY / 2;
+      setTransform(x, y);
+    }, 10);
+
+    // ==========================================
+    // Lightbox Logic
+    // ==========================================
+    const lightbox = document.getElementById("photos-lightbox");
+    const lbImage = document.getElementById("lightbox-image");
+    const btnClose = document.getElementById("lightbox-close");
+    const btnPrev = document.getElementById("lightbox-prev");
+    const btnNext = document.getElementById("lightbox-next");
+    const imagesDataStr = T.getAttribute("data-images");
+    const urls = imagesDataStr ? JSON.parse(imagesDataStr) : [];
+
+    let currentIndex = 0;
+    let isLightboxOpen = false;
+
+    function openLightbox(index) {
+      if (urls.length === 0 || !lightbox || !lbImage) return;
+      currentIndex = index;
+      isLightboxOpen = true;
+      lightbox.classList.add("is-open");
+      updateLightboxImage();
+      document.addEventListener("keydown", onLightboxKeydown);
+    }
+
+    function closeLightbox() {
+      if (!lightbox) return;
+      isLightboxOpen = false;
+      lightbox.classList.remove("is-open");
+      document.removeEventListener("keydown", onLightboxKeydown);
+    }
+
+    function updateLightboxImage() {
+      if (!lbImage) return;
+      lbImage.classList.add("is-loading");
+
+      // Load new image
+      const newImg = new Image();
+      newImg.src = urls[currentIndex];
+      newImg.onload = () => {
+        lbImage.src = newImg.src;
+        lbImage.classList.remove("is-loading");
+      };
+    }
+
+    function nextImage() {
+      currentIndex = (currentIndex + 1) % urls.length;
+      updateLightboxImage();
+    }
+
+    function prevImage() {
+      currentIndex = (currentIndex - 1 + urls.length) % urls.length;
+      updateLightboxImage();
+    }
+
+    function onLightboxKeydown(e) {
+      if (!isLightboxOpen) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") nextImage();
+      if (e.key === "ArrowLeft") prevImage();
+    }
+
+    if (lightbox) {
+      btnClose?.addEventListener("click", closeLightbox);
+      btnNext?.addEventListener("click", nextImage);
+      btnPrev?.addEventListener("click", prevImage);
+
+      // Close on backdrop click
+      lightbox.addEventListener("click", (e) => {
+        if (
+          e.target === lightbox ||
+          e.target === document.getElementById("lightbox-backdrop")
+        ) {
+          closeLightbox();
+        }
+      });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPhotosCanvas);
+  } else {
+    initPhotosCanvas();
+  }
+</script>

@@ -141,7 +141,7 @@
     bottom: -10px;
     left: -10px;
     pointer-events: none;
-    background-color: var(--cream);
+    background-color: #0d1855;
     z-index: -1;
 
     -webkit-mask-image: url("/images/stuff/stuffcardinside.PNG");
@@ -155,10 +155,10 @@
     content: "";
     position: absolute;
     /* Outer blue border, positioned outside the inner card with an 8px gap */
-    top: -38px;
-    right: -32px;
-    bottom: -42px;
-    left: -32px;
+    top: -30px;
+    right: -25px;
+    bottom: -36px;
+    left: -25px;
     pointer-events: none;
     background-color: #0d1855;
 
@@ -183,7 +183,7 @@
   .now-playing .t {
     font-weight: 800;
     font-size: 15px;
-    color: var(--ink);
+    color: #f5c842;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -192,7 +192,7 @@
   }
   .now-playing .a {
     font-size: 11px;
-    color: #8a8880;
+    color: rgba(245, 200, 66, 0.7);
     margin-top: 2px;
   }
   .now-playing .t.fading {
@@ -200,7 +200,7 @@
   }
   .time-display {
     font-size: 12px;
-    color: #8a8880;
+    color: rgba(245, 200, 66, 0.7);
     white-space: nowrap;
     padding-top: 2px;
   }
@@ -208,7 +208,7 @@
   .buffering-line {
     text-align: left;
     font-size: 9px;
-    color: var(--card-red);
+    color: #f5c842;
     opacity: 0.65;
     min-height: 11px;
     margin-bottom: 2px;
@@ -230,8 +230,8 @@
   .progress-bar {
     height: 11px;
     border-radius: 0;
-    border: 2px solid var(--ink);
-    background: var(--cream);
+    border: 2px solid #f5c842;
+    background: #0d1855;
     position: relative;
     cursor: pointer;
     overflow: hidden;
@@ -243,7 +243,7 @@
     top: 0;
     bottom: 0;
     width: 0%;
-    background: var(--card-red);
+    background: #f5c842;
   }
 
   .buttons-row {
@@ -265,7 +265,7 @@
     border: none;
     cursor: pointer;
     padding: 0;
-    color: var(--ink);
+    color: #f5c842;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -280,12 +280,13 @@
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: var(--accent);
-    border: 2px solid var(--ink);
+    background: #f0cf6b;
+    color: #0d1855;
+    border: 0.5px solid #0d1855;
     flex: none;
   }
   .btn.circle:hover {
-    filter: brightness(0.97);
+    filter: brightness(1.2);
   }
   .btn.circle:active {
     transform: translateY(1px);
@@ -294,10 +295,10 @@
   .btn.play-pause {
     width: 48px;
     height: 48px;
-    background: var(--ink);
-    color: #fff;
-    border: 3px solid var(--cream);
-    box-shadow: 0 0 0 2px #3f7fe0;
+    background: #0d1855;
+    color: #f5c842;
+    border: 0.5px solid #f5c842;
+    box-shadow: 0 0 0 2px #f5c842;
   }
   .btn.play-pause svg {
     width: 18px;
@@ -321,10 +322,10 @@
     cursor: pointer;
     background: linear-gradient(
       to right,
-      var(--card-red) 0%,
-      var(--card-red) var(--vol, 100%),
-      #ded7c0 var(--vol, 100%),
-      #ded7c0 100%
+      #f5c842 0%,
+      #f5c842 var(--vol, 100%),
+      rgba(245, 200, 66, 0.3) var(--vol, 100%),
+      rgba(245, 200, 66, 0.3) 100%
     );
   }
   .volume input[type="range"]::-webkit-slider-thumb {
@@ -332,32 +333,32 @@
     width: 13px;
     height: 13px;
     border-radius: 0;
-    background: var(--card-red);
-    border: 2px solid var(--ink);
+    background: #0d1855;
+    border: 2px solid #f5c842;
     cursor: pointer;
   }
   .volume input[type="range"]::-moz-range-track {
     height: 3px;
     border-radius: 0;
-    background: #ded7c0;
+    background: rgba(245, 200, 66, 0.3);
   }
   .volume input[type="range"]::-moz-range-progress {
     height: 3px;
     border-radius: 0;
-    background: var(--card-red);
+    background: #f5c842;
   }
   .volume input[type="range"]::-moz-range-thumb {
     width: 13px;
     height: 13px;
     border-radius: 0;
-    background: var(--card-red);
-    border: 2px solid var(--ink);
+    background: #0d1855;
+    border: 2px solid #f5c842;
     cursor: pointer;
   }
 
   .status-line {
     text-align: center;
-    color: var(--card-red);
+    color: #f5c842;
     opacity: 0.7;
     font-size: 9px;
     margin-top: 10px;
@@ -368,13 +369,13 @@
   .upcoming {
     margin-top: 13px;
     padding-top: 11px;
-    border-top: 2px solid var(--ink);
+    border-top: 2px solid #f5c842;
   }
   .upcoming-heading {
     font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.08em;
-    color: #8a8880;
+    color: rgba(245, 200, 66, 0.7);
     text-transform: uppercase;
     margin-bottom: 6px;
   }
@@ -383,14 +384,14 @@
     align-items: center;
     gap: 10px;
     padding: 7px 0;
-    border-top: 1px solid rgba(17, 16, 16, 0.15);
+    border-top: 1px solid rgba(245, 200, 66, 0.2);
   }
   .upcoming-row:first-of-type {
     border-top: none;
   }
   .upcoming-row .num {
     font-size: 10px;
-    color: #8a8880;
+    color: rgba(245, 200, 66, 0.7);
     width: 14px;
     flex: none;
   }
@@ -401,14 +402,14 @@
   .upcoming-row .info .name {
     font-weight: 700;
     font-size: 11px;
-    color: var(--ink);
+    color: #f5c842;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .upcoming-row .info .artist {
     font-size: 10px;
-    color: #8a8880;
+    color: rgba(245, 200, 66, 0.7);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -610,7 +611,7 @@
           <g id="tonearmGroup">
             <path
               d="M430,548 C415,552 405,540 412,525"
-              stroke="var(--arm-grey-dark)"
+              stroke="var(--cream)"
               stroke-width="14"
               stroke-linecap="round"
               fill="none"></path>
@@ -619,7 +620,7 @@
               y1="535"
               x2="930"
               y2="300"
-              stroke="var(--arm-grey)"
+              stroke="var(--cream)"
               stroke-width="11"
               stroke-linecap="round"></line>
             <rect
@@ -628,7 +629,7 @@
               width="55"
               height="95"
               rx="10"
-              fill="var(--arm-grey-dark)"
+              fill="var(--cream)"
               transform="rotate(28 932 302)"></rect>
           </g>
         </svg>
