@@ -6,8 +6,10 @@ export interface Props {
   borderColor?: string;
   /** Background color of the modal. Defaults to dark blue. */
   bgColor?: string;
-  /** Background color of the close button. Defaults to dark blue. */
+  /** Background color of the close button. Defaults to transparent. */
   closeBtnBg?: string;
+  /** Color of the close icon (using CSS mask). Defaults to gold. */
+  closeIconColor?: string;
   /** Path to the close icon image */
   closeIcon?: string;
 }
@@ -16,7 +18,8 @@ const {
   id,
   borderColor = "#F5C842",
   bgColor = "#0D1855",
-  closeBtnBg = "#0D1855",
+  closeBtnBg = "transparent",
+  closeIconColor = "#F5C842",
   closeIcon = "/images/frame/closeo.PNG",
 } = Astro.props;
 ---
@@ -40,7 +43,13 @@ const {
       data-stuff-close
       style={`background-color: ${closeBtnBg};`}
     >
-      <img src={closeIcon} alt="Close" />
+      <div style={`
+        width: 32px;
+        height: 32px;
+        background-color: ${closeIconColor};
+        mask: url('${closeIcon}') no-repeat center / contain;
+        -webkit-mask: url('${closeIcon}') no-repeat center / contain;
+      `}></div>
     </button>
 
     <!-- Popup body content (injected per-card via slot) -->
