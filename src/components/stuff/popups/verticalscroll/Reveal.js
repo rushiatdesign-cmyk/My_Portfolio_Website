@@ -2,13 +2,16 @@ import { gsap } from "gsap";
 
 export default class Reveal {
   constructor() {
+    this.isMobile = window.innerWidth <= 1024;
     this.items = new Map();
     gsap.utils.toArray(".gallery__slide").forEach((slide) => {
       const wrapper = slide.querySelector(".gallery__img-wrapper");
       const caption = slide.querySelector("figcaption");
 
-      gsap.set(wrapper, { autoAlpha: 0 });
-      if (caption) gsap.set(caption, { autoAlpha: 0 });
+      if (!this.isMobile) {
+        gsap.set(wrapper, { autoAlpha: 0 });
+        if (caption) gsap.set(caption, { autoAlpha: 0 });
+      }
 
       this.items.set(slide, { wrapper, caption });
     });

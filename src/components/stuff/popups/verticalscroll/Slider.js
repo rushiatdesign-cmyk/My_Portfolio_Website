@@ -7,10 +7,13 @@ gsap.registerPlugin(Observer);
 /** Infinite slider driven by wheel/touch scrolling */
 export default class Slider {
   constructor({ enabled = () => true, onToggle } = {}) {
+    this.isMobile = window.innerWidth <= 1024;
     this.enabled = enabled;
 
     // Called with the slides that just entered or left the viewport
     this.onToggle = onToggle;
+
+    if (this.isMobile) return;
 
     this.createLoop();
     this.createParallax();
@@ -104,7 +107,7 @@ export default class Slider {
   createObserver() {
     this.observer = Observer.create({
       target: window,
-      type: "wheel,touch",
+      type: "wheel,touch,pointer",
       preventDefault: true,
       onChange: (self) => {
         this.scroll(self);
@@ -114,6 +117,7 @@ export default class Slider {
 
   /** Rebuild the loop when the viewport size settles */
   resize() {
+    if (this.isMobile) return;
     let id;
 
     window.addEventListener("resize", () => {
@@ -147,6 +151,7 @@ export default class Slider {
 
   /** Hand the gallery over to a transition */
   stop() {
+    if (this.isMobile) return;
     this.observer.disable();
 
     this.freeze();
@@ -154,6 +159,7 @@ export default class Slider {
 
   /** Take the gallery back once a transition has finished with it */
   start() {
+    if (this.isMobile) return;
     this.observer.enable();
   }
 

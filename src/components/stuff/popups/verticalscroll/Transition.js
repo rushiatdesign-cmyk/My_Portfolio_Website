@@ -50,7 +50,6 @@ export default class Transition {
           targets: this.preview,
           duration: 1.2,
           ease: "power4.inOut",
-          absolute: true,
         }),
         0,
       )
@@ -90,7 +89,6 @@ export default class Transition {
         Flip.fit(this.preview, wrapper, {
           duration: 1,
           ease: "power3.inOut",
-          absolute: true,
         }),
         0,
       )
@@ -103,6 +101,12 @@ export default class Transition {
     const img = slide.querySelector(".gallery__img");
     this.previewImg.src = img.src;
     this.previewImg.alt = img.alt;
+    
+    // Copy the aspect ratio from the active slide so the preview matches
+    const wrapper = slide.querySelector(".gallery__img-wrapper");
+    const ar = getComputedStyle(wrapper).aspectRatio;
+    this.preview.style.aspectRatio = ar;
+
     this.groups.forEach((group) =>
       group.classList.toggle("active", Number(group.dataset.index) === index),
     );
