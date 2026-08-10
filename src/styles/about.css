@@ -1,0 +1,161 @@
+/* ======================================================
+   ABOUT PAGE — Full CSS
+   Design: Crimson background, Gold (#FFCA22) accents
+====================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Slackey&family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #A52C39;
+  font-family: 'EB Garamond', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ======================================================
+   FIXED VIEWPORT FRAME (from stuff)
+====================================================== */
+.about-frame-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  pointer-events: none;
+  border-style: solid;
+  border-color: #A52C39;
+  border-top-width: calc(4dvh + 43px);
+  border-bottom-width: calc(4dvh + 36px);
+  border-left-width: calc(4dvw + 25px);
+  border-right-width: calc(4dvw + 25px);
+}
+
+.about-frame {
+  position: fixed;
+  top: 4dvh;
+  bottom: 4dvh;
+  left: 4dvw;
+  right: 4dvw;
+  pointer-events: none;
+  z-index: 202;
+  user-select: none;
+
+  border-style: solid;
+  border-width: 43px 25px 36px 25px;
+  border-color: #FFCA22;
+  
+  /* Use mask-box-image to shape the solid #FFCA22 border */
+  -webkit-mask-box-image-source: url('/images/stuff/stuffframe.PNG');
+  -webkit-mask-box-image-slice: 15% 6% 13% 6%;
+  -webkit-mask-box-image-width: 43px 25px 36px 25px;
+  -webkit-mask-box-image-repeat: stretch;
+  mask-border-source: url('/images/stuff/stuffframe.PNG');
+  mask-border-slice: 15% 6% 13% 6%;
+  mask-border-width: 43px 25px 36px 25px;
+  mask-border-repeat: stretch;
+}
+
+/* ======================================================
+   LOGO — TOP CENTER, FIXED
+====================================================== */
+.about-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 210;
+  background-color: transparent;
+  padding: clamp(16px, 3vh, 40px) 0;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.about-header.is-hidden {
+  transform: translateY(-100%);
+}
+
+.about-logo {
+  width: clamp(200px, 48vw, 540px);
+  aspect-ratio: 540 / 140; /* matches blog logo proportions */
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  background-color: #FFCA22;
+  -webkit-mask: url('/images/frame/bloglogo.PNG') no-repeat center / contain;
+  mask: url('/images/frame/bloglogo.PNG') no-repeat center / contain;
+}
+
+/* ======================================================
+   FIXED DECORATIVES (Trees)
+====================================================== */
+.about-deco {
+  position: fixed;
+  z-index: 20;
+  pointer-events: none;
+  user-select: none;
+}
+
+@keyframes tree-sway {
+  0%, 100% { transform: rotate(-2deg) scale(1.05); }
+  50% { transform: rotate(2deg) scale(1.06); }
+}
+
+.about-deco--treeleft {
+  top: 7%;
+  left: -1%;
+  width: clamp(120px, 18vw, 260px);
+  height: auto;
+  transform-origin: bottom center;
+  animation: tree-sway 6s ease-in-out infinite;
+}
+
+.about-deco--treeright {
+  top: 7%;
+  right: -1%;
+  width: clamp(110px, 16vw, 240px);
+  height: auto;
+  transform-origin: bottom center;
+  animation: tree-sway 7s ease-in-out infinite reverse;
+}
+
+/* ======================================================
+   BOTTOM LANDSCAPE
+====================================================== */
+.about-footer-zone {
+  position: fixed;
+  bottom: calc(4dvh + 4px); /* Align perfectly on top of the thin border baseline */
+  left: 0;
+  right: 0;
+  z-index: 115;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.about-landscape {
+  width: clamp(300px, 70vw, 900px);
+  height: clamp(100px, 20vh, 300px);
+  background-color: #FFCA22;
+  -webkit-mask: url('/images/About page/landscape.png') no-repeat bottom center / contain;
+  mask: url('/images/About page/landscape.png') no-repeat bottom center / contain;
+}
+
+/* ======================================================
+   PAGE LAYOUT
+====================================================== */
+.about-layout-content {
+  position: relative;
+  /* Removed z-index to prevent trapping fixed elements inside */
+  padding: clamp(100px, 18vh, 180px) clamp(24px, 6vw, 80px) clamp(160px, 24vh, 260px);
+  max-width: 1400px;
+  margin: 0 auto;
+}

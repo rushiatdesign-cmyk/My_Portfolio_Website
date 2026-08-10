@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from 'astro:content';
+import { calcReadingTime } from '../components/content/ReadingTime.ts';
+import AboutLayout from '../layouts/AboutLayout.astro';
+
+const rawPosts = await getCollection('blog');
+const sortedPosts = rawPosts.sort(
+  (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
+);
+
+const postsWithHtml = await Promise.all(
+  sortedPosts.map(async (post) => {
+    const { Content } = await render(post);
+    return { post, Content };
+  })
+);
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+---
+
+<AboutLayout>
+  <!-- About logo banner — top center -->
+  <header class="about-header">
+    <div class="about-logo" aria-label="About"></div>
+  </header>
+
+  <!-- Temporary empty space to allow scrolling so the header behavior can be tested -->
+  <div style="min-height: 200vh;"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Header scroll hide/show logic
+      let lastScrollY = window.scrollY;
+      const header = document.querySelector('.about-header');
+
+      window.addEventListener('scroll', () => {
+        if (!header) return;
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 150) {
+          header.classList.add('is-hidden');
+        } else {
+          header.classList.remove('is-hidden');
+        }
+        lastScrollY = currentScrollY;
+      }, { passive: true });
+    });
+  </script>
+</AboutLayout>
