@@ -136,13 +136,17 @@ const photoUrls = photographs.map((p) => p.image);
     background-color: #f3f1d6 !important; /* Set popup background to yellow */
   }
 
-  .pho-viewport {
+  #pho-viewport {
     position: relative;
     width: 100%;
-    height: 84vh;
+    /* Fill entire viewport */
+    height: 100vh;
     overflow: hidden;
+    background-color: #fcf3d9; /* Light warm background */
+    border: none;
+    border-radius: 0;
     cursor: grab;
-    touch-action: none; /* Required for native touch drag prevention */
+    touch-action: none; /* Crucial for custom touch handling */
   }
 
   .pho-viewport.is-dragging {

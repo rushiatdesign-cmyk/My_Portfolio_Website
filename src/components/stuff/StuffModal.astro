@@ -12,6 +12,8 @@ export interface Props {
   closeIconColor?: string;
   /** Path to the close icon image */
   closeIcon?: string;
+  /** Whether the modal should take up the full screen. Defaults to false. */
+  fullscreen?: boolean;
 }
 
 const {
@@ -21,10 +23,11 @@ const {
   closeBtnBg = "transparent",
   closeIconColor = "#F5C842",
   closeIcon = "/images/frame/closeo.PNG",
+  fullscreen = false,
 } = Astro.props;
 ---
 
-<div id={id} class="stuff-modal-overlay" aria-hidden="true" data-stuff-modal>
+<div id={id} class={`stuff-modal-overlay ${fullscreen ? 'is-fullscreen' : ''}`} aria-hidden="true" data-stuff-modal>
   <div
     class="stuff-modal-panel"
     role="dialog"

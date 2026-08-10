@@ -114,8 +114,12 @@ const photoUrls = illustrations.map((p) => p.image);
   .ill-viewport {
     position: relative;
     width: 100%;
-    height: 84vh;
+    /* Fill entire viewport */
+    height: 100vh;
     overflow: hidden;
+    background-color: #fcf3d9; /* Light warm background */
+    border: none;
+    border-radius: 0;
     cursor: grab;
     touch-action: none; /* Required for native touch drag prevention */
   }

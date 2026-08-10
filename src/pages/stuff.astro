@@ -10,21 +10,11 @@ import PhotographsContent from "../components/stuff/popups/PhotographsContent.as
 import IllustrationsContent from "../components/stuff/popups/IllustrationsContent.astro";
 
 const cards = [
-  { id: "stuff-modal-movies", title: "Movies", emoji: "🎬", index: 0 },
-  { id: "stuff-modal-dishes", title: "Dishes", emoji: "🥘", index: 1 },
-  { id: "stuff-modal-music", title: "Music", emoji: "🎵", index: 2 },
-  {
-    id: "stuff-modal-photographs",
-    title: "Photographs",
-    emoji: "📷",
-    index: 3,
-  },
-  {
-    id: "stuff-modal-illustrations",
-    title: "Illustrations",
-    emoji: "🎨",
-    index: 4,
-  },
+  { id: "stuff-modal-music", title: "Music", emoji: "🎵", index: 0 },
+  { id: "stuff-modal-illustrations", title: "Illustrations", emoji: "🎨", index: 1 },
+  { id: "stuff-modal-movies", title: "Movies", emoji: "🎬", index: 2 },
+  { id: "stuff-modal-photographs", title: "Photographs", emoji: "📷", index: 3 },
+  { id: "stuff-modal-dishes", title: "Dishes", emoji: "🥘", index: 4 },
 ];
 ---
 
@@ -69,6 +59,7 @@ const cards = [
       borderColor="#F5C842"
       bgColor="#F5C842"
       closeIconColor="#0D1855"
+      fullscreen={true}
     >
       <PhotographsContent />
     </StuffModal>
@@ -78,6 +69,7 @@ const cards = [
       borderColor="#F5C842"
       bgColor="#F5C842"
       closeIconColor="#0D1855"
+      fullscreen={true}
     >
       <IllustrationsContent />
     </StuffModal>
