@@ -1,33 +1,27 @@
 ---
-import { getCollection, render } from 'astro:content';
-import { calcReadingTime } from '../components/content/ReadingTime.ts';
+import { getCollection } from 'astro:content';
 import WorkLayout from '../layouts/WorkLayout.astro';
+import WorkCard from '../components/work/WorkCard.astro';
 
-const rawPosts = await getCollection('blog');
-const sortedPosts = rawPosts.sort(
+const rawProjects = await getCollection('work');
+const sortedProjects = rawProjects.sort(
   (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
 );
-
-const postsWithHtml = await Promise.all(
-  sortedPosts.map(async (post) => {
-    const { Content } = await render(post);
-    return { post, Content };
-  })
-);
-
-function fmtDate(d: Date) {
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-}
 ---
 
 <WorkLayout>
-  <!-- About logo banner — top center -->
+  <!-- Work logo banner — top center -->
   <header class="work-header">
-    <div class="work-logo" aria-label="About"></div>
+    <div class="work-logo" aria-label="Work"></div>
   </header>
 
-  <!-- Temporary empty space to allow scrolling so the header behavior can be tested -->
-  <div style="min-height: 200vh;"></div>
+  <div class="work-layout-content">
+    <div class="work-projects-list">
+      {sortedProjects.map(project => (
+        <WorkCard project={project} />
+      ))}
+    </div>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -38,7 +32,7 @@ function fmtDate(d: Date) {
       window.addEventListener('scroll', () => {
         if (!header) return;
         const currentScrollY = window.scrollY;
-        if (currentScrollY > lastScrollY && currentScrollY > 150) {
+        if (currentScrollY > lastScrollY && currentScrollY > 10) {
           header.classList.add('is-hidden');
         } else {
           header.classList.remove('is-hidden');

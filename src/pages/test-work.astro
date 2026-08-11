@@ -1,0 +1,7 @@
+---
+import { getCollection } from 'astro:content';
+const rawProjects = await getCollection('work');
+---
+<html><body>
+<pre>{JSON.stringify(rawProjects, null, 2)}</pre>
+</body></html>

@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>LEARN टाईप — the Devanagari kerning game</title>
+<meta name="description" content="A typography playground to learn Devanagari spacing: nudge aksharas along a living shirorekha and score your rhythm against the type designer's.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #17332e;
+    --bg-soft: #1c3d37;
+    --ink: #ecc75b;
+    --ink-soft: rgba(236,199,91,0.55);
+    --ink-faint: rgba(236,199,91,0.22);
+    --primary-fg: #17332e;
+    --good: #8fd19e;
+    --mid: #ecc75b;
+    --low: #e8896b;
+    --font-hand: "Kalam", cursive;
+    --font-script: "Caveat", cursive;
+    --font-display: "Baloo 2", "Kalam", cursive;
+    --radius: 0.25rem;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(236,199,91,0.05), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(236,199,91,0.05), transparent 45%);
+    color: var(--ink);
+    font-family: var(--font-hand);
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    padding: 0.7rem 1rem;
+  }
+
+  @media (min-width: 640px) {
+    main { padding: 0.7rem 2.5rem; }
+  }
+
+  /* hand-scrawled border doodles */
+  .doodle-strip {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--ink);
+    opacity: 0.22;
+    user-select: none;
+    white-space: nowrap;
+    pointer-events: none;
+    position: absolute;
+  }
+  .doodle-h {
+    inset-inline: 0;
+    text-align: center;
+    font-size: 1.1rem;
+    display: none;
+  }
+  .doodle-h.top { top: 0.2rem; }
+  .doodle-h.bottom { bottom: 0.2rem; font-size: 1.4rem; opacity: 0.28; }
+  .doodle-v {
+    top: 24%;
+    display: none;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 1.4rem;
+    line-height: 1.2;
+  }
+  .doodle-v.left { left: 0.3rem; }
+  .doodle-v.right { right: 0.3rem; }
+
+  @media (min-width: 640px) { .doodle-h { display: block; } }
+  @media (min-width: 1024px) { .doodle-v { display: flex; } }
+
+  .shell {
+    position: relative;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 56rem;
+    height: 100%;
+    min-height: 0;
+  }
+
+  /* rough hand-drawn double border, like an ink sketch */
+  .sketch-box {
+    position: relative;
+    border: 2px solid var(--ink);
+    border-radius: 3px 10px 4px 12px / 12px 4px 10px 3px;
+    background: transparent;
+  }
+  .sketch-box::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1.5px solid var(--ink-soft);
+    border-radius: 10px 3px 12px 4px / 4px 12px 3px 10px;
+    pointer-events: none;
+  }
+
+  header {
+    padding-top: 0.9rem;
+    text-align: center;
+    flex: none;
+  }
+  .title-box {
+    display: inline-block;
+    padding: 0.45rem 1.4rem;
+  }
+  .title-box .word-learn {
+    font-family: var(--font-hand);
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+  }
+  .title-box .word-type {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--ink);
+  }
+  @media (min-width: 640px) {
+    .title-box .word-learn, .title-box .word-type { font-size: 1.9rem; }
+  }
+  header .tagline {
+    max-width: 22rem;
+    margin: 0.5rem auto 0;
+    font-family: var(--font-script);
+    font-size: 1.15rem;
+    line-height: 1.15;
+    color: var(--ink-soft);
+  }
+  header .tagline .dev { font-family: var(--font-display); color: var(--ink); }
+
+  /* progress dots — one per band, filled as levels are cleared */
+  .bandbar {
+    display: flex;
+    gap: 0.3rem;
+    justify-content: center;
+    margin-top: 0.55rem;
+    flex-wrap: wrap;
+  }
+  .bandbar .dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--ink-faint);
+    transition: background 200ms ease, transform 200ms ease;
+  }
+  .bandbar .dot.done { background: var(--good); }
+  .bandbar .dot.current { background: var(--ink); transform: scale(1.5); }
+
+  section.stage {
+    display: flex;
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #board-wrap {
+    width: 100%;
+    max-width: 46rem;
+    user-select: none;
+  }
+
+  #board-svg {
+    width: 100%;
+    overflow: visible;
+    display: block;
+  }
+
+  .hint-text {
+    margin-top: 0.4rem;
+    text-align: center;
+    font-family: var(--font-script);
+    font-size: 1.2rem;
+    color: var(--ink-soft);
+    animation: fade-in 400ms ease;
+  }
+
+  .controls {
+    margin-top: 1.1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 3.4rem;
+  }
+
+  button {
+    font-family: var(--font-hand);
+    cursor: pointer;
+    color: var(--ink);
+    background: transparent;
+  }
+
+  .btn {
+    padding: 0.5rem 1.25rem;
+    font-size: 1rem;
+  }
+  .btn:disabled { opacity: 0.35; cursor: default; }
+  .btn.primary {
+    background: var(--ink);
+    color: var(--primary-fg);
+    font-weight: 700;
+  }
+  .btn-nav {
+    padding: 0.4rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .result {
+    text-align: center;
+  }
+  .result .pct {
+    font-family: var(--font-script);
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--ink);
+    animation: pop-in 350ms cubic-bezier(.2,1.4,.4,1);
+  }
+  .result .pct.good { color: var(--good); }
+  .result .pct.low { color: var(--low); }
+  .result p {
+    margin: 0.25rem 0 0;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+  }
+
+  footer {
+    flex: none;
+    width: 100%;
+    padding-bottom: 0.5rem;
+  }
+  .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    border-top: 1px solid var(--ink-faint);
+    padding-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+  .footer-row .level-badge { font-weight: 700; color: var(--ink); }
+  .footer-row .word-info { text-align: center; }
+  .footer-row .word-info .dev-word {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--ink);
+  }
+  .nav-cluster { display: flex; align-items: center; gap: 0.6rem; }
+  .footer-help {
+    margin: 0.4rem 0 0;
+    text-align: center;
+    font-size: 0.68rem;
+    color: rgba(236,199,91,0.45);
+  }
+
+  @keyframes fade-in { from { opacity: 0; transform: translateY(3px);} to { opacity: 1; transform: translateY(0);} }
+  @keyframes pop-in { 0% { opacity: 0; transform: scale(0.6);} 100% { opacity: 1; transform: scale(1);} }
+  @keyframes drag-hint-slide {
+    0%, 100% { transform: translateX(-14px); opacity: 0.35; }
+    50% { transform: translateX(14px); opacity: 1; }
+  }
+  .drag-hint { animation: drag-hint-slide 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+  svg text { cursor: default; }
+  svg .hit-rect { touch-action: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .drag-hint, .result .pct { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <div class="doodle-strip doodle-h top" id="doodle-top"></div>
+  <div class="doodle-strip doodle-h bottom" id="doodle-bottom"></div>
+  <div class="doodle-strip doodle-v left" id="doodle-left"></div>
+  <div class="doodle-strip doodle-v right" id="doodle-right"></div>
+
+  <div class="shell">
+    <header>
+      <h1 class="sketch-box title-box">
+        <span class="word-learn">LEARN</span> <span class="word-type">टाईप</span>
+      </h1>
+      <p class="tagline">The typography playground to learn Devanagari <span class="dev">देवनागरी</span></p>
+      <div class="bandbar" id="bandbar"></div>
+    </header>
+
+    <section class="stage">
+      <div id="board-wrap">
+        <svg id="board-svg" viewBox="0 0 100 100" role="img" aria-label="Devanagari word board"></svg>
+        <p class="hint-text" id="hint-text" hidden>drag a letter sideways to space it</p>
+      </div>
+
+      <div class="controls" id="controls"></div>
+    </section>
+
+    <footer>
+      <div class="footer-row">
+        <div class="level-badge" id="level-badge">Level 1 / 40</div>
+        <div class="word-info" id="word-info"></div>
+        <div class="nav-cluster">
+          <span id="avg-score"></span>
+          <button class="btn sketch-box btn-nav" id="btn-prev">Prev</button>
+          <button class="btn sketch-box btn-nav primary" id="btn-next">Next</button>
+        </div>
+      </div>
+      <p class="footer-help">drag a letter sideways · arrow keys nudge 1px, shift+arrow 10px · tab to switch letter</p>
+    </footer>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ----------------------------------------------------------------
+   * Devanagari akshara utilities: cluster splitting, metrics.
+   * ---------------------------------------------------------------- */
+  var MATRA_RANGE = /[\u0900-\u0903\u093A-\u094F\u0951-\u0957\u0962\u0963\u200C\u200D]/;
+  var VIRAMA = "\u094D";
+  var FONT = '"Baloo 2"';
+  var BASELINE_RATIO = 1.35;
+
+  function splitAksharas(word) {
+    var chars = Array.from(word);
+    var out = [];
+    var current = "";
+    var pendingVirama = false;
+    for (var idx = 0; idx < chars.length; idx++) {
+      var ch = chars[idx];
+      if (current === "") { current = ch; pendingVirama = false; continue; }
+      if (pendingVirama) { current += ch; pendingVirama = false; continue; }
+      if (ch === VIRAMA) { current += ch; pendingVirama = true; continue; }
+      if (MATRA_RANGE.test(ch)) { current += ch; continue; }
+      out.push(current);
+      current = ch;
+    }
+    if (current) out.push(current);
+    return out;
+  }
+
+  function ctx2d(size, font) {
+    var canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(size * 14);
+    canvas.height = Math.ceil(size * 2.2);
+    var ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.font = "700 " + size + "px " + font;
+    ctx.textBaseline = "alphabetic";
+    return { canvas: canvas, ctx: ctx };
+  }
+
+  /**
+   * Measure per-akshara advances and locate the shirorekha (headline) band
+   * by rasterising the word and finding the densest horizontal ink row.
+   */
+  function measureWord(word, size, font) {
+    var aksharas = splitAksharas(word);
+    var pair = ctx2d(size, font);
+    var canvas = pair.canvas, ctx = pair.ctx;
+
+    var advances = [];
+    var prefix = "";
+    var prevW = 0;
+    for (var i = 0; i < aksharas.length; i++) {
+      prefix += aksharas[i];
+      var w = ctx.measureText(prefix).width;
+      advances.push(w - prevW);
+      prevW = w;
+    }
+    var totalWidth = prevW;
+
+    var baseline = size * 1.35;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#000";
+    ctx.fillText(word, 4, baseline);
+
+    var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    var inkPerRow = new Array(canvas.height).fill(0);
+    for (var y = 0; y < canvas.height; y++) {
+      var count = 0;
+      for (var x = 0; x < canvas.width; x++) {
+        if (data[(y * canvas.width + x) * 4 + 3] > 120) count++;
+      }
+      inkPerRow[y] = count;
+    }
+    var peak = Math.max.apply(null, inkPerRow);
+    var bestRow = 0;
+    for (y = 0; y < canvas.height; y++) {
+      if (inkPerRow[y] === peak) { bestRow = y; break; }
+    }
+    var top = bestRow, bottom = bestRow;
+    var thresh = peak * 0.82;
+    while (top > 0 && inkPerRow[top - 1] >= thresh) top--;
+    while (bottom < canvas.height - 1 && inkPerRow[bottom + 1] >= thresh) bottom++;
+
+    var inkThresh = Math.max(1, Math.round(peak * 0.02));
+    var matraY = top, rukarY = bottom;
+    for (y = 0; y < canvas.height; y++) {
+      if (inkPerRow[y] >= inkThresh) { matraY = y; break; }
+    }
+    for (y = canvas.height - 1; y >= 0; y--) {
+      if (inkPerRow[y] >= inkThresh) { rukarY = y; break; }
+    }
+
+    return {
+      advances: advances,
+      headlineY: top,
+      headlineH: Math.max(2, bottom - top + 1),
+      totalWidth: totalWidth,
+      matraY: matraY,
+      rukarY: rukarY
+    };
+  }
+
+  /** 0-100 score from per-gap spacing error, KernType-style. */
+  function scoreOffsets(player, truth, tolerance) {
+    var gapsP = [], gapsT = [];
+    for (var i = 1; i < player.length; i++) gapsP.push(player[i] - player[i - 1]);
+    for (i = 1; i < truth.length; i++) gapsT.push(truth[i] - truth[i - 1]);
+    if (gapsT.length === 0) return { score: 100 };
+    var sum = 0;
+    for (i = 0; i < gapsP.length; i++) sum += Math.abs(gapsP[i] - gapsT[i]);
+    var avg = sum / gapsP.length;
+    var score = Math.max(0, Math.round(100 * (1 - avg / tolerance)));
+    return { score: score };
+  }
+
+  /* ----------------------------------------------------------------
+   * Levels — words to space, grouped into five difficulty bands.
+   * ---------------------------------------------------------------- */
+  var BANDS = [
+    { name: "Foundation", tolerance: 0.34 },
+    { name: "Rhythm", tolerance: 0.28 },
+    { name: "Conjuncts", tolerance: 0.24 },
+    { name: "Complexity", tolerance: 0.2 },
+    { name: "Mastery", tolerance: 0.16 }
+  ];
+
+  var WORDS = [
+    ["आमची", "Marathi", "ours"],
+    ["बचपन", "Hindi", "childhood"],
+    ["पहचान", "Hindi", "identity"],
+    ["मुसकान", "Hindi", "a smile"],
+    ["सरकार", "Hindi", "government"],
+    ["कलाकार", "Hindi", "artist"],
+    ["अनुभव", "Hindi", "experience"],
+    ["उपवास", "Marathi", "fasting"],
+    ["परिवार", "Hindi", "family"],
+    ["महाराज", "Marathi", "great king"],
+    ["सरोवर", "Marathi", "lake"],
+    ["रविवार", "Hindi", "Sunday"],
+    ["नागरिक", "Hindi", "citizen"],
+    ["बरसात", "Hindi", "the rains"],
+    ["पुरातन", "Sanskrit", "ancient"],
+    ["जंगलात", "Marathi", "in the forest"],
+    ["अंगणात", "Marathi", "in the courtyard"],
+    ["गणपती", "Marathi", "Ganapati"],
+    ["मुसाफिर", "Hindi", "traveller"],
+    ["केशरिया", "Hindi", "saffron"],
+    ["मोरपंख", "Hindi", "peacock feather"],
+    ["छापखाना", "Hindi", "printing press"],
+    ["शिरोरेखा", "Hindi", "the headline stroke"],
+    ["हिमालय", "Sanskrit", "the Himalaya"],
+    ["कहानियाँ", "Hindi", "stories"],
+    ["सुंदरता", "Hindi", "beauty"],
+    ["आनंदित", "Marathi", "joyful"],
+    ["सुगंधित", "Hindi", "fragrant"],
+    ["संपादक", "Marathi", "editor"],
+    ["रंगमंच", "Hindi", "stage"],
+    ["आमंत्रण", "Marathi", "invitation"],
+    ["नमस्कार", "Marathi", "greetings"],
+    ["चित्रकार", "Hindi", "painter"],
+    ["कार्यक्रम", "Hindi", "programme"],
+    ["मुद्राक्षर", "Marathi", "typeface"],
+    ["सांस्कृतिक", "Hindi", "cultural"],
+    ["अभिव्यक्ति", "Hindi", "expression"],
+    ["सर्वोत्तम", "Marathi", "the best"],
+    ["राष्ट्रभाषा", "Hindi", "national language"],
+    ["लिपिशास्त्र", "Sanskrit", "script studies"]
+  ];
+
+  var PER_BAND = Math.ceil(WORDS.length / BANDS.length);
+  var LEVELS = WORDS.map(function (w, i) {
+    var band = BANDS[Math.min(BANDS.length - 1, Math.floor(i / PER_BAND))];
+    return { id: i + 1, word: w[0], lang: w[1], meaning: w[2], band: band.name, tolerance: band.tolerance };
+  });
+
+  /* ----------------------------------------------------------------
+   * Game state
+   * ---------------------------------------------------------------- */
+  var levelIndex = 0;
+  var scores = {};
+  var tutorialDone = false;
+
+  var size = 0, metrics = null, truth = [], offsets = [], aksharas = [];
+  var active = 1, result = null;
+  var dragState = null;
+
+  var wrapEl = document.getElementById("board-wrap");
+  var svg = document.getElementById("board-svg");
+  var hintText = document.getElementById("hint-text");
+  var controlsEl = document.getElementById("controls");
+  var svgNS = "http://www.w3.org/2000/svg";
+
+  function currentLevel() { return LEVELS[levelIndex]; }
+
+  function computeSize() {
+    var w = wrapEl.clientWidth || 600;
+    var per = w / Math.max(2, aksharas.length + 1.2);
+    size = Math.max(40, Math.min(128, per));
+  }
+
+  function loadLevel() {
+    var level = currentLevel();
+    aksharas = splitAksharas(level.word);
+    computeSize();
+    result = null;
+
+    var afterFonts = function () {
+      var m = measureWord(level.word, size, FONT);
+      var t = [];
+      var acc = 0;
+      for (var i = 0; i < m.advances.length; i++) { t.push(acc); acc += m.advances[i]; }
+      metrics = m;
+      truth = t;
+      offsets = t.map(function (v, i) {
+        if (i === 0 || i === t.length - 1) return v;
+        return v + (Math.random() * 2 - 1) * size * 0.42;
+      });
+      active = t.length > 2 ? 1 : 0;
+      buildBoard();
+      updateFooter();
+    };
+
+    if (document.fonts) {
+      Promise.all([
+        document.fonts.load("700 " + size + "px " + FONT, level.word),
+        document.fonts.ready
+      ]).catch(function () {}).then(afterFonts);
+    } else {
+      afterFonts();
+    }
+  }
+
+  /* ----------------------------------------------------------------
+   * Rendering
+   * ---------------------------------------------------------------- */
+  function el(tag, attrs) {
+    var node = document.createElementNS(svgNS, tag);
+    for (var k in attrs) node.setAttribute(k, attrs[k]);
+    return node;
+  }
+
+  function currentGeometry() {
+    var pad = size * 0.6;
+    var playerWidth = offsets[offsets.length - 1] + metrics.advances[metrics.advances.length - 1];
+    var vbWidth = Math.max(playerWidth, metrics.totalWidth) + pad * 2;
+    var vbHeight = size * 2.1;
+    var baselineY = size * BASELINE_RATIO;
+    return { pad: pad, vbWidth: vbWidth, vbHeight: vbHeight, baselineY: baselineY };
+  }
+
+  function buildBoard() {
+    if (!metrics || offsets.length === 0) { svg.innerHTML = ""; return; }
+    var geo = currentGeometry();
+    svg.setAttribute("viewBox", "0 0 " + geo.vbWidth + " " + geo.vbHeight);
+    svg.innerHTML = "";
+
+    var guides = [
+      { y: Math.min(metrics.matraY, metrics.headlineY - size * 0.34) },
+      { y: metrics.headlineY },
+      { y: geo.baselineY },
+      { y: Math.min(geo.vbHeight - size * 0.12, Math.max(metrics.rukarY, geo.baselineY + size * 0.3)) }
+    ];
+    guides.forEach(function (g) {
+      svg.appendChild(el("line", {
+        x1: 0, x2: geo.vbWidth, y1: g.y, y2: g.y,
+        stroke: "var(--ink)", "stroke-width": 0.6, opacity: 0.34
+      }));
+    });
+
+    if (result) drawWord(truth, 0.28, false, geo);
+    drawWord(offsets, 1, true, geo);
+
+    if (currentLevel().id === 1 && !tutorialDone && offsets.length > 2 && !result) {
+      drawDragHint(geo);
+      hintText.hidden = false;
+    } else {
+      hintText.hidden = true;
+    }
+
+    renderControls();
+  }
+
+  function drawWord(xs, opacity, interactive, geo) {
+    var g = el("g", { opacity: opacity });
+    var start = xs[0];
+    var end = xs[xs.length - 1] + metrics.advances[metrics.advances.length - 1];
+    var headlineRect = el("rect", {
+      x: geo.pad + start, y: metrics.headlineY,
+      width: Math.max(1, end - start), height: metrics.headlineH,
+      fill: "var(--ink)"
+    });
+    if (interactive) headlineRect.id = "headline-rect";
+    g.appendChild(headlineRect);
+
+    aksharas.forEach(function (a, i) {
+      var t = el("text", {
+        x: geo.pad + xs[i], y: geo.baselineY,
+        "font-family": FONT, "font-weight": 700, "font-size": size,
+        fill: "var(--ink)"
+      });
+      t.textContent = a;
+      if (interactive) t.dataset.i = i;
+      g.appendChild(t);
+    });
+
+    if (interactive) {
+      aksharas.forEach(function (_, i) {
+        var draggable = i > 0 && i < xs.length - 1 && !result;
+        var hit = el("rect", {
+          class: "hit-rect",
+          x: geo.pad + xs[i], y: 0,
+          width: metrics.advances[i], height: geo.vbHeight,
+          fill: "transparent"
+        });
+        hit.style.cursor = draggable ? "ew-resize" : "default";
+        hit.dataset.hit = i;
+        if (!result) {
+          hit.addEventListener("pointerdown", makeStartDrag(i));
+          hit.addEventListener("pointermove", makeDragMove(i));
+          hit.addEventListener("pointerup", endDrag);
+          hit.addEventListener("pointercancel", endDrag);
+          hit.addEventListener("pointerenter", function () { setHover(i); });
+          hit.addEventListener("pointerleave", function () { setHover(null, i); });
+        }
+        g.appendChild(hit);
+      });
+    }
+    svg.appendChild(g);
+  }
+
+  function drawDragHint(geo) {
+    var hintIndex = Math.min(1, aksharas.length - 1);
+    var hintX = geo.pad + offsets[hintIndex] + metrics.advances[hintIndex] / 2;
+    var g = el("g", { class: "drag-hint", opacity: 0.85 });
+    var inner = el("g", { transform: "translate(" + hintX + "," + (size * 1.82) + ")" });
+    inner.appendChild(el("line", { x1: -size * 0.3, y1: 0, x2: size * 0.3, y2: 0, stroke: "var(--ink)", "stroke-width": 1 }));
+    inner.appendChild(el("polyline", {
+      points: (-size * 0.2) + "," + (-size * 0.06) + " " + (-size * 0.3) + ",0 " + (-size * 0.2) + "," + (size * 0.06),
+      fill: "none", stroke: "var(--ink)", "stroke-width": 1
+    }));
+    inner.appendChild(el("polyline", {
+      points: (size * 0.2) + "," + (-size * 0.06) + " " + (size * 0.3) + ",0 " + (size * 0.2) + "," + (size * 0.06),
+      fill: "none", stroke: "var(--ink)", "stroke-width": 1
+    }));
+    inner.appendChild(el("circle", { cx: 0, cy: 0, r: size * 0.07, fill: "var(--ink)", opacity: 0.7 }));
+    g.appendChild(inner);
+    svg.appendChild(g);
+  }
+
+  function setHover(i, leavingFrom) {
+    var texts = svg.querySelectorAll("text[data-i]");
+    if (i === null) {
+      texts.forEach(function (t) { t.style.opacity = 1; });
+      return;
+    }
+    texts.forEach(function (t) {
+      t.style.transition = "opacity 160ms ease";
+      t.style.opacity = (Number(t.dataset.i) === i) ? 1 : 0.35;
+    });
+  }
+
+  /** cheap position update during drag / keyboard nudge — no full rebuild */
+  function updatePositions() {
+    var geo = currentGeometry();
+    svg.setAttribute("viewBox", "0 0 " + geo.vbWidth + " " + geo.vbHeight);
+    var texts = svg.querySelectorAll("text[data-i]");
+    texts.forEach(function (t) {
+      var i = Number(t.dataset.i);
+      t.setAttribute("x", geo.pad + offsets[i]);
+    });
+    var hits = svg.querySelectorAll("rect.hit-rect");
+    hits.forEach(function (r) {
+      var i = Number(r.dataset.hit);
+      r.setAttribute("x", geo.pad + offsets[i]);
+    });
+    var headline = document.getElementById("headline-rect");
+    if (headline) {
+      var start = offsets[0];
+      var end = offsets[offsets.length - 1] + metrics.advances[metrics.advances.length - 1];
+      headline.setAttribute("x", geo.pad + start);
+      headline.setAttribute("width", Math.max(1, end - start));
+    }
+  }
+
+  /* ----------------------------------------------------------------
+   * Interaction: drag + keyboard nudge
+   * ---------------------------------------------------------------- */
+  function clampIndex(index, delta) {
+    if (index <= 0 || index >= offsets.length - 1) return;
+    var lo = offsets[index - 1] - size * 0.1;
+    var hi = offsets[index + 1] + size * 0.1;
+    offsets[index] = Math.min(hi, Math.max(lo, offsets[index] + delta));
+  }
+
+  function nudge(index, delta) {
+    if (result) return;
+    clampIndex(index, delta);
+    updatePositions();
+  }
+
+  function makeStartDrag(index) {
+    return function (e) {
+      active = index;
+      if (index === 0 || index === offsets.length - 1 || result) return;
+      hideTutorial();
+      var rect = svg.getBoundingClientRect();
+      dragState = {
+        index: index,
+        startX: e.clientX,
+        startOffset: offsets[index],
+        scale: currentGeometry().vbWidth / rect.width
+      };
+      e.currentTarget.setPointerCapture(e.pointerId);
+    };
+  }
+
+  function makeDragMove(index) {
+    return function (e) {
+      if (!dragState || dragState.index !== index) return;
+      var dx = (e.clientX - dragState.startX) * dragState.scale;
+      var lo = offsets[index - 1] - size * 0.1;
+      var hi = offsets[index + 1] + size * 0.1;
+      offsets[index] = Math.min(hi, Math.max(lo, dragState.startOffset + dx));
+      updatePositions();
+    };
+  }
+
+  function endDrag() { dragState = null; }
+
+  function hideTutorial() {
+    if (!tutorialDone) {
+      tutorialDone = true;
+      hintText.hidden = true;
+      var hint = svg.querySelector(".drag-hint");
+      if (hint) hint.remove();
+    }
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (offsets.length <= 2 || result) return;
+    var tag = (document.activeElement && document.activeElement.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    var step = e.shiftKey ? 10 : 1;
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      hideTutorial();
+      nudge(active, -step);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      hideTutorial();
+      nudge(active, step);
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      var last = offsets.length - 2;
+      active = e.shiftKey ? (active <= 1 ? last : active - 1) : (active >= last ? 1 : active + 1);
+    }
+  });
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(loadLevel, 150);
+  });
+
+  /* ----------------------------------------------------------------
+   * Controls: Compare / Shuffle / result
+   * ---------------------------------------------------------------- */
+  function renderControls() {
+    controlsEl.innerHTML = "";
+    if (!result) {
+      var compareBtn = document.createElement("button");
+      compareBtn.className = "btn sketch-box primary";
+      compareBtn.textContent = "Compare";
+      compareBtn.onclick = submit;
+
+      var shuffleBtn = document.createElement("button");
+      shuffleBtn.className = "btn sketch-box";
+      shuffleBtn.textContent = "Shuffle";
+      shuffleBtn.onclick = shuffle;
+
+      controlsEl.appendChild(compareBtn);
+      controlsEl.appendChild(shuffleBtn);
+    } else {
+      var wrap = document.createElement("div");
+      wrap.className = "result";
+      var pct = document.createElement("p");
+      pct.className = "pct " + (result.score >= 80 ? "good" : result.score < 50 ? "low" : "");
+      pct.textContent = result.score + "%";
+      var caption = document.createElement("p");
+      caption.textContent = "the faded word behind is the type designer\u2019s spacing";
+      wrap.appendChild(pct);
+      wrap.appendChild(caption);
+      controlsEl.appendChild(wrap);
+    }
+  }
+
+  function submit() {
+    var level = currentLevel();
+    var r = scoreOffsets(offsets, truth, size * level.tolerance);
+    result = { score: r.score };
+    scores[level.id] = Math.max(scores[level.id] || 0, r.score);
+    buildBoard();
+    updateFooter();
+    renderBandbar();
+  }
+
+  function shuffle() {
+    offsets = truth.map(function (v, i) {
+      if (i === 0 || i === truth.length - 1) return v;
+      return v + (Math.random() * 2 - 1) * size * 0.42;
+    });
+    result = null;
+    buildBoard();
+  }
+
+  /* ----------------------------------------------------------------
+   * Footer / navigation
+   * ---------------------------------------------------------------- */
+  var levelBadge = document.getElementById("level-badge");
+  var wordInfo = document.getElementById("word-info");
+  var avgScoreEl = document.getElementById("avg-score");
+  var btnPrev = document.getElementById("btn-prev");
+  var btnNext = document.getElementById("btn-next");
+
+  function updateFooter() {
+    var level = currentLevel();
+    levelBadge.textContent = "Level " + level.id + " / " + LEVELS.length + " \u00B7 " + level.band;
+    wordInfo.innerHTML = '<span class="dev-word">' + level.word + "</span> \u00B7 " + level.lang + " \u00B7 \u201C" + level.meaning + "\u201D";
+
+    var vals = Object.keys(scores).map(function (k) { return scores[k]; });
+    if (vals.length) {
+      var avg = Math.round(vals.reduce(function (a, b) { return a + b; }, 0) / vals.length);
+      avgScoreEl.textContent = "avg " + avg + "%";
+    } else {
+      avgScoreEl.textContent = "";
+    }
+    btnPrev.disabled = levelIndex === 0;
+  }
+
+  function renderBandbar() {
+    var bar = document.getElementById("bandbar");
+    bar.innerHTML = "";
+    LEVELS.forEach(function (lvl, i) {
+      var dot = document.createElement("span");
+      dot.className = "dot";
+      if (scores[lvl.id] !== undefined) dot.classList.add("done");
+      if (i === levelIndex) dot.classList.add("current");
+      dot.title = "Level " + lvl.id + ": " + lvl.word;
+      bar.appendChild(dot);
+    });
+  }
+
+  btnPrev.addEventListener("click", function () {
+    levelIndex = Math.max(0, levelIndex - 1);
+    loadLevel();
+    renderBandbar();
+  });
+  btnNext.addEventListener("click", function () {
+    levelIndex = Math.min(LEVELS.length - 1, levelIndex + 1);
+    loadLevel();
+    renderBandbar();
+  });
+
+  /* ----------------------------------------------------------------
+   * Decorative doodle strips
+   * ---------------------------------------------------------------- */
+  var DOODLE_H = "अ आ इ ई क ख ग घ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह";
+  document.getElementById("doodle-top").textContent = DOODLE_H;
+  document.getElementById("doodle-bottom").textContent = DOODLE_H;
+  var DOODLE_V = Array.from("टाईपोग्राफी");
+  ["doodle-left", "doodle-right"].forEach(function (id) {
+    var host = document.getElementById(id);
+    DOODLE_V.forEach(function (c) {
+      var span = document.createElement("span");
+      span.textContent = c;
+      host.appendChild(span);
+    });
+  });
+
+  /* ----------------------------------------------------------------
+   * Boot
+   * ---------------------------------------------------------------- */
+  renderBandbar();
+  loadLevel();
+})();
+</script>
+</body>
+</html>

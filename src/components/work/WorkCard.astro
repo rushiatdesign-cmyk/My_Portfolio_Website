@@ -1,0 +1,34 @@
+---
+import '../../styles/work-card.css';
+
+const { project } = Astro.props;
+const { title, description, image, client, tags } = project.data;
+---
+
+<a href={`/work/${project.id}`} class="work-card">
+  <!-- Left Side: Image -->
+  <div class="work-card__image-wrap">
+    <img src={image} alt={title} class="work-card__image" loading="lazy" />
+  </div>
+
+  <!-- Right Side: Content -->
+  <div class="work-card__content">
+    <div class="work-card__info">
+      <h2 class="work-card__title">{title}</h2>
+      <p class="work-card__description">{description}</p>
+    </div>
+
+    <div class="work-card__meta">
+      <div class="work-card__meta-item">
+        <span class="work-card__meta-label">Client</span>
+        <span class="work-card__meta-value">{client}</span>
+      </div>
+      <div class="work-card__meta-item">
+        <span class="work-card__meta-label">Category</span>
+        <span class="work-card__meta-value">
+          {tags.join(', ')}
+        </span>
+      </div>
+    </div>
+  </div>
+</a>
