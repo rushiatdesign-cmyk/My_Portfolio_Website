@@ -50,15 +50,10 @@ body {
   border-width: 43px 25px 36px 25px;
   border-color: #FFCA22;
   
-  /* Use mask-box-image to shape the solid #FFCA22 border */
   -webkit-mask-box-image-source: url('/images/stuff/stuffframe.PNG');
   -webkit-mask-box-image-slice: 15% 6% 13% 6%;
   -webkit-mask-box-image-width: 43px 25px 36px 25px;
   -webkit-mask-box-image-repeat: stretch;
-  mask-border-source: url('/images/stuff/stuffframe.PNG');
-  mask-border-slice: 15% 6% 13% 6%;
-  mask-border-width: 43px 25px 36px 25px;
-  mask-border-repeat: stretch;
 }
 
 /* ======================================================
