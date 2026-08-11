@@ -145,8 +145,8 @@ body {
   width: 100%;
   height: clamp(150px, 20vh, 250px);
   background-color: #FFCA22;
-  -webkit-mask: url('/images/About page/landscape.png') no-repeat top center / 100% auto;
-  mask: url('/images/About page/landscape.png') no-repeat top center / 100% auto;
+  -webkit-mask: url('/images/about/landscape.png') no-repeat top center / 100% auto;
+  mask: url('/images/about/landscape.png') no-repeat top center / 100% auto;
 }
 
 /* ======================================================
