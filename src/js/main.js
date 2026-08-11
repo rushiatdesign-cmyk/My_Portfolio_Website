@@ -95,7 +95,7 @@ function deactivateLayer(targetId) {
 	target.classList.remove('is-active');
 }
 
-function getShotPosition(shot, sceneNode) {
+function getShotPosition(shot, trackNode, sceneNode) {
 	if (shot.target === 'overview') {
 		return {
 			x: shot.xOffset ?? 0,
@@ -121,15 +121,33 @@ function getShotPosition(shot, sceneNode) {
 
 	const centerX = left + width / 2;
 	const centerY = top + height / 2;
+	const trackWidth = trackNode.offsetWidth;
+	const trackHeight = trackNode.offsetHeight;
 	const sceneWidth = sceneNode.offsetWidth;
 	const sceneHeight = sceneNode.offsetHeight;
-	const targetX = sceneWidth * (centerX / 100);
-	const targetY = sceneHeight * (centerY / 100);
+	const targetX = trackWidth * (centerX / 100);
+	const targetY = trackHeight * (centerY / 100);
+	const scale = shot.zoom ?? 1;
+
+	let desiredX = sceneWidth / 2 - targetX + (shot.xOffset ?? 0);
+	let desiredY = trackHeight - sceneHeight / 2 - targetY + (shot.yOffset ?? 0);
+
+	const minX = sceneWidth / 2 + sceneWidth / (2 * scale) - trackWidth;
+	const maxX = sceneWidth / 2 - sceneWidth / (2 * scale);
+	const minY = sceneHeight / (2 * scale) - sceneHeight / 2;
+	const maxY = trackHeight - sceneHeight / 2 - sceneHeight / (2 * scale);
+
+	if (minX <= maxX) {
+		desiredX = Math.max(minX, Math.min(maxX, desiredX));
+	}
+	if (minY <= maxY) {
+		desiredY = Math.max(minY, Math.min(maxY, desiredY));
+	}
 
 	return {
-		x: sceneWidth / 2 - targetX + (shot.xOffset ?? 0),
-		y: sceneHeight / 2 - targetY + (shot.yOffset ?? 0),
-		scale: shot.zoom ?? 1,
+		x: desiredX,
+		y: desiredY,
+		scale: scale,
 	};
 }
 
@@ -152,7 +170,7 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 			timeline = null;
 		}
 
-		const initialShot = getShotPosition(CAMERA_SHOTS[0], sceneNode);
+		const initialShot = getShotPosition(CAMERA_SHOTS[0], trackNode, sceneNode);
 
 		gsap.set(cameraNode, {
 			scale: initialShot.scale,
@@ -182,7 +200,7 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 
 		for (let index = 1; index < CAMERA_SHOTS.length; index += 1) {
 			const shot = CAMERA_SHOTS[index];
-			const camera = getShotPosition(shot, sceneNode);
+			const camera = getShotPosition(shot, trackNode, sceneNode);
 			const label = `shot-${index}`;
 
 			timeline.to(
