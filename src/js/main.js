@@ -354,8 +354,27 @@ function initHeroSection() {
 	window.__heroScrollScene = scrollScene;
 }
 
+function initScootyAnimation() {
+	const scooty = document.getElementById('hero-scooty');
+	if (!scooty) return;
+
+	// Fetch the GIF as a raw blob so it is stored in memory.
+	fetch(scooty.src)
+		.then((res) => res.blob())
+		.then((blob) => {
+			// Every time the CSS animation loops back to the start, 
+			// we generate a brand new Blob URL for the image.
+			// This completely bypasses the browser cache and forces the GIF
+			// to flawlessly restart from frame 0 without any flickering or network requests!
+			scooty.addEventListener('animationiteration', () => {
+				scooty.src = URL.createObjectURL(blob);
+			});
+		});
+}
+
 window.addEventListener('DOMContentLoaded', () => {
 	initHotspots();
 	initHeroSection();
+	initScootyAnimation();
 	initModals();
 });

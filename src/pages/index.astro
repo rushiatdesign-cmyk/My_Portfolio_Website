@@ -8,6 +8,8 @@ import building3Top from "../../Images/building_3_top.webp";
 import building4Top from "../../Images/building_4_top.webp";
 import building5Top from "../../Images/building_5_top.webp";
 import building6Top from "../../Images/building_6_top.webp";
+import scootyGif from "../../Images/scooty.gif?url";
+import cloudsImg from "../../Images/clouds.webp";
 import ModalShell from "../components/modals/ModalShell.astro";
 
 // The source art is 6000x4000 — tiny on disk (WebP) but ~96MB each once the
@@ -44,6 +46,26 @@ const layers = [
 			<div id="hero-scene" class="scene">
 				<div id="hero-camera" class="camera">
 					<div id="hero-scene-track" class="scene__track">
+						<div class="scene__clouds">
+							<Image
+								id="hero-clouds-1"
+								class="scene__clouds-img"
+								src={cloudsImg}
+								width={HERO_WIDTH}
+								alt="Clouds"
+								loading="eager"
+								fetchpriority="high"
+							/>
+							<Image
+								id="hero-clouds-2"
+								class="scene__clouds-img"
+								src={cloudsImg}
+								width={HERO_WIDTH}
+								alt="Clouds"
+								loading="eager"
+								fetchpriority="high"
+							/>
+						</div>
 						<Image
 							id="hero-ground"
 							class="scene__ground"
@@ -52,6 +74,13 @@ const layers = [
 							alt="Ground background"
 							loading="eager"
 							fetchpriority="high"
+						/>
+
+						<img
+							id="hero-scooty"
+							class="scene__scooty"
+							src={scootyGif}
+							alt="Scooter"
 						/>
 
 						<div class="scene__stage">

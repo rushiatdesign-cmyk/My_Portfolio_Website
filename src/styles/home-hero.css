@@ -59,6 +59,59 @@ body {
 	object-fit: contain;
 }
 
+.scene__clouds {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 200%;
+	height: 100%;
+	display: flex;
+	pointer-events: none;
+	animation: floatClouds 20s linear infinite;
+	will-change: transform;
+	margin-top: -2%;
+}
+
+.scene__clouds-img {
+	width: 50%;
+	height: 100%;
+	object-fit: cover;
+	pointer-events: none;
+}
+
+.scene__scooty {
+	position: absolute;
+	/* The base left value is now driven by the animation */
+	top: 76%;
+	width: 14%;
+	/* Adjust to make it smaller or larger */
+	height: auto;
+	z-index: 2;
+	pointer-events: none;
+	animation: driveScooty 10s linear infinite;
+	will-change: left;
+}
+
+@keyframes driveScooty {
+	0% {
+		left: -12%;
+	}
+
+	100% {
+		left: 100%;
+	}
+}
+
+@keyframes floatClouds {
+	0% {
+		transform: translateX(0);
+	}
+
+	100% {
+		transform: translateX(-50%);
+	}
+}
+
 .scene__ground {
 	z-index: 1;
 }
