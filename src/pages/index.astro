@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import "../styles/home-hero.css";
 import buildingsGround from "../../Images/buildings_ground.webp";
 import building1Top from "../../Images/building_1_top.webp";
@@ -9,13 +10,21 @@ import building5Top from "../../Images/building_5_top.webp";
 import building6Top from "../../Images/building_6_top.webp";
 import ModalShell from "../components/modals/ModalShell.astro";
 
+// The source art is 6000x4000 — tiny on disk (WebP) but ~96MB each once the
+// browser decodes it to a bitmap to draw. We only ever show it full-screen, so
+// cap the rendered width. Astro (via Sharp) regenerates optimized WebP at this
+// size at build time. 4096 keeps it crisp even at the 3x zoom shots while
+// roughly halving decoded memory (~96MB -> ~45MB per layer). Lower this toward
+// 3000 for even less memory if the zoom still looks sharp enough to you.
+const HERO_WIDTH = 4096;
+
 const layers = [
-	{ src: building1Top.src, alt: "Building 1" },
-	{ src: building2Top.src, alt: "Building 2" },
-	{ src: building3Top.src, alt: "Building 3" },
-	{ src: building4Top.src, alt: "Building 4" },
-	{ src: building5Top.src, alt: "Building 5" },
-	{ src: building6Top.src, alt: "Building 6" },
+	{ id: "building-1", img: building1Top, alt: "Building 1" },
+	{ id: "building-2", img: building2Top, alt: "Building 2" },
+	{ id: "building-3", img: building3Top, alt: "Building 3" },
+	{ id: "building-4", img: building4Top, alt: "Building 4" },
+	{ id: "building-5", img: building5Top, alt: "Building 5" },
+	{ id: "building-6", img: building6Top, alt: "Building 6" },
 ];
 ---
 
@@ -35,44 +44,29 @@ const layers = [
 			<div id="hero-scene" class="scene">
 				<div id="hero-camera" class="camera">
 					<div id="hero-scene-track" class="scene__track">
-						<img
+						<Image
 							id="hero-ground"
 							class="scene__ground"
-							src={buildingsGround.src}
+							src={buildingsGround}
+							width={HERO_WIDTH}
 							alt="Ground background"
+							loading="eager"
+							fetchpriority="high"
 						/>
 
 						<div class="scene__stage">
-							<img
-								id="building-1"
-								class="scene__layer"
-								src={building1Top.src}
-							/>
-							<img
-								id="building-2"
-								class="scene__layer"
-								src={building2Top.src}
-							/>
-							<img
-								id="building-3"
-								class="scene__layer"
-								src={building3Top.src}
-							/>
-							<img
-								id="building-4"
-								class="scene__layer"
-								src={building4Top.src}
-							/>
-							<img
-								id="building-5"
-								class="scene__layer"
-								src={building5Top.src}
-							/>
-							<img
-								id="building-6"
-								class="scene__layer"
-								src={building6Top.src}
-							/>
+							{
+								layers.map((layer) => (
+									<Image
+										id={layer.id}
+										class="scene__layer"
+										src={layer.img}
+										width={HERO_WIDTH}
+										alt={layer.alt}
+										loading="eager"
+									/>
+								))
+							}
 
 							<div class="hotspot-layer">
 								<div
