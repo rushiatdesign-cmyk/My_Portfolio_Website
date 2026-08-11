@@ -1,44 +1,50 @@
 ---
-/**
- * work.astro — /work
- */
-import { getCollection } from 'astro:content';
-import '../styles/work.css';
+import { getCollection, render } from 'astro:content';
+import { calcReadingTime } from '../components/content/ReadingTime.ts';
+import WorkLayout from '../layouts/WorkLayout.astro';
 
-const rawPosts = await getCollection('work');
+const rawPosts = await getCollection('blog');
 const sortedPosts = rawPosts.sort(
   (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
 );
+
+const postsWithHtml = await Promise.all(
+  sortedPosts.map(async (post) => {
+    const { Content } = await render(post);
+    return { post, Content };
+  })
+);
+
+function fmtDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
 ---
 
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width" />
-  <link rel="icon" href="/favicon.ico" />
-  <title>Work — Portfolio</title>
-  <meta name="description" content="Projects and case studies." />
-</head>
-<body class="work-page">
-  <nav class="work-nav" aria-label="Site navigation">
-    <a href="/" class="work-nav__logo">Portfolio</a>
-    <ul class="work-nav__links">
-      <li><a href="/blog">Blog</a></li>
-      <li><a href="/work" aria-current="page">Work</a></li>
-      <li><a href="/gallery">Gallery</a></li>
-      <li><a href="/stuff">Stuff</a></li>
-    </ul>
-  </nav>
-  
-  <main class="work-main">
-    <h1>Work</h1>
-    <div class="work-grid">
-      {sortedPosts.map(post => (
-        <a href={`/work/${post.id}`} class="work-card">
-          <h2>{post.data.title}</h2>
-        </a>
-      ))}
-    </div>
-  </main>
-</body>
-</html>
+<WorkLayout>
+  <!-- About logo banner — top center -->
+  <header class="work-header">
+    <div class="work-logo" aria-label="About"></div>
+  </header>
+
+  <!-- Temporary empty space to allow scrolling so the header behavior can be tested -->
+  <div style="min-height: 200vh;"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Header scroll hide/show logic
+      let lastScrollY = window.scrollY;
+      const header = document.querySelector('.work-header');
+
+      window.addEventListener('scroll', () => {
+        if (!header) return;
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 150) {
+          header.classList.add('is-hidden');
+        } else {
+          header.classList.remove('is-hidden');
+        }
+        lastScrollY = currentScrollY;
+      }, { passive: true });
+    });
+  </script>
+</WorkLayout>

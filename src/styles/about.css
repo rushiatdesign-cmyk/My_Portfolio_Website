@@ -132,8 +132,8 @@ body {
 .about-footer-zone {
   position: fixed;
   bottom: calc(4dvh + 4px); /* Align perfectly on top of the thin border baseline */
-  left: 0;
-  right: 0;
+  left: 4dvw;
+  right: 4dvw;
   z-index: 115;
   pointer-events: none;
   display: flex;
@@ -142,11 +142,11 @@ body {
 }
 
 .about-landscape {
-  width: clamp(300px, 70vw, 900px);
-  height: clamp(100px, 20vh, 300px);
+  width: 100%;
+  height: clamp(150px, 20vh, 250px);
   background-color: #FFCA22;
-  -webkit-mask: url('/images/About page/landscape.png') no-repeat bottom center / contain;
-  mask: url('/images/About page/landscape.png') no-repeat bottom center / contain;
+  -webkit-mask: url('/images/About page/landscape.png') no-repeat top center / 100% auto;
+  mask: url('/images/About page/landscape.png') no-repeat top center / 100% auto;
 }
 
 /* ======================================================

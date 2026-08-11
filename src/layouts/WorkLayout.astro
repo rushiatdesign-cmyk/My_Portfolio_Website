@@ -1,0 +1,62 @@
+---
+import "../styles/work.css";
+import "../styles/blog-card.css"; // Reuse blog cards for now
+
+export interface Props {
+  pageTitle?: string;
+  description?: string;
+}
+
+const {
+  pageTitle = "Work — Portfolio",
+  description = "Learn more about me.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Slackey&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <!-- Fixed full-viewport frame border (from stuff, colored #FFCA22) -->
+    <div class="work-frame-bg" aria-hidden="true"></div>
+    <div class="work-frame" aria-hidden="true"></div>
+
+    <!-- Fixed decorative elements -->
+    <!-- We keep the trees, but remove the bottom door frames -->
+    <img
+      src="/images/frame/treeleft.PNG"
+      class="work-deco work-deco--treeleft"
+      alt=""
+      aria-hidden="true"
+    />
+    <img
+      src="/images/frame/treeright.PNG"
+      class="work-deco work-deco--treeright"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <!-- Footer zone: landscape image at the bottom, colored #FFCA22 via CSS mask -->
+    <div class="work-footer-zone" aria-hidden="true">
+      <div class="work-landscape"></div>
+    </div>
+
+    <!-- Scrollable page content -->
+    <main class="work-layout-content">
+      <slot />
+    </main>
+  </body>
+</html>
