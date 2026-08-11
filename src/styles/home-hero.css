@@ -67,7 +67,9 @@ body {
 	z-index: 2;
 	transform: translateY(10px);
 	transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
-	will-change: transform;
+	/* No will-change here: these 6 layers never move during scroll (only the
+	   camera scales and the track pans), so promoting each to its own GPU layer
+	   just wastes memory. They paint into the track's single layer instead. */
 }
 
 .scene__layer.is-active {

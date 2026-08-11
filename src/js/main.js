@@ -194,6 +194,19 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 				onUpdate: (self) => {
 					if (isKeyboardJumping) return;
 					currentShotIndex = getNearestShotIndex(self.progress);
+
+					// Track zoom from the shot data instead of reading the DOM every
+					// frame. GSAP is the one setting the scale, so we already know it —
+					// this avoids a forced style/layout flush on every scroll frame.
+					const nextScale = CAMERA_SHOTS[currentShotIndex].zoom ?? 1;
+					// Only clear lingering hover "lifts" on the frame we first zoom in,
+					// not on every frame.
+					if (nextScale > 1 && currentCameraScale === 1) {
+						document
+							.querySelectorAll('.scene__layer.is-active')
+							.forEach((el) => el.classList.remove('is-active'));
+					}
+					currentCameraScale = nextScale;
 				},
 			},
 		});
@@ -220,15 +233,6 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 					scale: camera.scale,
 					duration: heroSettings.shotDuration,
 					ease: heroSettings.ease,
-					onUpdate() {
-						// Keep currentCameraScale in sync so activateLayer can gate the hover.
-						const matrix = new DOMMatrix(window.getComputedStyle(cameraNode).transform);
-						currentCameraScale = matrix.a; // 'a' is the X scale component
-						// If we zoomed in, immediately remove any active building-top lift.
-						if (currentCameraScale > 1) {
-							document.querySelectorAll('.scene__layer.is-active').forEach(el => el.classList.remove('is-active'));
-						}
-					},
 				},
 				label
 			);
