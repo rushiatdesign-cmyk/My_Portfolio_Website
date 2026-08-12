@@ -79,7 +79,7 @@ body {
 	top: 0;
 	width: 200%;
 	height: 100%;
-	z-index: 5;
+	z-index: 1;
 	pointer-events: none;
 	display: flex;
 	pointer-events: none;

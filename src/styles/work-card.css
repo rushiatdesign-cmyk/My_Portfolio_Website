@@ -4,7 +4,7 @@
   border-image-source: url('/images/work/work_border.PNG');
   border-image-slice: 25% 8%;
   border-image-repeat: round;
-  background-color: transparent;
+  background-color: #f5e2a8;
 
   display: flex;
   flex-direction: column;
@@ -13,7 +13,8 @@
   margin: 0 auto clamp(40px, 6vh, 80px) auto;
   width: 100%;
   position: relative;
-  z-index: 20; /* Middle: Above header (10), below frame (30) */
+  z-index: 20;
+  /* Middle: Above header (10), below frame (30) */
   text-decoration: none;
   color: inherit;
   outline: none;
