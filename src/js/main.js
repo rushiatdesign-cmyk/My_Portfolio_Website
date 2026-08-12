@@ -376,13 +376,37 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 	const mobilePrevBtn = document.getElementById('mobile-nav-prev');
 	const mobileNextBtn = document.getElementById('mobile-nav-next');
 
-	const handleMobilePrev = () => goToShot(currentShotIndex - 1);
-	const handleMobileNext = () => goToShot(currentShotIndex + 1);
+	const handleMobilePrev = () => {
+		// Prevent going back to the first overview (index 0)
+		if (currentShotIndex <= 1) return;
+		goToShot(currentShotIndex - 1);
+	};
+
+	const handleMobileNext = () => {
+		const isMobile = window.innerWidth <= 768;
+		const currentShots = isMobile ? MOBILE_CAMERA_SHOTS : DESKTOP_CAMERA_SHOTS;
+		// If at the final overview, loop back to Building 1
+		if (currentShotIndex >= currentShots.length - 1) {
+			goToShot(1);
+		} else {
+			goToShot(currentShotIndex + 1);
+		}
+	};
 
 	if (mobilePrevBtn) mobilePrevBtn.addEventListener('click', handleMobilePrev);
 	if (mobileNextBtn) mobileNextBtn.addEventListener('click', handleMobileNext);
 
 	build();
+
+	const isMobile = window.innerWidth <= 768;
+	if (isMobile) {
+		// Wait 1.5 seconds to ensure the user sees the initial wide view, then zoom to Building 1
+		setTimeout(() => {
+			if (currentShotIndex === 0 && window.scrollY < 50) {
+				goToShot(1);
+			}
+		}, 1500);
+	}
 
 	return {
 		refresh() {
