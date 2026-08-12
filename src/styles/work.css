@@ -80,7 +80,7 @@ body {
 }
 
 .work-logo {
-  width: clamp(200px, 48vw, 540px);
+  width: clamp(120px, 28.8vw, 324px);
   aspect-ratio: 540 / 140;
   /* matches blog logo proportions */
   height: auto;

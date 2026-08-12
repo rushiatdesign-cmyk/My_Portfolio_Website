@@ -1,5 +1,6 @@
 ---
 import "../styles/stuff.css";
+import TopNav from "../components/navigation/TopNav.astro";
 
 export interface Props {
   pageTitle?: string;
@@ -35,6 +36,7 @@ const {
 
     <!-- Sticky logo at top-center -->
     <header class="stuff-header">
+      <TopNav />
       <img
         src="/images/stuff/stufflogo.PNG"
         class="stuff-logo"

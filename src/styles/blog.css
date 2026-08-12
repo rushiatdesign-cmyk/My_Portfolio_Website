@@ -137,7 +137,8 @@ body.modal-open .blog-deco {
 }
 
 .blog-bottom-bar {
-  height: 3vh; /* Reduced by 50% from 6vh */
+  height: 3vh;
+  /* Reduced by 50% from 6vh */
   background-color: #FD6244;
   width: 100%;
   flex-shrink: 0;
@@ -185,8 +186,9 @@ body.modal-open .blog-grid {
 }
 
 .blog-logo {
-  width: clamp(200px, 48vw, 540px);
+  width: clamp(120px, 29vw, 324px);
   height: auto;
+  margin-top: 1vh;
   display: block;
 }
 

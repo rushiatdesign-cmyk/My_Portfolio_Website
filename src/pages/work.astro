@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import WorkLayout from '../layouts/WorkLayout.astro';
 import WorkCard from '../components/work/WorkCard.astro';
+import TopNav from '../components/navigation/TopNav.astro';
 
 const rawProjects = await getCollection('work');
 const sortedProjects = rawProjects.sort(
@@ -12,6 +13,7 @@ const sortedProjects = rawProjects.sort(
 <WorkLayout>
   <!-- Work logo banner — top center -->
   <header class="work-header">
+    <TopNav />
     <div class="work-logo" aria-label="Work"></div>
   </header>
 

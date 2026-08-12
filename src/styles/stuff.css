@@ -79,7 +79,7 @@
 }
 
 .stuff-logo {
-  width: clamp(198px, 31vw, 418px);
+  width: clamp(158.8px, 18.6vw, 270.8px);
   height: auto;
   display: block;
   pointer-events: none;
@@ -149,7 +149,8 @@
 @media (max-width: 768px) {
   .stuff-arrow {
     top: auto;
-    bottom: clamp(100px, 15vh, 180px); /* Position below cards */
+    bottom: clamp(100px, 15vh, 180px);
+    /* Position below cards */
     transform: none;
   }
 
@@ -164,7 +165,8 @@
     transform: translateX(-50%);
   }
 
-  .stuff-arrow--left:hover, .stuff-arrow--right:hover {
+  .stuff-arrow--left:hover,
+  .stuff-arrow--right:hover {
     transform: translateX(-50%) scale(1.15);
   }
 }

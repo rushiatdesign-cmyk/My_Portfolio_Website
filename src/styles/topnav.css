@@ -1,0 +1,57 @@
+/* ======================================================
+   TOP NAVIGATION
+====================================================== */
+.global-top-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(16px, 4vw, 40px);
+  padding: 10px 0;
+  width: 100%;
+}
+
+.global-top-nav a {
+  font-family: 'Slackey', cursive;
+  font-size: clamp(10px, 2.5vw, 10px);
+  color: #fff;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.global-top-nav a:hover {
+  transform: scale(1.1) rotate(-2deg);
+  opacity: 0.8;
+}
+
+/* Ensure the nav text contrasts against the header backgrounds */
+/* In work.css header is #F4AB26. Black or dark navy (#0B2838) looks good. */
+.work-header .global-top-nav a {
+  color: #0B2838;
+}
+
+/* In about.css header is #A52C39. Yellow (#FFCA22) looks good. */
+.about-header .global-top-nav a {
+  margin-top: 0.7%;
+  color: #FFCA22;
+}
+
+/* In blog.css header is transparent or colored. Let's use #0B2838. */
+.blog-header .global-top-nav a {
+  color: #FE6244;
+}
+
+/* In stuff.css header is #FFCA22. Let's use #0B2838. */
+.stuff-header .global-top-nav a {
+  margin-top: 0.7%;
+  color: #FBCB53;
+}
+
+/* Give the header container flex-direction column so nav sits above logo */
+.about-header,
+.blog-header,
+.stuff-header,
+.work-header {
+  flex-direction: column;
+  align-items: center;
+}

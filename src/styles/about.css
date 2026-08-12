@@ -79,7 +79,7 @@ body {
 }
 
 .about-logo {
-  width: clamp(200px, 48vw, 540px);
+  width: clamp(100px, 48vw, 340px);
   aspect-ratio: 540 / 140;
   /* matches blog logo proportions */
   height: auto;

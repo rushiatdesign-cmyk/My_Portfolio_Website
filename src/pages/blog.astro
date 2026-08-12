@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import { calcReadingTime } from '../components/content/ReadingTime.ts';
 import BlogLayout from '../layouts/BlogLayout.astro';
+import TopNav from '../components/navigation/TopNav.astro';
 
 const rawPosts = await getCollection('blog');
 const sortedPosts = rawPosts.sort(
@@ -23,6 +24,7 @@ function fmtDate(d: Date) {
 <BlogLayout>
   <!-- Blog logo banner — top center -->
   <header class="blog-header">
+    <TopNav />
     <img src="/images/frame/bloglogo.PNG" class="blog-logo" alt="Blog" />
   </header>
 
