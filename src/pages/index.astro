@@ -12,13 +12,10 @@ import scootyGif from "../../Images/scooty.gif?url";
 import cloudsImg from "../../Images/clouds.webp";
 import ModalShell from "../components/modals/ModalShell.astro";
 
-// The source art is 6000x4000 — tiny on disk (WebP) but ~96MB each once the
-// browser decodes it to a bitmap to draw. We only ever show it full-screen, so
-// cap the rendered width. Astro (via Sharp) regenerates optimized WebP at this
-// size at build time. 4096 keeps it crisp even at the 3x zoom shots while
-// roughly halving decoded memory (~96MB -> ~45MB per layer). Lower this toward
-// 3000 for even less memory if the zoom still looks sharp enough to you.
-const HERO_WIDTH = 4096;
+// The source art is 6000x4000. By keeping it at 6000 and forcing quality="max",
+// we prevent Astro from compressing or downsizing the image, keeping it 
+// razor-sharp even at maximum GSAP camera zoom levels.
+const HERO_WIDTH = 6000;
 
 const layers = [
 	{ id: "building-1", img: building1Top, alt: "Building 1" },
@@ -52,6 +49,7 @@ const layers = [
 								class="scene__clouds-img"
 								src={cloudsImg}
 								width={HERO_WIDTH}
+								quality="max"
 								alt="Clouds"
 								loading="eager"
 								fetchpriority="high"
@@ -61,6 +59,7 @@ const layers = [
 								class="scene__clouds-img"
 								src={cloudsImg}
 								width={HERO_WIDTH}
+								quality="max"
 								alt="Clouds"
 								loading="eager"
 								fetchpriority="high"
@@ -71,6 +70,7 @@ const layers = [
 							class="scene__ground"
 							src={buildingsGround}
 							width={HERO_WIDTH}
+							quality="max"
 							alt="Ground background"
 							loading="eager"
 							fetchpriority="high"
@@ -91,6 +91,7 @@ const layers = [
 										class="scene__layer"
 										src={layer.img}
 										width={HERO_WIDTH}
+										quality="max"
 										alt={layer.alt}
 										loading="eager"
 									/>
