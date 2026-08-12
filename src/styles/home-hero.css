@@ -169,10 +169,8 @@ body {
 	width: var(--bx-width, 10%);
 	height: var(--bx-height, 10%);
 
-	border: 1px solid red;
-	/* debug — remove once positioned */
-	background: rgba(255, 0, 0, 0.25);
-	/* debug — remove once positioned */
+	border: none;
+	background: transparent;
 	cursor: pointer;
 	pointer-events: auto;
 	padding: 0;
