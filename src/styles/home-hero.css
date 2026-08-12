@@ -59,12 +59,28 @@ body {
 	object-fit: contain;
 }
 
+.hero-bg-logo {
+	position: absolute;
+	top: 18%;
+	left: 50%;
+	transform: translateX(-50%);
+	font-family: 'Slackey';
+	font-size: clamp(60px, 8vw, 300px);
+	color: #C6E6F9;
+	opacity: 0.8;
+	pointer-events: none;
+	white-space: nowrap;
+	z-index: 1;
+}
+
 .scene__clouds {
 	position: absolute;
 	left: 0;
 	top: 0;
 	width: 200%;
 	height: 100%;
+	z-index: 5;
+	pointer-events: none;
 	display: flex;
 	pointer-events: none;
 	animation: floatClouds 20s linear infinite;

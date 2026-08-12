@@ -137,7 +137,7 @@ body.modal-open .blog-deco {
 }
 
 .blog-bottom-bar {
-  height: 6vh;
+  height: 3vh; /* Reduced by 50% from 6vh */
   background-color: #FD6244;
   width: 100%;
   flex-shrink: 0;
