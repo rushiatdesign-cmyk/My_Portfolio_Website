@@ -182,3 +182,48 @@ body {
 	outline: 2px solid #000;
 	outline-offset: 2px;
 }
+
+/* Mobile Navigation UI */
+.mobile-nav {
+	display: none;
+}
+
+@media (max-width: 768px) {
+	.mobile-nav {
+		display: flex;
+		position: fixed;
+		bottom: 24px;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 100;
+		background: #0B2838; /* Deep navy */
+		border: 2px solid #FFCA22; /* Gold accent */
+		border-radius: 9999px;
+		padding: 8px 16px;
+		align-items: center;
+		gap: 16px;
+		box-shadow: 4px 4px 0px #FFCA22;
+	}
+	.mobile-nav-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 4px;
+		color: #FFCA22;
+		transition: transform 0.2s;
+	}
+	.mobile-nav-btn:active {
+		transform: scale(0.9);
+	}
+	.mobile-nav-indicator {
+		font-family: inherit;
+		font-weight: 700;
+		color: #FFCA22;
+		min-width: 4ch;
+		text-align: center;
+		font-size: 14px;
+	}
+}

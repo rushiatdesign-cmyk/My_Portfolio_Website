@@ -22,7 +22,7 @@ const heroSettings = {
 	keyboardScrollDuration: 1, // seconds, for arrow/number-key jumps
 };
 
-const CAMERA_SHOTS = [
+const DESKTOP_CAMERA_SHOTS = [
 	{ target: 'overview', zoom: 1, xOffset: 0, yOffset: 0 },     // 1. Full overview
 	{ target: 1, zoom: 2.2, xOffset: -40, yOffset: 0 },        // 2. Building 1
 	{ target: 2, zoom: 2.4, xOffset: -20, yOffset: 0 },         // 3. Building 2
@@ -31,6 +31,18 @@ const CAMERA_SHOTS = [
 	{ target: 4, zoom: 2.2, xOffset: -50, yOffset: 0 },          // 6. Building 4
 	{ target: 5, zoom: 2.4, xOffset: 20, yOffset: 0 },          // 7. Building 5
 	{ target: 6, zoom: 2.2, xOffset: 10, yOffset: 10 },          // 8. Building 6
+	{ target: 'overview', zoom: 1, xOffset: 0, yOffset: 0 },     // 9. Full overview
+];
+
+const MOBILE_CAMERA_SHOTS = [
+	{ target: 'overview', zoom: 1, xOffset: 0, yOffset: 0 },     // 1. Full overview
+	{ target: 1, zoom: 4, xOffset: 80, yOffset: 0 },        // 2. Building 1
+	{ target: 2, zoom: 4, xOffset: 0, yOffset: 0 },         // 3. Building 2
+	{ target: 3, zoom: 4, xOffset: -10, yOffset: 60 },     // 4. Building 3 balcony
+	{ target: 3, zoom: 4, xOffset: -10, yOffset: 0 },       // 5. Building 3 storefront
+	{ target: 4, zoom: 4, xOffset: 0, yOffset: 0 },          // 6. Building 4
+	{ target: 5, zoom: 4, xOffset: 10, yOffset: 0 },          // 7. Building 5
+	{ target: 6, zoom: 4, xOffset: 0, yOffset: 10 },          // 8. Building 6
 	{ target: 'overview', zoom: 1, xOffset: 0, yOffset: 0 },     // 9. Full overview
 ];
 
@@ -97,9 +109,24 @@ function deactivateLayer(targetId) {
 
 function getShotPosition(shot, trackNode, sceneNode) {
 	if (shot.target === 'overview') {
+		const isMobile = window.innerWidth <= 768;
+		let desiredX = shot.xOffset ?? 0;
+		let desiredY = shot.yOffset ?? 0;
+
+		if (isMobile) {
+			const trackWidth = trackNode.offsetWidth;
+			const trackHeight = trackNode.offsetHeight;
+			const sceneWidth = sceneNode.offsetWidth;
+			const sceneHeight = sceneNode.offsetHeight;
+
+			// Center the scene vertically and horizontally on mobile
+			desiredX = (sceneWidth / 2) - (trackWidth / 2) + (shot.xOffset ?? 0);
+			desiredY = (trackHeight / 2) - (sceneHeight / 2) + (shot.yOffset ?? 0);
+		}
+
 		return {
-			x: shot.xOffset ?? 0,
-			y: shot.yOffset ?? 0,
+			x: desiredX,
+			y: desiredY,
 			scale: shot.zoom ?? 1,
 		};
 	}
@@ -164,13 +191,16 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 	let isKeyboardJumping = false;
 
 	function build() {
+		const isMobile = window.innerWidth <= 768;
+		const currentShots = isMobile ? MOBILE_CAMERA_SHOTS : DESKTOP_CAMERA_SHOTS;
+
 		if (timeline) {
 			timeline.scrollTrigger?.kill();
 			timeline.kill();
 			timeline = null;
 		}
 
-		const initialShot = getShotPosition(CAMERA_SHOTS[0], trackNode, sceneNode);
+		const initialShot = getShotPosition(currentShots[0], trackNode, sceneNode);
 
 		gsap.set(cameraNode, {
 			scale: initialShot.scale,
@@ -198,7 +228,7 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 					// Track zoom from the shot data instead of reading the DOM every
 					// frame. GSAP is the one setting the scale, so we already know it —
 					// this avoids a forced style/layout flush on every scroll frame.
-					const nextScale = CAMERA_SHOTS[currentShotIndex].zoom ?? 1;
+					const nextScale = currentShots[currentShotIndex].zoom ?? 1;
 					// Only clear lingering hover "lifts" on the frame we first zoom in,
 					// not on every frame.
 					if (nextScale > 1 && currentCameraScale === 1) {
@@ -207,12 +237,21 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 							.forEach((el) => el.classList.remove('is-active'));
 					}
 					currentCameraScale = nextScale;
+
+					updateMobileNavIndicator();
 				},
 			},
 		});
 
-		for (let index = 1; index < CAMERA_SHOTS.length; index += 1) {
-			const shot = CAMERA_SHOTS[index];
+		function updateMobileNavIndicator() {
+			const indicator = document.getElementById('mobile-nav-indicator');
+			if (indicator) {
+				indicator.textContent = `${currentShotIndex + 1} / ${currentShots.length}`;
+			}
+		}
+
+		for (let index = 1; index < currentShots.length; index += 1) {
+			const shot = currentShots[index];
 			const camera = getShotPosition(shot, trackNode, sceneNode);
 			const label = `shot-${index}`;
 
@@ -237,7 +276,7 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 				label
 			);
 
-			if (index !== CAMERA_SHOTS.length - 1) {
+			if (index !== currentShots.length - 1) {
 				timeline.to({}, { duration: heroSettings.betweenShotPause }, `>-${heroSettings.betweenShotPause * 0.5}`);
 			}
 		}
@@ -246,13 +285,16 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 	}
 
 	function getNearestShotIndex(progress) {
+		const isMobile = window.innerWidth <= 768;
+		const currentShots = isMobile ? MOBILE_CAMERA_SHOTS : DESKTOP_CAMERA_SHOTS;
+
 		const totalDuration = timeline.duration();
 		const currentTime = progress * totalDuration;
 
 		let nearestIndex = 0;
 		let nearestDelta = Infinity;
 
-		for (let index = 0; index < CAMERA_SHOTS.length; index += 1) {
+		for (let index = 0; index < currentShots.length; index += 1) {
 			const labelTime = timeline.labels[`shot-${index}`] ?? 0;
 			const delta = Math.abs(labelTime - currentTime);
 			if (delta < nearestDelta) {
@@ -265,8 +307,11 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 	}
 
 	function goToShot(index) {
-		const clampedIndex = Math.max(0, Math.min(CAMERA_SHOTS.length - 1, index));
-		const st = timeline.scrollTrigger;
+		const isMobile = window.innerWidth <= 768;
+		const currentShots = isMobile ? MOBILE_CAMERA_SHOTS : DESKTOP_CAMERA_SHOTS;
+
+		const clampedIndex = Math.max(0, Math.min(currentShots.length - 1, index));
+		const st = timeline?.scrollTrigger;
 		if (!st) return;
 
 		const labelTime = timeline.labels[`shot-${clampedIndex}`] ?? 0;
@@ -276,6 +321,12 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 
 		isKeyboardJumping = true;
 		currentShotIndex = clampedIndex;
+
+		// Immediately update the indicator so it feels responsive before the animation finishes
+		const indicator = document.getElementById('mobile-nav-indicator');
+		if (indicator) {
+			indicator.textContent = `${currentShotIndex + 1} / ${currentShots.length}`;
+		}
 
 		gsap.to(window, {
 			scrollTo: { y: targetScroll },
@@ -321,6 +372,16 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 
 	window.addEventListener('keydown', handleKeydown);
 
+	// Mobile Navigation Binding
+	const mobilePrevBtn = document.getElementById('mobile-nav-prev');
+	const mobileNextBtn = document.getElementById('mobile-nav-next');
+
+	const handleMobilePrev = () => goToShot(currentShotIndex - 1);
+	const handleMobileNext = () => goToShot(currentShotIndex + 1);
+
+	if (mobilePrevBtn) mobilePrevBtn.addEventListener('click', handleMobilePrev);
+	if (mobileNextBtn) mobileNextBtn.addEventListener('click', handleMobileNext);
+
 	build();
 
 	return {
@@ -330,6 +391,8 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 		},
 		destroy() {
 			window.removeEventListener('keydown', handleKeydown);
+			if (mobilePrevBtn) mobilePrevBtn.removeEventListener('click', handleMobilePrev);
+			if (mobileNextBtn) mobileNextBtn.removeEventListener('click', handleMobileNext);
 			timeline?.scrollTrigger?.kill();
 			timeline?.kill();
 		},
