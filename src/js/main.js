@@ -296,7 +296,11 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 
 		for (let index = 0; index < currentShots.length; index += 1) {
 			const labelTime = timeline.labels[`shot-${index}`] ?? 0;
-			const delta = Math.abs(labelTime - currentTime);
+			// The label marks the START of the camera movement.
+			// The shot is actually "reached" after the movement duration.
+			const targetTime = index === 0 ? 0 : labelTime + heroSettings.shotDuration;
+			
+			const delta = Math.abs(targetTime - currentTime);
 			if (delta < nearestDelta) {
 				nearestDelta = delta;
 				nearestIndex = index;
@@ -315,8 +319,10 @@ function createHeroScrollScene(rootNode, cameraNode, trackNode) {
 		if (!st) return;
 
 		const labelTime = timeline.labels[`shot-${clampedIndex}`] ?? 0;
+		const targetTime = clampedIndex === 0 ? 0 : labelTime + heroSettings.shotDuration;
+		
 		const totalDuration = timeline.duration();
-		const targetProgress = totalDuration === 0 ? 0 : labelTime / totalDuration;
+		const targetProgress = totalDuration === 0 ? 0 : targetTime / totalDuration;
 		const targetScroll = st.start + targetProgress * (st.end - st.start);
 
 		isKeyboardJumping = true;

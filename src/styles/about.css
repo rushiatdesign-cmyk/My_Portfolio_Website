@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap');
 /* ======================================================
    ABOUT PAGE — Full CSS
    Design: Crimson background, Gold (#FFCA22) accents
@@ -30,26 +31,26 @@ body {
   pointer-events: none;
   border-style: solid;
   border-color: #A52C39;
-  border-top-width: calc(4dvh + 43px);
-  border-bottom-width: calc(4dvh + 36px);
-  border-left-width: calc(4dvw + 25px);
-  border-right-width: calc(4dvw + 25px);
+  border-top-width: calc(1.5dvh + 43px);
+  border-bottom-width: calc(1.5dvh + 36px);
+  border-left-width: calc(1.5dvw + 25px);
+  border-right-width: calc(1.5dvw + 25px);
 }
 
 .about-frame {
   position: fixed;
-  top: 4dvh;
-  bottom: 4dvh;
-  left: 4dvw;
-  right: 4dvw;
+  top: 1.5dvh;
+  bottom: 1.5dvh;
+  left: 1.5dvw;
+  right: 1.5dvw;
   pointer-events: none;
-  z-index: 202;
+  z-index: 222;
   user-select: none;
 
   border-style: solid;
   border-width: 43px 25px 36px 25px;
   border-color: #FFCA22;
-  
+
   -webkit-mask-box-image-source: url('/images/stuff/stuffframe.PNG');
   -webkit-mask-box-image-slice: 15% 6% 13% 6%;
   -webkit-mask-box-image-width: 43px 25px 36px 25px;
@@ -67,7 +68,8 @@ body {
   top: 0;
   left: 0;
   z-index: 210;
-  background-color: transparent;
+  background-color: #A52C39;
+  /* Solid background to prevent scrolling content overlap */
   padding: clamp(16px, 3vh, 40px) 0;
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
@@ -78,14 +80,15 @@ body {
 
 .about-logo {
   width: clamp(200px, 48vw, 540px);
-  aspect-ratio: 540 / 140; /* matches blog logo proportions */
+  aspect-ratio: 540 / 140;
+  /* matches blog logo proportions */
   height: auto;
   display: block;
   pointer-events: none;
   user-select: none;
   background-color: #FFCA22;
-  -webkit-mask: url('/images/frame/bloglogo.PNG') no-repeat center / contain;
-  mask: url('/images/frame/bloglogo.PNG') no-repeat center / contain;
+  -webkit-mask: url('/images/about/aboutlogo.PNG') no-repeat center / contain;
+  mask: url('/images/about/aboutlogo.PNG') no-repeat center / contain;
 }
 
 /* ======================================================
@@ -93,14 +96,21 @@ body {
 ====================================================== */
 .about-deco {
   position: fixed;
-  z-index: 20;
+  z-index: 220;
   pointer-events: none;
   user-select: none;
 }
 
 @keyframes tree-sway {
-  0%, 100% { transform: rotate(-2deg) scale(1.05); }
-  50% { transform: rotate(2deg) scale(1.06); }
+
+  0%,
+  100% {
+    transform: rotate(-2deg) scale(1.05);
+  }
+
+  50% {
+    transform: rotate(2deg) scale(1.06);
+  }
 }
 
 .about-deco--treeleft {
@@ -126,9 +136,10 @@ body {
 ====================================================== */
 .about-footer-zone {
   position: fixed;
-  bottom: calc(4dvh + 4px); /* Align perfectly on top of the thin border baseline */
-  left: 4dvw;
-  right: 4dvw;
+  bottom: calc(1.5dvh + 4px);
+  /* Align perfectly on top of the thin border baseline */
+  left: 1.5dvw;
+  right: 1.5dvw;
   z-index: 115;
   pointer-events: none;
   display: flex;
@@ -153,4 +164,111 @@ body {
   padding: clamp(100px, 18vh, 180px) clamp(24px, 6vw, 80px) clamp(160px, 24vh, 260px);
   max-width: 1400px;
   margin: 0 auto;
+}
+
+/* ======================================================
+   CUSTOM HERO LAYOUT (CHARACTER + BUBBLE)
+====================================================== */
+
+.about-hero-section {
+
+  position: relative;
+  z-index: 100;
+  padding: 0;
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+  font-family: 'Caveat', cursive;
+  color: #FFCA22;
+  margin-top: 8%;
+  margin-left: auto;
+  margin-right: auto;
+  /* Gold/yellow text from the sketch */
+}
+
+.about-hero-content {
+  display: block;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.about-character-img {
+  float: left;
+  width: clamp(120px, 20vw, 250px);
+  /* Reduced from 200px/35vw/400px */
+  height: auto;
+  shape-outside: url('/images/about/mycharacter.PNG');
+  shape-margin: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+
+.about-text-content {
+  font-size: clamp(18px, 2.5vw, 28px);
+  /* Smaller font size */
+  line-height: 1.3;
+  padding-top: 2rem;
+}
+
+.about-quote-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.about-quote-text {
+  font-size: clamp(32px, 4vw, 56px);
+  line-height: 1.1;
+  max-width: 600px;
+}
+
+.about-quote-arrow {
+  font-size: clamp(24px, 3vw, 36px);
+  margin-left: 100px;
+  transform: rotate(-5deg);
+}
+
+.about-contact-btn {
+  position: relative;
+  display: inline-block;
+  padding: 1rem 3rem;
+  font-size: clamp(28px, 3vw, 42px);
+  color: #FFCA22;
+  text-decoration: none;
+  margin-top: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.about-contact-btn:hover {
+  transform: scale(1.05) rotate(2deg);
+}
+
+.about-contact-btn .btn-text {
+  position: relative;
+  z-index: 2;
+}
+
+.about-contact-btn .btn-border {
+  position: absolute;
+  inset: 0;
+  border: 3px solid #FFCA22;
+  border-radius: 4px;
+  z-index: 1;
+  transform: rotate(-1deg);
+}
+
+.about-contact-btn .btn-border-inner {
+  position: absolute;
+  inset: 4px;
+  border: 2px solid #FFCA22;
+  border-radius: 2px;
+  z-index: 1;
+  transform: rotate(1deg);
 }
